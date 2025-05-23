@@ -13,6 +13,8 @@ book:
     - did.qmd
     - twfe.qmd
     - sunab.qmd
+    - csdid.qmd
+    - didmultiple.qmd
 
 
 format:

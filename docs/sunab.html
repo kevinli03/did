@@ -59,6 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
+<link href="./csdid.html" rel="next">
 <link href="./twfe.html" rel="prev">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
@@ -170,6 +171,18 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Interaction-Weighted</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./csdid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Doubly-Robust</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./didmultiple.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">DIDmultiple</span></span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -234,8 +247,8 @@ Y_{it} = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \underbrace{\su
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 23%">
-<col style="width: 76%">
+<col style="width: 25%">
+<col style="width: 75%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -500,11 +513,8 @@ Finding Exact Dynamic Coefficient Values
 </section>
 <section id="additional-resources" class="level3">
 <h3 class="anchored" data-anchor-id="additional-resources">Additional Resources</h3>
-<p>The main paper:</p>
-<ul>
-<li>Sun, L. and Abraham S. (2021) ‘Estimating Dynamic Treatment Effects in Event studies with Heterogenous Treatment Effects’, <em>Journal of Econometrics</em>, 225(2), pp.&nbsp;175-199. Available at: <a href="https://arxiv.org/abs/1804.05785" class="uri">https://arxiv.org/abs/1804.05785</a></li>
-</ul>
-<p>Additional Resources:</p>
+<p>Sun, L. and Abraham S. (2021) ‘Estimating Dynamic Treatment Effects in Event studies with Heterogenous Treatment Effects’, <em>Journal of Econometrics</em>, 225(2), pp.&nbsp;175-199. Available at: <a href="https://arxiv.org/abs/1804.05785" class="uri">https://arxiv.org/abs/1804.05785</a></p>
+<p>Additional Links:</p>
 <ul>
 <li>Fixest documentation for <a href="https://lrberge.github.io/fixest/reference/sunab.html">sunab() function</a>.</li>
 <li>Fixest documentation for <a href="https://lrberge.github.io/fixest/reference/aggregate.fixest.html">aggregate() function</a>.</li>
@@ -942,6 +952,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./csdid.html" class="pagination-link" aria-label="Doubly-Robust">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Doubly-Robust</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

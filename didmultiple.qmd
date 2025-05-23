@@ -1,0 +1,31 @@
+# DIDmultiple
+
+##### De Chaisemartin and D'Haultfœuille (2020, 2024)
+
+### What is DIDmultiple?
+
+The DIDMultiple estimator, also called **csdid**, is an estimator for DiD that solves the issues with TWFE in staggered settings. It also expands DiD to work with continuous treatments and non-absorbing treatments. The estimator was proposed by de Chaisemartin and D'Haultfœuille (2020, 2024).
+
+DIDmultiple is a **matching and reweighting estimator** for DiD, with the matching part solving the "forbidden comparisons" problem of TWFE, and the reweighting part solving the "negative weighting" problem of TWFE.
+
+The estimator focuses on **switchers** - those units in a certain period who change their treatment status. For example, a unit that goes from $D_{it} = 0$ to $D_{it} = 1$. DIDmultiple "matches" these switchers to the group that does not switch (so the group of units that stay $D_{it} = 0$), and estimates the difference in outcomes. In a binary treatment setting, the treatment effect at period $\tau_t$ can be described as:
+
+$$
+\tau_t = \frac{\mathbb E[\Delta Y |\text{switchers}] - \mathbb E[\Delta Y |\text{non-switchers}]}{\underbrace{\mathbb E[\Delta D |\text{switchers}]}_\text{=1 if absorbing treatment}}
+$$
+
+::: small
+This might seem similar to those familar with IV-wald estimator, and in fact, this is a Wald estimator, called Wald-TC.
+:::
+
+Then, DIDmultiple aggregates these effects of switchers by reweighting them properly. This can be used to estimate both a singular ATT and dynamic effects. The focus on switchers allows DIDmultiple to be applied onto non-binary treatments, including continuous treatments.
+
+<br />
+
+### R: Running the Model
+
+### R: Output the Effects
+
+### R: Plotting Dynamic Effects
+
+### Additional Resources
