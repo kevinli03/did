@@ -41,6 +41,7 @@ df.pot <- data.frame(
 #| echo: false
 #| warning: false
 #| message: false
+#| fig-align: center
 
 ggplot() +
   geom_point(aes(x = time, y = nj, color = "col2"), data = df.nj) +
@@ -70,6 +71,7 @@ Difference-in-differences is a solution to this problem. DiD tells us too look a
 #| echo: false
 #| warning: false
 #| message: false
+#| fig-align: center
 
 ggplot() +
   geom_point(aes(x = time, y = nj, color = "col2"), data = df.nj) +
@@ -95,6 +97,7 @@ Pennsylvania gives us the **trend** in employment rate if **no minimum wage incr
 #| echo: false
 #| warning: false
 #| message: false
+#| fig-align: center
 
 df.att <- data.frame(
   time = c(1, 1),
@@ -139,6 +142,7 @@ What can go wrong when parallel trends is violated? Consider the same example ab
 #| echo: false
 #| warning: false
 #| message: false
+#| fig-align: center
 
 df.pt1 <- data.frame(
   time = c(0, 1),

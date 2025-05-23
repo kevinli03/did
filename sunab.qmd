@@ -41,7 +41,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable      | Description                                                                                                                                                                                                                |
-|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|------------|------------------------------------------------------------|
 | `unit`        | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                        |
 | `time`        | A variable indicating time-periods in our study for each observation.                                                                                                                                                      |
 | `outcome`     | Outcome variable for each observation.                                                                                                                                                                                     |
@@ -184,6 +184,7 @@ plot +
 #| warning: false
 #| fig-height: 3
 #| echo: false
+#| fig-align: center
 
 library(ggdark)
 library(ggfixest)
@@ -285,6 +286,7 @@ ggplot(data = group, aes(x = Estimate, y = period)) +
 #| echo: false
 #| fig-height: 3.5
 #| warning: false
+#| fig-align: center
 
 library(tidyverse)
 

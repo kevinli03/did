@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Basics of DiD – Difference-in-Differences (DiD) Resources</title>
+<title>6&nbsp; DIDimputation – Difference-in-Differences (DiD) Resources</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -25,8 +25,8 @@ ul.task-list li input[type="checkbox"] {
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./twfe.html" rel="next">
-<link href="./index.html" rel="prev">
+<link href="./did2s.html" rel="next">
+<link href="./fect.html" rel="prev">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -67,7 +67,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./did.html">Basics of DiD</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./didimputation.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">DIDimputation</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -92,7 +92,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./did.html" class="sidebar-item-text sidebar-link active">
+  <a href="./did.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Basics of DiD</span></a>
   </div>
 </li>
@@ -135,7 +135,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./didimputation.html" class="sidebar-item-text sidebar-link">
+  <a href="./didimputation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">DIDimputation</span></span></a>
   </div>
 </li>
@@ -194,24 +194,15 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#what-is-did" id="toc-what-is-did" class="nav-link active" data-scroll-target="#what-is-did">What is DiD?</a></li>
-  <li><a href="#parallel-trends-assumption" id="toc-parallel-trends-assumption" class="nav-link" data-scroll-target="#parallel-trends-assumption">Parallel Trends Assumption</a></li>
-  <li><a href="#att-and-dynamic-effects" id="toc-att-and-dynamic-effects" class="nav-link" data-scroll-target="#att-and-dynamic-effects">ATT and Dynamic Effects</a></li>
-  <li><a href="#staggered-and-absorbing" id="toc-staggered-and-absorbing" class="nav-link" data-scroll-target="#staggered-and-absorbing">Staggered and Absorbing</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Basics of DiD</h1>
+<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">DIDimputation</span></h1>
 </div>
 
 
@@ -228,99 +219,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="what-is-did" class="level3">
-<h3 class="anchored" data-anchor-id="what-is-did">What is DiD?</h3>
-<p>Difference-in-differences (DiD) is a causal identification strategy that can help us estimate <strong>causal effects</strong>, and go from correlation to causation.</p>
-<p>For an example, let us consider the famous paper by Card and Kreuger (1993).</p>
-<ul>
-<li>Context: New Jersey increased its minimum wage in April of 1992.</li>
-<li>Question: How did raising the minimum wage affect the employment rates at fast-food restaurants?</li>
-</ul>
-<p>We have data on employment rates in New Jersey in March 1992, before the minimum wage increase, and data from December 1992, after the minimum wage increase. The data looks like this:</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="did_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Based on this data, it might be tempting to say something like this:</p>
-<blockquote class="blockquote">
-<p>The employment rate in December 1992 is 4 units higher than than the employment rate in March. Thus, the causal effect of the minimum wage increase is 4 units.</p>
-</blockquote>
-<p>However, <u><strong>this would be the wrong conclusion</strong></u>. Why? Well something could have happened between March and December. Perhaps there was a giant country-wide economic boom which caused the increase in employment, which had nothing to do with minimum wage in New Jersey.</p>
-<p>Difference-in-differences is a solution to this problem. DiD tells us too look at another state - a state that did not receive the treatment. Nearby Pennsylvania did not increase its minimum wage during this time period. Let us see how their employment rate is doing:</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="did_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Pennsylvania gives us the <strong>trend</strong> in employment rate if <strong>no minimum wage increase occurred</strong>. We then make an assumption - had New Jersey not undergone a minimum wage increase, it would have followed the same trend in employment rates.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="did_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Thus, difference-in-differences allows us to estimate the causal effect of a treatment by looking at the trend of an untreated unit, and using that trend to approximate what would have happened if the treatment never occurred.</p>
-<p><br></p>
-</section>
-<section id="parallel-trends-assumption" class="level3">
-<h3 class="anchored" data-anchor-id="parallel-trends-assumption">Parallel Trends Assumption</h3>
-<p>The key assumption behind DiD is the parallel trends assumption - that indeed, New Jersey would have followed the same trend as Pennsylvania, had New Jersey not had the minimum wage increase. Or in the figures above, that New Jersey would have indeed followed the dotted purple line trend if it had not had a minimum wage increase.</p>
-<p>More generally, the parallel trends assumption says that if the treated units had been hypothetically untreated, they would have followed the same trend in the outcome variable as the untreated units.</p>
-<p>What can go wrong when parallel trends is violated? Consider the same example above, but somehow, we were able to magically see what really happened to New Jersey without a minimum wage increase. Let us pretend that New Jersey alone (and not Pennsylvania) suffered from some mighty economic crash.</p>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="did_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>We can see that in this scenario, the true New Jersey trend (solid purple) is not parallel to the Pennsylvania trend. Thus, if we were to assume the Pennsylvania trend on the New Jersey trend (dotted purple), our estimate of the causal effect would be wrong.</p>
-<p>How do we check the parallel trends assumption? Unfortunately, it is impossible to actually check it, since it involves a hypothetical outcome (New Jersey not getting the minimum wage increase).</p>
-<p>However, we often test for parallel trends in the years <strong>before</strong> the treatment starts (pre-treatment periods). The idea is that if there are parallel trends for several years before the start of treatment, then it is likely to continue into the treatment period.</p>
-<p>We can also control for covariates (other variables) that we believe might cause violations in parallel trends. Typically covariates that cause violations of parallel trends are:</p>
-<ol type="1">
-<li>Correlated with the outcome variable.</li>
-<li>Have different trends in the untreated and treated groups.</li>
-</ol>
-<p><br></p>
-</section>
-<section id="att-and-dynamic-effects" class="level3">
-<h3 class="anchored" data-anchor-id="att-and-dynamic-effects">ATT and Dynamic Effects</h3>
-<p>The main causal effect of interest in DiD is the average treatment effect on the treated (ATT). This is the causal effect of treatment on units that receive the treatment.</p>
-<ul>
-<li>Important! This is not the same as the average treatment effect (ATE). That applies to all units, including untreated units. The ATT only applies to treated units, and cannot easily be generalised to untreated units.</li>
-</ul>
-<p>We are often also interested in what is called <strong>dynamic treatment effects</strong>. These are essentially ATT estimates for every year in our data.</p>
-<p>For example, let us say that after New Jersey legalised minimum wage, we continued to observe the employment rates for the next 5 years (as well as those in Pennsylvania). We can then create dynamic treatment effects for each of the next 5 years - which will help us visualise how the treatment effects change over time.</p>
-<p>Dynamic treatment effects are also not only limited to the post-treatment period. If we had data before the treatment took place, we could also calculate dynamic treatment effects for each period. This is useful because we can use this to <strong>test for parallel trends</strong>.</p>
-<p>This is because we shouldn’t expect the treatment and control groups to differ in their pre-treatment trends if parallel trends is met, and thus, the treatment effect should be 0 or close to 0 in the pre-treatment period. if this is not the case, then we have evidence that parallel trends is violated.</p>
-<p><br></p>
-</section>
-<section id="staggered-and-absorbing" class="level3">
-<h3 class="anchored" data-anchor-id="staggered-and-absorbing">Staggered and Absorbing</h3>
-<p>DiD designs can be categorised by two factors: if treatment is staggered and if treatment is absorbing.</p>
-<p>Non-staggered treatment means all units that receive the treatment in our study receive it at the same time. For example, in our New Jersey example, all fast food restaurants in New Jersey experienced the minimum wage rise at the same time.</p>
-<p>Staggered treatment means units start treatment at different times in our study. This is often the case when we are studying multiple states - where some states begin some treatment earlier than others.</p>
-<p>Absorbing treatment means units who get treated, always remain treated for the rest of our study. For example, in our New Jersey example, all fast food restaurants in New Jersey who got the minimum wage rise, remained with the higher minimum wage.</p>
-<p>Non-Absorbing treatment means units who get treated might return to being untreated. For example, this could happen if New Jersey decides a few years later to lower the minimum wage back to its original level.</p>
-<p>These terms will become important when we explore the issues with two-way fixed effects, and why econometricians have spent 2021-onwards trying to solve those issues.</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -745,13 +645,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link" aria-label="Welcome!">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Welcome!</span>
+      <a href="./fect.html" class="pagination-link" aria-label="Imputation FEct">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Imputation FEct</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./twfe.html" class="pagination-link" aria-label="Two-Way Fixed Effects">
-        <span class="nav-page-text">Two-Way Fixed Effects</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./did2s.html" class="pagination-link" aria-label="2-Stage DiD">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">2-Stage DiD</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

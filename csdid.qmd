@@ -181,6 +181,7 @@ graph + geom_vline(xintercept = -0.5, linetype = 3) # line at treat time
 #| fig-height: 3
 #| echo: false
 #| message: false
+#| fig-align: center
 
 library(ggdark)
 m <- ggdid(
@@ -228,6 +229,7 @@ ggdid(
 ```{r}
 #| echo: false
 #| fig-height: 3
+#| fig-align: center
 
 graph <- ggdid(
   object = group,           # input your object from aggte
