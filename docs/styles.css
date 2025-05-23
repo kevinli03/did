@@ -7,7 +7,6 @@ pre, code, .sourceCode {
 }
 .small {
   font-size: 0.8em;
-  font-style: italic;
   color: #666;
 }
 .append {
@@ -20,14 +19,16 @@ table {
   font-weight: 900;
   color: #999;
 }
-pre.sourceCode {
-    background-color: #000000 !important;
-    color: #ffffff; /* Optional: Set text color to white for better contrast */
-}
 
 code {
     background-color: #000000 !important;
-    color: #999999; /* Optional: White text for contrast */
+    color: #ffffff; /* Optional: White text for contrast */
     padding: 1px 4px; /* Optional: Add padding for better appearance */
     border-radius: 3px; /* Optional: Rounded corners */
+}
+
+pre.sourceCode {
+  border: 1px solid #444; /* Light gray border */
+  border-radius: 4px; /* Optional: rounded corners */
+  padding: 10px; /* Optional: padding for better appearance */
 }

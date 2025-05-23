@@ -93,13 +93,19 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./did.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basics of DiD</span></span></a>
+ <span class="menu-text">Basics of DiD</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Two-Way Fixed Effects</span></span></a>
+ <span class="menu-text">Two-Way Fixed Effects</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sunab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Interaction-Weighted</span></span></a>
   </div>
 </li>
     </ul>
@@ -112,11 +118,9 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#welcome" id="toc-welcome" class="nav-link active" data-scroll-target="#welcome">Welcome!</a>
-  <ul class="collapse">
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#welcome" id="toc-welcome" class="nav-link active" data-scroll-target="#welcome">Welcome!</a></li>
   <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional Resources</a></li>
-  </ul></li>
+  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements">Acknowledgements</a></li>
   </ul>
 </nav>
     </div>
@@ -149,44 +153,85 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="welcome" class="level1 unnumbered">
-<h1 class="unnumbered">Welcome!</h1>
-<section id="introduction" class="level3">
-<h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+<section id="welcome" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="welcome">Welcome!</h3>
 <p>Difference-in-differences (DiD) is one of the most widely used methods for estimating causal effects. It is often the go-to design for Policy analysts, Economists, and Epidemiologists.</p>
 <p>This repository is a collection of resources on the causal identification strategy of Difference-in-Differences (DiD). This repository includes:</p>
 <ol type="1">
-<li>A basic overview of DiD, including how it works, and the assumptions.</li>
-<li>Overview of the two-way fixed effects (TWFE) estimator.</li>
-<li>Exploration of the issues with TWFE in staggered and non-absorbing settings.</li>
-<li>Modern DiD estimators to deal with issues with TWFE.</li>
-<li>Other additional useful resources.</li>
+<li>A basic overview of DiD, including how it works, and the assumptions. A look at the TWFE estimator in classic DiD.</li>
+<li>A series of modern estimators that address issues with TWFE, including a brief description/vignette and R-code.</li>
+<li>A series of additional tests/visualisations useful for DiD.</li>
 </ol>
-<p>This repository was created to help me collect all that I had learned about DiD together into one place. I hope this can be helpful for others.</p>
-<p>I would like to thank the following individuals for teaching me so much about DiD and causal inference:</p>
-<ul>
-<li>Dr.&nbsp;Aliz Toth</li>
-<li>Dr.&nbsp;Daniel de Kadt</li>
-</ul>
+<div class="small">
+<p>In the appendix, I also include some methods that are not DiD but can be used for causal panel analysis.</p>
+</div>
 <p><br></p>
 </section>
 <section id="additional-resources" class="level3">
 <h3 class="anchored" data-anchor-id="additional-resources">Additional Resources</h3>
-<p>Some github pages:</p>
-<ul>
-<li>Professor Yiqing Xu’s <a href="https://yiqingxu.org/packages/fect/05-panel.html#csdid">page on modern advancements in DiD</a>.</li>
-<li>Dr.&nbsp;Asjad Naqvi’s <a href="https://asjadnaqvi.github.io/DiD/">repository on DiD</a>.</li>
-<li>Causal Inference: The Mixtape (textbook) <a href="https://mixtape.scunning.com/">chapter on DiD</a>.</li>
-</ul>
-<p>Some influential papers:</p>
-<ul>
-<li><p><a href="https://yiqingxu.org/papers/english/2023_panel/CLLX.pdf">Chiu et al (2025)</a> ‘Causal Panel Analysis under Parallel Trends: Lessons from a Large Reanalysis Study’.</p></li>
-<li><p><a href="https://www.jonathandroth.com/assets/files/DiD_Review_Paper.pdf">Roth et al (2025)</a> ‘What’s trending in difference-in-differences? A synthesis of the econometrics literature’.</p></li>
-<li><p><a href="https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf">Liu et al (2025</a>) ‘A Practical Guide to Counterfactual Estimators for Causal Inference with Time-Series Cross-Sectional Data’.</p></li>
-</ul>
-
-
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Resource</th>
+<th>Author</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://yiqingxu.org/packages/fect/05-panel.html#csdid">Yiqing Xu: modern advancements in DiD</a></td>
+<td>Yiqing Xu</td>
+<td>Useful overview of all modern DiD methods and R code.</td>
+</tr>
+<tr class="even">
+<td><a href="https://asjadnaqvi.github.io/DiD/">Asjad Naqvi: repository on DiD</a></td>
+<td>Asjad Naqvi</td>
+<td>Useful R and state code for DiD.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://bcallaway11.github.io/did/articles/index.html">User Guides for DiD</a></td>
+<td>Brantly Callaway</td>
+<td>Useful guides and explanations of DiD with R.</td>
+</tr>
+<tr class="even">
+<td><a href="https://psantanna.com/DiD/11_Staggered_problems.pdf">Lecture: Problems with TWFE</a></td>
+<td>Pedro Sant’Anna</td>
+<td>Bacon decomposition and introduction to csdid.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://mixtape.scunning.com/">Causal Inference: The Mixtape</a></td>
+<td>Scott Cunningham</td>
+<td>Textbook chapter introducing DiD.</td>
+</tr>
+<tr class="even">
+<td><a href="https://yiqingxu.org/papers/english/2023_panel/CLLX.pdf">Chiu et al (2025)</a></td>
+<td>Chiu et al</td>
+<td>Paper exploring new DiD methods and reanalysing old polisci papers.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.jonathandroth.com/assets/files/DiD_Review_Paper.pdf">Roth et al (2025)</a></td>
+<td>Roth et al</td>
+<td>An overview of new DiD methods.</td>
+</tr>
+<tr class="even">
+<td><a href="https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf">Liu et al (2025)</a></td>
+<td>Liu et al</td>
+<td>An overview of imputation DiD methods.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
 </section>
+<section id="acknowledgements" class="level3">
+<h3 class="anchored" data-anchor-id="acknowledgements">Acknowledgements</h3>
+<p>This repository was created to help me collect all that I had learned about DiD together into one place. I hope this can be helpful for others.</p>
+<p>I would like to thank the following individuals for teaching me so much about DiD and causal inference during my Master’s degree at LSE:</p>
+<ul>
+<li>Dr.&nbsp;Daniel de Kadt</li>
+<li>Dr.&nbsp;Aliz Toth</li>
+</ul>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -615,7 +660,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   </div>
   <div class="nav-page nav-page-next">
       <a href="./did.html" class="pagination-link" aria-label="Basics of DiD">
-        <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basics of DiD</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text">Basics of DiD</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

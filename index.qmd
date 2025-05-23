@@ -1,38 +1,39 @@
-# Welcome! {.unnumbered}
-
-### Introduction
+### Welcome! {.unnumbered}
 
 Difference-in-differences (DiD) is one of the most widely used methods for estimating causal effects. It is often the go-to design for Policy analysts, Economists, and Epidemiologists.
 
 This repository is a collection of resources on the causal identification strategy of Difference-in-Differences (DiD). This repository includes:
 
-1.  A basic overview of DiD, including how it works, and the assumptions.
-2.  Overview of the two-way fixed effects (TWFE) estimator.
-3.  Exploration of the issues with TWFE in staggered and non-absorbing settings.
-4.  Modern DiD estimators to deal with issues with TWFE.
-5.  Other additional useful resources.
+1.  A basic overview of DiD, including how it works, and the assumptions. A look at the TWFE estimator in classic DiD.
+2.  A series of modern estimators that address issues with TWFE, including a brief description/vignette and R-code.
+3.  A series of additional tests/visualisations useful for DiD.
 
-This repository was created to help me collect all that I had learned about DiD together into one place. I hope this can be helpful for others.
-
-I would like to thank the following individuals for teaching me so much about DiD and causal inference:
-
--   Dr. Aliz Toth
--   Dr. Daniel de Kadt
+::: small
+In the appendix, I also include some methods that are not DiD but can be used for causal panel analysis.
+:::
 
 <br />
 
 ### Additional Resources
 
-Some github pages:
+| Resource                                                                                        | Author           | Notes                                                               |
+|-------------------------------------------------------------------------------------------------|------------------|---------------------------------------------------------------------|
+| [Yiqing Xu: modern advancements in DiD](https://yiqingxu.org/packages/fect/05-panel.html#csdid) | Yiqing Xu        | Useful overview of all modern DiD methods and R code.               |
+| [Asjad Naqvi: repository on DiD](https://asjadnaqvi.github.io/DiD/)                             | Asjad Naqvi      | Useful R and state code for DiD.                                    |
+| [User Guides for DiD](https://bcallaway11.github.io/did/articles/index.html)                    | Brantly Callaway | Useful guides and explanations of DiD with R.                       |
+| [Lecture: Problems with TWFE](https://psantanna.com/DiD/11_Staggered_problems.pdf)              | Pedro Sant'Anna  | Bacon decomposition and introduction to csdid.                      |
+| [Causal Inference: The Mixtape](https://mixtape.scunning.com/)                                  | Scott Cunningham | Textbook chapter introducing DiD.                                   |
+| [Chiu et al (2025)](https://yiqingxu.org/papers/english/2023_panel/CLLX.pdf)                    | Chiu et al       | Paper exploring new DiD methods and reanalysing old polisci papers. |
+| [Roth et al (2025)](https://www.jonathandroth.com/assets/files/DiD_Review_Paper.pdf)            | Roth et al       | An overview of new DiD methods.                                     |
+| [Liu et al (2025)](https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf)                   | Liu et al        | An overview of imputation DiD methods.                              |
 
--   Professor Yiqing Xu's [page on modern advancements in DiD](https://yiqingxu.org/packages/fect/05-panel.html#csdid).
--   Dr. Asjad Naqvi's [repository on DiD](https://asjadnaqvi.github.io/DiD/).
--   Causal Inference: The Mixtape (textbook) [chapter on DiD](https://mixtape.scunning.com/).
+<br />
 
-Some influential papers:
+### Acknowledgements
 
--   [Chiu et al (2025)](https://yiqingxu.org/papers/english/2023_panel/CLLX.pdf) 'Causal Panel Analysis under Parallel Trends: Lessons from a Large Reanalysis Study'.
+This repository was created to help me collect all that I had learned about DiD together into one place. I hope this can be helpful for others.
 
--   [Roth et al (2025)](https://www.jonathandroth.com/assets/files/DiD_Review_Paper.pdf) 'What's trending in difference-in-differences? A synthesis of the econometrics literature'.
+I would like to thank the following individuals for teaching me so much about DiD and causal inference during my Master's degree at LSE:
 
--   [Liu et al (2025](https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf)) 'A Practical Guide to Counterfactual Estimators for Causal Inference with Time-Series Cross-Sectional Data'.
+-   Dr. Daniel de Kadt
+-   Dr. Aliz Toth

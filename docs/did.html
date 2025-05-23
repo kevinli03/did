@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>1&nbsp; Basics of DiD – Difference-in-Differences (DiD) Resources</title>
+<title>Basics of DiD – Difference-in-Differences (DiD) Resources</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -67,7 +67,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./did.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basics of DiD</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./did.html">Basics of DiD</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -93,13 +93,19 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./did.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basics of DiD</span></span></a>
+ <span class="menu-text">Basics of DiD</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Two-Way Fixed Effects</span></span></a>
+ <span class="menu-text">Two-Way Fixed Effects</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./sunab.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Interaction-Weighted</span></span></a>
   </div>
 </li>
     </ul>
@@ -116,7 +122,6 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#parallel-trends-assumption" id="toc-parallel-trends-assumption" class="nav-link" data-scroll-target="#parallel-trends-assumption">Parallel Trends Assumption</a></li>
   <li><a href="#att-and-dynamic-effects" id="toc-att-and-dynamic-effects" class="nav-link" data-scroll-target="#att-and-dynamic-effects">ATT and Dynamic Effects</a></li>
   <li><a href="#staggered-and-absorbing" id="toc-staggered-and-absorbing" class="nav-link" data-scroll-target="#staggered-and-absorbing">Staggered and Absorbing</a></li>
-  <li><a href="#when-can-i-use-did" id="toc-when-can-i-use-did" class="nav-link" data-scroll-target="#when-can-i-use-did">When Can I Use DiD?</a></li>
   </ul>
 </nav>
     </div>
@@ -125,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basics of DiD</span></h1>
+<h1 class="title">Basics of DiD</h1>
 </div>
 
 
@@ -205,6 +210,11 @@ ul.task-list li input[type="checkbox"] {
 <p>We can see that in this scenario, the true New Jersey trend (solid purple) is not parallel to the Pennsylvania trend. Thus, if we were to assume the Pennsylvania trend on the New Jersey trend (dotted purple), our estimate of the causal effect would be wrong.</p>
 <p>How do we check the parallel trends assumption? Unfortunately, it is impossible to actually check it, since it involves a hypothetical outcome (New Jersey not getting the minimum wage increase).</p>
 <p>However, we often test for parallel trends in the years <strong>before</strong> the treatment starts (pre-treatment periods). The idea is that if there are parallel trends for several years before the start of treatment, then it is likely to continue into the treatment period.</p>
+<p>We can also control for covariates (other variables) that we believe might cause violations in parallel trends. Typically covariates that cause violations of parallel trends are:</p>
+<ol type="1">
+<li>Correlated with the outcome variable.</li>
+<li>Have different trends in the untreated and treated groups.</li>
+</ol>
 <p><br></p>
 </section>
 <section id="att-and-dynamic-effects" class="level3">
@@ -227,19 +237,6 @@ ul.task-list li input[type="checkbox"] {
 <p>Absorbing treatment means units who get treated, always remain treated for the rest of our study. For example, in our New Jersey example, all fast food restaurants in New Jersey who got the minimum wage rise, remained with the higher minimum wage.</p>
 <p>Non-Absorbing treatment means units who get treated might return to being untreated. For example, this could happen if New Jersey decides a few years later to lower the minimum wage back to its original level.</p>
 <p>These terms will become important when we explore the issues with two-way fixed effects, and why econometricians have spent 2021-onwards trying to solve those issues.</p>
-<p><br></p>
-</section>
-<section id="when-can-i-use-did" class="level3">
-<h3 class="anchored" data-anchor-id="when-can-i-use-did">When Can I Use DiD?</h3>
-<p>Difference-in-differences can be used if the following characteristics are met:</p>
-<p>First, we must have either a panel dataset or repeated cross-section dataset over at least 2 years.</p>
-<ul>
-<li>A panel dataset is when we observe the same units/individuals over multiple time periods. For example, we observe Bob, Anna, and James in year 1 and year 2.</li>
-<li>A repeated cross-section dataset is when we observe different units from the same groups over multiple periods. For example, we have a sample of individuals from California in year 1, and another sample of individuals from California in year 2.</li>
-</ul>
-<p>Second, we must have a never-treated group and a treated group. The never-treated group never receives the treatment, no matter what year we are in. The treated group receives the treatment sometime during the time period of our dataset.</p>
-<p>Third, we must have variation in time of adopting the treatment for the treated group. This means we cannot have the treated group start out treated and remain treated for the entirety of our data/study. We need the treated group to start out untreated, then during the course of the study, receive treatment.</p>
-<p><br></p>
 
 
 </section>
@@ -673,7 +670,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   </div>
   <div class="nav-page nav-page-next">
       <a href="./twfe.html" class="pagination-link" aria-label="Two-Way Fixed Effects">
-        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Two-Way Fixed Effects</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text">Two-Way Fixed Effects</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

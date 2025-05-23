@@ -8,9 +8,11 @@ book:
   author: "Kevin Li (London School of Economics)"
   search: false
   chapters:
-    - index.qmd
+    - text: "Welcome!"
+      href: index.qmd
     - did.qmd
     - twfe.qmd
+    - sunab.qmd
 
 
 format:
@@ -18,7 +20,8 @@ format:
     theme: cyborg
     fontsize: 11.5pt
     css: styles.css
-    highlight-style: dracula
+    highlight-style: github
+    code-block-bg: false
     number-depth: 1
     html-math-method: mathjax
     crossref:

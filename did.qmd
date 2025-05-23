@@ -1,6 +1,4 @@
----
-title: "Basics of DiD"
----
+# Basics of DiD {.unnumbered}
 
 ### What is DiD?
 
@@ -183,6 +181,11 @@ How do we check the parallel trends assumption? Unfortunately, it is impossible 
 
 However, we often test for parallel trends in the years **before** the treatment starts (pre-treatment periods). The idea is that if there are parallel trends for several years before the start of treatment, then it is likely to continue into the treatment period.
 
+We can also control for covariates (other variables) that we believe might cause violations in parallel trends. Typically covariates that cause violations of parallel trends are:
+
+1.  Correlated with the outcome variable.
+2.  Have different trends in the untreated and treated groups.
+
 <br />
 
 ### ATT and Dynamic Effects
@@ -214,20 +217,3 @@ Absorbing treatment means units who get treated, always remain treated for the r
 Non-Absorbing treatment means units who get treated might return to being untreated. For example, this could happen if New Jersey decides a few years later to lower the minimum wage back to its original level.
 
 These terms will become important when we explore the issues with two-way fixed effects, and why econometricians have spent 2021-onwards trying to solve those issues.
-
-<br />
-
-### When Can I Use DiD?
-
-Difference-in-differences can be used if the following characteristics are met:
-
-First, we must have either a panel dataset or repeated cross-section dataset over at least 2 years.
-
--   A panel dataset is when we observe the same units/individuals over multiple time periods. For example, we observe Bob, Anna, and James in year 1 and year 2.
--   A repeated cross-section dataset is when we observe different units from the same groups over multiple periods. For example, we have a sample of individuals from California in year 1, and another sample of individuals from California in year 2.
-
-Second, we must have a never-treated group and a treated group. The never-treated group never receives the treatment, no matter what year we are in. The treated group receives the treatment sometime during the time period of our dataset.
-
-Third, we must have variation in time of adopting the treatment for the treated group. This means we cannot have the treated group start out treated and remain treated for the entirety of our data/study. We need the treated group to start out untreated, then during the course of the study, receive treatment.
-
-<br />
