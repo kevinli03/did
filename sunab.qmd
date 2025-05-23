@@ -41,7 +41,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable      | Description                                                                                                                                                                                                                |
-|------------------|------------------------------------------------------|
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `unit`        | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                        |
 | `time`        | A variable indicating time-periods in our study for each observation.                                                                                                                                                      |
 | `outcome`     | Outcome variable for each observation.                                                                                                                                                                                     |
