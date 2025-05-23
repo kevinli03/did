@@ -1,0 +1,37 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "Difference-in-Differences (DiD) Resources"
+  subtitle: "Resources for Causal Panel Analysis"
+  author: "Kevin Li (London School of Economics)"
+  search: false
+  chapters:
+    - index.qmd
+    - did.qmd
+    - twfe.qmd
+
+
+format:
+  html:
+    theme: cyborg
+    fontsize: 11.5pt
+    css: styles.css
+    highlight-style: dracula
+    number-depth: 1
+    html-math-method: mathjax
+    crossref:
+      eq-prefix: eq.
+      def-prefix: definition
+      thm-prefix: theorem
+    include-in-header:
+      text: |
+        <script src="mathjax-config.js"></script>
+    include-after-body:
+      text: |
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+editor: visual
+

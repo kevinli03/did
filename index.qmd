@@ -1,0 +1,38 @@
+# Welcome! {.unnumbered}
+
+### Introduction
+
+Difference-in-differences (DiD) is one of the most widely used methods for estimating causal effects. It is often the go-to design for Policy analysts, Economists, and Epidemiologists.
+
+This repository is a collection of resources on the causal identification strategy of Difference-in-Differences (DiD). This repository includes:
+
+1.  A basic overview of DiD, including how it works, and the assumptions.
+2.  Overview of the two-way fixed effects (TWFE) estimator.
+3.  Exploration of the issues with TWFE in staggered and non-absorbing settings.
+4.  Modern DiD estimators to deal with issues with TWFE.
+5.  Other additional useful resources.
+
+This repository was created to help me collect all that I had learned about DiD together into one place. I hope this can be helpful for others.
+
+I would like to thank the following individuals for teaching me so much about DiD and causal inference:
+
+-   Dr. Aliz Toth
+-   Dr. Daniel de Kadt
+
+<br />
+
+### Additional Resources
+
+Some github pages:
+
+-   Professor Yiqing Xu's [page on modern advancements in DiD](https://yiqingxu.org/packages/fect/05-panel.html#csdid).
+-   Dr. Asjad Naqvi's [repository on DiD](https://asjadnaqvi.github.io/DiD/).
+-   Causal Inference: The Mixtape (textbook) [chapter on DiD](https://mixtape.scunning.com/).
+
+Some influential papers:
+
+-   [Chiu et al (2025)](https://yiqingxu.org/papers/english/2023_panel/CLLX.pdf) 'Causal Panel Analysis under Parallel Trends: Lessons from a Large Reanalysis Study'.
+
+-   [Roth et al (2025)](https://www.jonathandroth.com/assets/files/DiD_Review_Paper.pdf) 'What's trending in difference-in-differences? A synthesis of the econometrics literature'.
+
+-   [Liu et al (2025](https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf)) 'A Practical Guide to Counterfactual Estimators for Causal Inference with Time-Series Cross-Sectional Data'.

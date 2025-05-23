@@ -1,0 +1,212 @@
+---
+title: "Two-Way Fixed Effects"
+---
+
+### What is TWFE?
+
+Two-way fixed effects (TWFE) is the primary estimator used to estimate causal effects in difference-in-differences. The TWFE estimator is a regression model specified as follows:
+
+$$
+Y_{it} = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + D_{it}\tau + \cov + \eps_{it}
+$$
+
+The variables in this regression model are:
+
+-   $Y_{it}$ is our outcome variable value for unit $i$ at time $t$.
+-   $D_{it}$ is our treatment variable value (treated = 1, not treated = 0) for unit $i$ at time $t$.
+-   $\mathbf X_{it}$ is a vector of covariate variable values for unit $i$ at time $t$. These covariates are optional, and are used if we believe they are needed to meet the parallel trends assumption.
+
+Fixed effect $\alpha_i$ accounts/controls for differences between units, and $\gamma_t$ accounts/controls for differences between time periods.
+
+If we account for differences between units and differences between time periods, the only possible confounders remaining are unit-specific trends over time. But with the parallel trends assumption, we rule out this type of confounder.
+
+Thus, under the parallel trends assumption, there are no omitted confounders/variables, and our regression is exogenous. Since OLS is unbiased under exogeneity, our TWFE estimator for $\tau$ is unbiased.
+
+There are [issues with TWFE] that you should understand before relying on TWFE.
+
+<br />
+
+### R: Estimating the ATT
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+library(fixest)
+data(base_stagg, package = "fixest")
+df <- base_stagg
+colnames(df) <- c("unit", "time", "cohort", "rel.time", "treat", "te", "covariate", "outcome")
+```
+
+Our dataset `df` should have the following variables:
+
+-   `unit`: variable indicating units $i$ in our dataset.
+-   `time`: variable indicating the time-periods $t$ in our dataset.
+-   `treat`: variable indicating the treatment status of unit $i$ at time-period $t$. Should equal 1 if treated, and 0 if not treated.
+-   `outcome`: variable indicating the outcome value of unit $i$ at time-period $t$.
+
+We can also have these optional variables:
+
+-   `covariate`: a control variable (if needed) to meet parallel trends. We can have multiple.
+
+We then use the **feols()** command to run a TWFE model:
+
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+
+library(fixest)
+
+att <- feols(
+  fml   = outcome ~ treat + covariate | unit + time,  # covariate is optional
+  data  = df,                                         # your data
+  vcov  = ~unit                                       # cluster SE by unit
+)
+
+summary(att)
+```
+
+The coefficient of `treat` is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by `Pr(>|t|)` (the p-value) and the stars `***` .
+
+<br />
+
+### R: Estimating Dynamic Effects
+
+We can also estimate dynamic treatment effects with the TWFE estimator. Our dataset `df` should have the following variables:
+
+-   `unit`: variable indicating units $i$ in our dataset.
+-   `time`: variable indicating the time-periods $t$ in our dataset.
+-   `outcome`: variable indicating the outcome value of unit $i$ at time-period $t$.
+-   `rel.time`: a relative time variable that indicates for period $t$, how many periods away unit $i$ first received treatment (0 is the year they received treatment, negatives are before treatment, positives after treatment). For info on how to create this variable, see the appendix.
+
+We can also have these optional variables:
+
+-   `covariate`: a control variable (if needed) to meet parallel trends. We can have multiple.
+
+We then use the **feols()** command to run a TWFE model for dynamic effects:
+
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+
+library(fixest)
+
+dynamic <- feols(
+  # Formula
+  fml   = outcome ~ i(rel.time, ref = c(-1, Inf)) + covariate | unit + time,
+  # Do not change -1 in c(). You change Inf to the value of never-treated for rel.time
+  
+  data  = df,     # your data
+  vcov  = ~unit   # cluster SE by unit
+)
+
+head(coeftable(dynamic))  # head because this table is long
+```
+
+The output here contains the dynamic effects from rel.time periods -20 to -15. You can see more of them if you get rid of the `head()` function surrounding the `coeftable(dynamic)`.
+
+These results aren't too useful on their own. It is much more useful to plot these results.
+
+```{r}
+#| eval: false
+
+library(ggfixest)
+library(ggplot2)
+
+plot <- ggiplot(
+  # required options
+  object   = dynamic,           # input your dynamic model name
+  drop     = "[[:digit:]]{2}",  # this limits pre-post period to -9 to 9.
+  ref.line = FALSE,             # we will add our own line later
+  
+  # optional aesthetic options
+  xlab     = "Time Relative to Treatment",  # x-axis label
+  ylab     = "Dynamic ATT Estimate",        # y-axis label
+  main     = "Dynamic Treatment Effects",   # title for plot
+)
+
+plot +
+  geom_vline(xintercept = -0.5, linetype = 3) +               # add treatment begin line
+  geom_hline(yintercept = 0, linetype = 3, color = "red")     # add 0 effect line
+# ggfixest allows us to add any additional ggplot2 options
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| fig-height: 3
+#| echo: false
+
+library(ggdark)
+library(ggfixest)
+
+plot <- ggiplot(
+  # required options
+  object   = dynamic,           # input your dynamic model name
+  drop     = "[[:digit:]]{2}",  # this limits pre-post period to -9 to 9.
+  ref.line = FALSE,             # we will add our own line later
+  
+  # optional aesthetic options
+  xlab     = "Time Relative to Treatment",  # x-axis label
+  ylab     = "Dynamic ATT Estimate",        # y-axis label
+  main     = "Dynamic Treatment Effects",   # title for plot
+)
+
+plot +
+  geom_vline(xintercept = -0.5, linetype = 3) +               # add treatment begin line
+  geom_hline(yintercept = 0, linetype = 3, color = "red") +  # add 0 effect line
+  dark_mode(theme_bw())
+
+```
+
+Here we can see all of our dynamic treatment effects plotted. We can split the dynamic treatment effects into 2 groups for interpretation purposes.
+
+1.  Pre-treatment (before the white dotted line). If parallel trends assumption is met, then the confidence intervals of the estimates should cover 0 (the red line).
+
+::: small
+In this example, we can see evidence that parallel trends is violated.
+:::
+
+2.  Post-treatment (after the white dotted line). These coefficients represent the treatment effect over time. If their confidence intervals do not include 0, that means the treatment effect is significant.
+
+::: small
+In this example, we can see the initial post-treatment periods have negative effects, but this becomes positive as the years go on.
+:::
+
+<br />
+
+### Issues with TWFE
+
+TWFE has been shown to be a **biased** estimator (bad estimator) for the ATT and dynamic treatment effects when dealing with staggered treatment implementation. So when units begin treatment at different times, TWFE is biased.
+
+Why is this? Goodman-Bacon (2021) shows that in a staggered setting, TWFE is actually a weighted average of 4 comparisons:
+
+1.  Early-treated units vs. untreated units.
+2.  Late-treated units vs. untreated units.
+3.  Early-treated units vs. late-treated units before treatment.
+4.  Early-treated units after treatment vs. late-treated units before **and** **after** treatment.
+
+When we compare treatment to control, we want to compare treated to untreated units. The issue comes with the 4th comparison - we actually use late-treated units **after** receiving treatment as a untreated comparison. This is called the "forbidden comparison" problem of TWFE.
+
+De Chaisemartin and D'Haultœuille (2020) show that there is another problem with TWFE - the weighting of these comparisons when aggregating these comparisons. For an accurate **average treatment effect** on the treated (ATT), we in theory want to weight each comparison by the proportion of the sample size each comparison contains. For example, if more units are in the early-treated units, we would want to weight that comparison more.
+
+The issue with TWFE is that not only does it not weight by group size, it doesn't even always give positive weights. In fact, sometimes, TWFE will assign **negative** weights to certain comparisons. This is completely nonsensical, and has been shown to even **reverse** the sign of the true ATT in simulations.
+
+Thus, TWFE is a **biased** estimator [when it comes to staggered treatment]{.underline} designs. Since 2021, Econometricians have started developing **modern estimators** that resolve the issues with TWFE.
+
+<br />
+
+<br />
+
+### When to Use TWFE?
+
+We have established that TWFE is a **biased** estimator [when it comes to staggered treatment]{.underline} designs. Thus, we should be cautious when using TWFE in these situations.
+
+The general advice is to not rely on TWFE if there is any staggered treatment implementation or non-absorbing treatment.
+
+However, while we cannot rely on TWFE, it is still very conventional to estimate a TWFE model and report the results. While in theory TWFE can be very biased (as explained above), in reality, it often is not that different than any other modern estimators.
