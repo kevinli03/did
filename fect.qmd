@@ -49,7 +49,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                         |
-|-----------------|-------------------------------------------------------|
+|-----------|-------------------------------------------------------------------------------------------------------------------------------------|
 | `unit`    | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}. |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                               |
 | `outcome` | Outcome variable for each observation.                                                                                              |
@@ -129,11 +129,15 @@ The FEct package allows quick aggregation of dynamic effects through plotting. T
 
 library(ggplot2)
 
-plot(fect,
+plot(
+  # required arguments
+  x      = fect,                         # our output object from fect()
+  start0 = T,                            # don't change
+  
+  # optional aesthetic arguments
   main   = "Dynamic Treatment Effects",  # title
   ylab   = "Estimate",                   # y-axis label
   xlab   = "Time to Treatment",          # x-axis label
-  start0 = T,                            # don't change
   xlim   = c(-7, 7)                      # what time periods to include (offset by +1)
 )
 ```
@@ -172,14 +176,16 @@ FEct allows us to make some pretty cool graphs that allow us to explore treatmen
 #| eval: false
 
 plot(
+  # required arguments
   x      = fect,                          # our output object from fect()
+  start0 = T,                             # don't change
+  
+  # optional aesthetic arguments
   type   = "calendar",                    # don't change
   main   = "Calendar Treatment Effects",  # title
   ylab   = "Estimate",                    # y-axis label
   xlab   = "Time Period",                 # x-axis label
-  start0 = T,                             # don't change
   xlim   = c(1, 10)                       # what time periods to include (offset by +1)
-  
 )
 ```
 
@@ -205,18 +211,25 @@ plot + dark_mode(theme_bw())
 
 The red-line shows the overall ATT estimate. The highlighted area is the confidence intervals of the heterogeneous treatment effects over time.
 
+<br />
+
+### R: Individual Treatment Effects
+
 We can also explore the distributions of individual treatment effects by relative time period:
 
 ```{r}
 #| eval: false
 
 plot(
+  # required arguments
   x      = fect,                            # our output object from fect()
+  start0 = T,                               # don't change
+  
+  # optional aesthetic options
   type   = "box",                           # don't change
   main   = "Individual Treatment Effects",  # title
   ylab   = "Estimate",                      # y-axis label
   xlab   = "Time to Treatment",             # x-axis label
-  start0 = T,                               # don't change
   xlim   = c(-7, 7)                         # what time periods to include (offset by +1)
   
 )

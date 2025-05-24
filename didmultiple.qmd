@@ -55,14 +55,17 @@ With all the proper variables, we can estimate a DIDmultiple model with the **DI
 library(DIDmultiplegtDYN)
 
 DIDmultiple <- did_multiplegt_dyn(
-  df = df,
+  # required arguments
+  df         = df,
   outcome    = "outcome",
   group      = "unit",    # Note: group here refers to unit, not first.treat
   time       = "time",
   treatment  = "treat",
-  controls   = NULL,      # optional, vector of covariates. I have difficulties.
   effects    = 4,         # Number of post-treatment periods dynamic effects
   placebo    = 4,         # Number of pre-treatment periods of effects
+  
+  # optional arguments
+  controls   = NULL,      # optional, vector of covariates. I have difficulties.
   continuous = NULL,      # change to 1 if your treatment is true
   graph_off  = T
 )

@@ -33,7 +33,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable      | Description                                                                                                                                                                                                                |
-|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|----------------|--------------------------------------------------------|
 | `unit`        | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}.                                                                                        |
 | `time`        | A variable indicating time-periods in our study for each observation.                                                                                                                                                      |
 | `outcome`     | Outcome variable for each observation.                                                                                                                                                                                     |
@@ -89,15 +89,18 @@ With all the proper variables, we can estimate a csdid model with the **did** pa
 library(did)
 
 csdid <- att_gt(
+  # required arguments
   yname                  = "outcome",
   tname                  = "time",
   idname                 = "unit",          # must be a integer-variable
   gname                  = "first.treat",
-  data                   = df,
-  xformla                = ~covar,          # you may have difficulties with covariates
-  control_group          = "nevertreated",  # use "notyettreated" if sample size is small
   base_period            = 'universal',     # do not change
-  allow_unbalanced_panel = T                # generally good to keep this T
+  allow_unbalanced_panel = T,               # generally good to keep this T
+  data                   = df,
+  
+  # optional arguments
+  xformla                = ~covar,          # you may have difficulties with covariates
+  control_group          = "nevertreated"   # use "notyettreated" if sample size is small
 )
 ```
 
@@ -168,7 +171,10 @@ We can then plot these effects with the **ggdid** package included in the **did*
 ```{r}
 #| eval: false
 graph <- ggdid(
+  # required arguments
   object = dynamic,              # input your object from aggte
+  
+  # optional arguments
   xlab   = "Time to Treatment",  # x-axis label
   ylab   = "Dynamic ATT",        # y-axis label
   title  = "Dynamic Effects"     # you can include a title string if you want
@@ -213,13 +219,16 @@ group <- aggte(
 # summary(group) if you want to see the exact group-ATT numbers
 ```
 
-We can then plot these effects with the **ggdid** package included in the **did** package:
+We can then plot these effects with the **ggdid** function included in the **did** package:
 
 ```{r}
 #| eval: false
 
 ggdid(
+  # required arguments
   object = group,           # input your object from aggte
+  
+  # optional arguments
   xlab   = "ATT Estimate",  # x-axis label
   ylab   = "Group",         # y-axis label
   title  = "Group ATT"      # you can include a title string if you want
@@ -236,6 +245,56 @@ graph <- ggdid(
   xlab   = "ATT Estimate",  # x-axis label
   ylab   = "Group",         # y-axis label
   title  = "Group ATT"      # you can include a title string if you want
+)
+graph + # line at 0 treat effect
+  dark_mode(theme_bw())
+```
+
+<br />
+
+### R: Heterogeneity Across Time
+
+We can also explore how treatment effects change over calendar time (not relative time, but actual time).
+
+```{r}
+#| comment: "#>"
+#| class-output: r
+
+time <- aggte(
+  MP    = csdid,       # model from att_gt
+  type  = "calendar",  # this tells R aggregate for dynamic effects
+  na.rm = T
+)
+
+# summary(group) if you want to see the exact group-ATT numbers
+```
+
+We can then plot these effects with the **ggdid** function included in the **did** package:
+
+```{r}
+#| eval: false
+
+ggdid(
+  # required arguments
+  object = time,               # input your object from aggte
+  
+  # optional arguments
+  xlab   = "Time Period",      # x-axis label
+  ylab   = "Estimate",         # y-axis label
+  title  = "Calendar Effects"  # you can include a title string if you want
+)
+```
+
+```{r}
+#| echo: false
+#| fig-height: 3
+#| fig-align: center
+
+graph <- ggdid(
+  object = time,            # input your object from aggte
+  xlab   = "Time Period",  # x-axis label
+  ylab   = "Estimate",       # y-axis label
+  title  = "Calendar Effects"       # you can include a title string if you want
 )
 graph + # line at 0 treat effect
   dark_mode(theme_bw())
