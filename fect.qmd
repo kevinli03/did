@@ -1,4 +1,4 @@
-# Imputation Method
+# Imputation
 
 ##### Liu, Xu, and Wang (2024)
 
@@ -49,7 +49,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                         |
-|---------------|--------------------------------------------------------|
+|-----------------|-------------------------------------------------------|
 | `unit`    | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}. |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                               |
 | `outcome` | Outcome variable for each observation.                                                                                              |
@@ -257,4 +257,9 @@ Borusyak, K., Jaravel, X., and Spiess, J. (2024) 'Revisiting Event-Study Designs
 -   Yiqing Xu's [page on Fect](https://yiqingxu.org/packages/fect/02-fect.html).
 -   Yiqing Xu's page on [Fect plot options](https://yiqingxu.org/packages/fect/03-plots.html).
 -   R-[documentation of the fect package](https://cran.r-project.org/web/packages/fect/fect.pdf).
+
+*More on Other Imputation Estimators*
+
 -   Kyle Butts' github page on [DIDimputation](https://github.com/kylebutts/didimputation).
+-   Kyle Butts' [github page on did2s](https://kylebutts.github.io/did2s/articles/Two-Stage-Difference-in-Differences.html).
+-   Asjad Naqvi's [github page on did2s](https://asjadnaqvi.github.io/DiD/docs/code_r/07_did2s_r/).
