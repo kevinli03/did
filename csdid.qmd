@@ -33,7 +33,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable      | Description                                                                                                                                                                                                                |
-|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|------------|------------------------------------------------------------|
 | `unit`        | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}.                                                                                        |
 | `time`        | A variable indicating time-periods in our study for each observation.                                                                                                                                                      |
 | `outcome`     | Outcome variable for each observation.                                                                                                                                                                                     |
@@ -184,7 +184,7 @@ graph + geom_vline(xintercept = -0.5, linetype = 3) # line at treat time
 #| fig-align: center
 
 library(ggdark)
-m <- ggdid(
+m = ggdid(
   object = dynamic,             # input your object from aggte
   xlab = "Time to Treatment",  # x-axis label
   ylab = "Dynamic ATT",        # y-axis label
@@ -196,7 +196,7 @@ m + dark_mode(theme_bw())
 
 <br />
 
-### Aggregating Group ATT
+### R: Aggregating Group ATT
 
 If we are interested in how the ATT differs by year of treatment adoption, we can also aggregate effects by initial treatment period group:
 

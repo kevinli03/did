@@ -13,7 +13,7 @@ This is a work in progress, and I am updating it constantly. If there are any is
 ### Additional Resources
 
 | Resource                                                                                        | Author           | Notes                                                               |
-|----------------------------------|---------------|------------------------|
+|-------------------------------------------------------------------------------------------------|------------------|---------------------------------------------------------------------|
 | [Yiqing Xu: modern advancements in DiD](https://yiqingxu.org/packages/fect/05-panel.html#csdid) | Yiqing Xu        | Useful overview of all modern DiD methods and R code.               |
 | [Asjad Naqvi: repository on DiD](https://asjadnaqvi.github.io/DiD/)                             | Asjad Naqvi      | Useful R and state code for DiD.                                    |
 | [User Guides for DiD](https://bcallaway11.github.io/did/articles/index.html)                    | Brantly Callaway | Useful guides and explanations of DiD with R.                       |

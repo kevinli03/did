@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>5&nbsp; Imputation FEct – Difference-in-Differences (DiD) Resources</title>
+<title>5&nbsp; Imputation Method – Difference-in-Differences (DiD) Resources</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,12 +20,46 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./didimputation.html" rel="next">
+<link href="./etwfe.html" rel="next">
 <link href="./panelmatch.html" rel="prev">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
@@ -54,6 +88,35 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <script src="mathjax-config.js"></script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -67,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./fect.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Imputation FEct</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./fect.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Imputation Method</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -130,63 +193,39 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./fect.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Imputation FEct</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./didimputation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">DIDimputation</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./did2s.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">2-Stage DiD</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./ifect.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Imputation IFEct</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./mc.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Matrix Completion</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Imputation Method</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">ETWFE</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">ETWFE</span></span></a>
   </div>
 </li>
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">PanelView</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">PanelView</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./pta.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Parallel Trends</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Parallel Trends</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./honest.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">HonestDiD</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">HonestDiD</span></span></a>
   </div>
 </li>
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./gsynth.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Gsynth</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gsynth</span></span></a>
   </div>
 </li>
     </ul>
@@ -194,15 +233,25 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#what-is-imputation" id="toc-what-is-imputation" class="nav-link active" data-scroll-target="#what-is-imputation">What is Imputation?</a></li>
+  <li><a href="#r-estimating-the-att" id="toc-r-estimating-the-att" class="nav-link" data-scroll-target="#r-estimating-the-att">R: Estimating the ATT</a></li>
+  <li><a href="#r-estimating-dynamic-effects" id="toc-r-estimating-dynamic-effects" class="nav-link" data-scroll-target="#r-estimating-dynamic-effects">R: Estimating Dynamic Effects</a></li>
+  <li><a href="#r-treatment-heterogeneity" id="toc-r-treatment-heterogeneity" class="nav-link" data-scroll-target="#r-treatment-heterogeneity">R: Treatment Heterogeneity</a></li>
+  <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional Resources</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Imputation FEct</span></h1>
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Imputation Method</span></h1>
 </div>
 
 
@@ -219,8 +268,234 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="liu-xu-and-wang-2024" class="level5">
+<h5 class="anchored" data-anchor-id="liu-xu-and-wang-2024">Liu, Xu, and Wang (2024)</h5>
+</section>
+<section id="what-is-imputation" class="level3">
+<h3 class="anchored" data-anchor-id="what-is-imputation">What is Imputation?</h3>
+<p>The Imputation method, also known as the fixed-effects counterfactual estimator (FEct), is an estimator for DiD that solves the issues with TWFE in staggered settings. The estimator also accomodates non-absorbing treatment. The estimator was proposed by Liu, Xu, and Wang (2024). The same approach is also proposed by Borusyak, Jaravel, and Spiess (2021).</p>
+<div class="small">
+<p>I will only use the <strong>fect</strong> package from Liu, Xu, and Wang (2024), not the <strong>DIDimputation package</strong> from Borusyak, Jaravel, and Spiess (2021), or the <strong>did2s</strong> package from Gardner (2021). These do almost the identical thing, but fect has additional estimators and tools that make it more useful.</p>
+</div>
+<p>FEct is a imputation estimator - a class of estimators that estimates causal effects directly by imputing missing potential outcomes. For treated units <span class="math inline">\(D_{it} = 1\)</span>, the potential outcome <span class="math inline">\(Y_{it}(0)\)</span> is a counterfactual we do not observe. Imputation estimators try to estimate <span class="math inline">\(Y_{it}(0)\)</span>, which allows us to compute individual treatment effects <span class="math inline">\(\tau_i\)</span> and find the ATT. FEct estimates <span class="math inline">\(Y_{it}(0)\)</span> for treated units by using the following model:</p>
+<p><span class="math display">\[
+Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_{it}
+\]</span></p>
+<div class="small">
+<p>This is literally a TWFE model with <span class="math inline">\(D_{it} = 0\)</span>, which is the case for potential outcome <span class="math inline">\(Y_{it}(0)\)</span>.</p>
+</div>
+<p>This model is estimated with all units <span class="math inline">\(D_{it} = 0\)</span>, which allows us to estimate <span class="math inline">\(\hat\alpha_i\)</span>, <span class="math inline">\(\hat\gamma_t\)</span>, and <span class="math inline">\(\hat{\b\beta}\)</span>. Using these estimates, we can estimate missing counterfactuals <span class="math inline">\(\hat Y_{it}(0)\)</span>.</p>
+<p>There are three versions of imputation estimators that are implemented in the fect package:</p>
+<ol type="1">
+<li><strong>FEct</strong> (fixed effects counterfactual): this is exactly the same as described above.</li>
+<li><strong>IFEct</strong> (interactive fixed effects counterfactual): This is the above model for <span class="math inline">\(Y_{it}(0)\)</span>, but with the inclusion of a term <span class="math inline">\(\b\lambda_i' \b\xi_t\)</span>. The <span class="math inline">\(\b\xi_t\)</span> is a vector of latent variable that change over time, and <span class="math inline">\(\b\lambda_i\)</span> is a vector of how much each unit is related to each latent variable. More simply, this allows IFEct to be more robust to minor parallel trends violations.</li>
+<li><strong>MC</strong> (matrix completion). This is a more machine-learning based approach of estimating <span class="math inline">\(Y_{it}(0)\)</span> that does not rely on the fixed-effects specification.</li>
+</ol>
+<p>You should use IFEct if you believe parallel trends is violated, and you have a large panel dataset. You should use MC if you believe parallel trends is violated but your data is smaller.</p>
+<p><br></p>
+</section>
+<section id="r-estimating-the-att" class="level3">
+<h3 class="anchored" data-anchor-id="r-estimating-the-att">R: Estimating the ATT</h3>
+<p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 78%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>unit</code></td>
+<td>A variable indicating the units/individual an observation belongs to in our data.* <u>For csdid, this must be integers</u>.</td>
+</tr>
+<tr class="even">
+<td><code>time</code></td>
+<td>A variable indicating time-periods in our study for each observation.</td>
+</tr>
+<tr class="odd">
+<td><code>outcome</code></td>
+<td>Outcome variable for each observation.</td>
+</tr>
+<tr class="even">
+<td><code>covar</code></td>
+<td>(optional) covariate(s) to condition for parallel trends.</td>
+</tr>
+</tbody>
+</table>
+<div class="small">
+<p>*For repeated cross-section, the <code>unit</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>unit</code> variable.</p>
+</div>
+<p>With all the proper variables, we can estimate a FEct model with the <strong>fect</strong> package. As noted in the “what is imputation” section, we can choose between three methods: “fe”, “ife”, and “mc”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fect)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>fect <span class="ot">&lt;-</span> <span class="fu">fect</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> outcome <span class="sc">~</span> treat <span class="sc">+</span> covar,  <span class="co"># covar is optional</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data    =</span> df,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">index   =</span> <span class="fu">c</span>(<span class="st">"unit"</span>, <span class="st">"time"</span>),        <span class="co"># unit and time var</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">method  =</span> <span class="st">"fe"</span>,                     <span class="co"># use "fe", "ife", or "mc"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional arguments</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">se      =</span> T,                        <span class="co"># F means no estimated std error - much quicker</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">nboots  =</span> <span class="dv">40</span>,                       <span class="co"># usually you should use 200, larger is slower</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed    =</span> <span class="dv">1239</span>                      <span class="co"># any number. for replication</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(fect)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; fect.formula(formula = outcome ~ treat + covar, data = df, index = c("unit", </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     "time"), method = "fe", se = T, nboots = 40, seed = 1239)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ATT:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                              ATT   S.E. CI.lower CI.upper   p.value</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Tr obs equally weighted   -1.091 0.4746   -2.022  -0.1611 2.148e-02</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Tr units equally weighted -2.964 0.5814   -4.104  -1.8246 3.432e-07</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Covariates:</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Coef    S.E. CI.lower CI.upper p.value</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; covar 1.004 0.02042   0.9643    1.044       0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<p>The output contains two different ATT estimates. It is typically conventional to use the first one, <code>Tr obs equally weighted</code>, which weights each observation <span class="math inline">\(it\)</span> equally (rather than the second which weights all <span class="math inline">\(i\)</span> equally).</p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Extract the ATT Directly
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>We can access the dataframe where the ATT and standard errors are stored as follows:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fect<span class="sc">$</span>est.avg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        ATT.avg      S.E.  CI.lower   CI.upper    p.value</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] -1.091429 0.4746486 -2.021723 -0.1611347 0.02147962</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<p>Thus, we can subset and retrieve the elements of this dataframe:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ATT estimate</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>fect<span class="sc">$</span>est.avg[<span class="dv">1</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Lower confidence interval</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>fect<span class="sc">$</span>est.avg[<span class="dv">3</span>]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Upper confidence interval</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>fect<span class="sc">$</span>est.avg[<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -1.091429</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -2.021723</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -0.1611347</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p><br></p>
+</section>
+<section id="r-estimating-dynamic-effects" class="level3">
+<h3 class="anchored" data-anchor-id="r-estimating-dynamic-effects">R: Estimating Dynamic Effects</h3>
+<p>The FEct package allows quick aggregation of dynamic effects through plotting. The plot is a ggplot object, if you want to change or make additions to it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fect,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main   =</span> <span class="st">"Dynamic Treatment Effects"</span>,  <span class="co"># title</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab   =</span> <span class="st">"Estimate"</span>,                   <span class="co"># y-axis label</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab   =</span> <span class="st">"Time to Treatment"</span>,          <span class="co"># x-axis label</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0 =</span> T,                            <span class="co"># don't change</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim   =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>)                      <span class="co"># what time periods to include (offset by +1)</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fect_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Note the bars below - it shows the number of observations of units who ever receive treatment in each time period.</p>
+<p>The fect package also allows us to conduct some pretty cool parallel trends tests, but that is for a later section.</p>
+<p><br></p>
+</section>
+<section id="r-treatment-heterogeneity" class="level3">
+<h3 class="anchored" data-anchor-id="r-treatment-heterogeneity">R: Treatment Heterogeneity</h3>
+<p>FEct allows us to make some pretty cool graphs that allow us to explore treatment heterogeneity. First, we can explore how treatment effects change over calendar time (not relative time, but actual time). This is somewhat similar to the “grouped” ATT treatment effects of the matching and reweighting estimators.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x      =</span> fect,                          <span class="co"># our output object from fect()</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type   =</span> <span class="st">"calendar"</span>,                    <span class="co"># don't change</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main   =</span> <span class="st">"Calendar Treatment Effects"</span>,  <span class="co"># title</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab   =</span> <span class="st">"Estimate"</span>,                    <span class="co"># y-axis label</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab   =</span> <span class="st">"Time Period"</span>,                 <span class="co"># x-axis label</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0 =</span> T,                             <span class="co"># don't change</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim   =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>)                       <span class="co"># what time periods to include (offset by +1)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fect_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The red-line shows the overall ATT estimate. The highlighted area is the confidence intervals of the heterogeneous treatment effects over time.</p>
+<p>We can also explore the distributions of individual treatment effects by relative time period:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x      =</span> fect,                            <span class="co"># our output object from fect()</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type   =</span> <span class="st">"box"</span>,                           <span class="co"># don't change</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main   =</span> <span class="st">"Individual Treatment Effects"</span>,  <span class="co"># title</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab   =</span> <span class="st">"Estimate"</span>,                      <span class="co"># y-axis label</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab   =</span> <span class="st">"Time to Treatment"</span>,             <span class="co"># x-axis label</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0 =</span> T,                               <span class="co"># don't change</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim   =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>)                         <span class="co"># what time periods to include (offset by +1)</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fect_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The fect package also allows us to conduct some pretty cool parallel trends tests, but that is for a later section.</p>
+<p><br></p>
+</section>
+<section id="additional-resources" class="level3">
+<h3 class="anchored" data-anchor-id="additional-resources">Additional Resources</h3>
+<p>Liu, L., Wang, Y., and Xu, Y. (2024) ‘A Practical Guide to Counterfactual Estimators for Causal Inference with Time-Series Cross-Sectional Data’, <em>American Journal of Political Science</em>, 68(1), pp.&nbsp;160-176. Available at: <a href="https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf" class="uri">https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf</a></p>
+<p>Borusyak, K., Jaravel, X., and Spiess, J. (2024) ‘Revisiting Event-Study Designs: Robust and Efficient Estimation’, <em>The Review of Economic Studies</em>, 91(6), pp.&nbsp;3253-3285. Available at: <a href="https://arxiv.org/abs/2108.12419" class="uri">https://arxiv.org/abs/2108.12419</a>.</p>
+<p><em>Additional Links</em></p>
+<ul>
+<li>Yiqing Xu’s <a href="https://yiqingxu.org/packages/fect/02-fect.html">page on Fect</a>.</li>
+<li>Yiqing Xu’s page on <a href="https://yiqingxu.org/packages/fect/03-plots.html">Fect plot options</a>.</li>
+<li>R-<a href="https://cran.r-project.org/web/packages/fect/fect.pdf">documentation of the fect package</a>.</li>
+<li>Kyle Butts’ github page on <a href="https://github.com/kylebutts/didimputation">DIDimputation</a>.</li>
+</ul>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -650,8 +925,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./didimputation.html" class="pagination-link" aria-label="DIDimputation">
-        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">DIDimputation</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./etwfe.html" class="pagination-link" aria-label="ETWFE">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">ETWFE</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
