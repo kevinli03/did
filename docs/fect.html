@@ -59,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./etwfe.html" rel="next">
+<link href="./did2s.html" rel="next">
 <link href="./panelmatch.html" rel="prev">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
@@ -198,34 +198,40 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./did2s.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">2-Stage DiD</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">ETWFE</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">ETWFE</span></span></a>
   </div>
 </li>
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">PanelView</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">PanelView</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./pta.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Parallel Trends</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Parallel Trends</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./honest.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">HonestDiD</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">HonestDiD</span></span></a>
   </div>
 </li>
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./gsynth.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gsynth</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Gsynth</span></span></a>
   </div>
 </li>
     </ul>
@@ -278,21 +284,20 @@ window.Quarto = {
 <div class="small">
 <p>I will only use the <strong>fect</strong> package from Liu, Xu, and Wang (2024), not the <strong>DIDimputation package</strong> from Borusyak, Jaravel, and Spiess (2021), or the <strong>did2s</strong> package from Gardner (2021). These do almost the identical thing, but fect has additional estimators and tools that make it more useful.</p>
 </div>
-<p>FEct is a imputation estimator - a class of estimators that estimates causal effects directly by imputing missing potential outcomes. For treated units <span class="math inline">\(D_{it} = 1\)</span>, the potential outcome <span class="math inline">\(Y_{it}(0)\)</span> is a counterfactual we do not observe. Imputation estimators try to estimate <span class="math inline">\(Y_{it}(0)\)</span>, which allows us to compute individual treatment effects <span class="math inline">\(\tau_i\)</span> and find the ATT. FEct estimates <span class="math inline">\(Y_{it}(0)\)</span> for treated units by using the following model:</p>
+<p>For treated units <span class="math inline">\(D_{it} = 1\)</span>, the potential outcome <span class="math inline">\(Y_{it}(0)\)</span> is a counterfactual we do not observe. Imputation estimators try to estimate <span class="math inline">\(Y_{it}(0)\)</span>, which allows us to compute individual treatment effects <span class="math inline">\(\tau_i\)</span> and find the ATT. FEct estimates <span class="math inline">\(Y_{it}(0)\)</span> for treated units by using the following model:</p>
 <p><span class="math display">\[
 Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_{it}
 \]</span></p>
 <div class="small">
 <p>This is literally a TWFE model with <span class="math inline">\(D_{it} = 0\)</span>, which is the case for potential outcome <span class="math inline">\(Y_{it}(0)\)</span>.</p>
 </div>
-<p>This model is estimated with all units <span class="math inline">\(D_{it} = 0\)</span>, which allows us to estimate <span class="math inline">\(\hat\alpha_i\)</span>, <span class="math inline">\(\hat\gamma_t\)</span>, and <span class="math inline">\(\hat{\b\beta}\)</span>. Using these estimates, we can estimate missing counterfactuals <span class="math inline">\(\hat Y_{it}(0)\)</span>.</p>
-<p>There are three versions of imputation estimators that are implemented in the fect package:</p>
+<p>Imputation estimators will use OLS to estimate <span class="math inline">\(\hat\alpha_i\)</span>, <span class="math inline">\(\hat\gamma_t\)</span>, and <span class="math inline">\(\hat{\b\beta}\)</span>, using only untreated observations <span class="math inline">\(D_{it} = 0\)</span>. Using these estimates, we can estimate missing counterfactuals <span class="math inline">\(\hat Y_{it}(0)\)</span>. There are three versions of imputation estimators:</p>
 <ol type="1">
-<li><strong>FEct</strong> (fixed effects counterfactual): this is exactly the same as described above.</li>
+<li><strong>FEct</strong> (fixed effects counterfactual): this is what is described above.</li>
 <li><strong>IFEct</strong> (interactive fixed effects counterfactual): This is the above model for <span class="math inline">\(Y_{it}(0)\)</span>, but with the inclusion of a term <span class="math inline">\(\b\lambda_i' \b\xi_t\)</span>. The <span class="math inline">\(\b\xi_t\)</span> is a vector of latent variable that change over time, and <span class="math inline">\(\b\lambda_i\)</span> is a vector of how much each unit is related to each latent variable. More simply, this allows IFEct to be more robust to minor parallel trends violations.</li>
 <li><strong>MC</strong> (matrix completion). This is a more machine-learning based approach of estimating <span class="math inline">\(Y_{it}(0)\)</span> that does not rely on the fixed-effects specification.</li>
 </ol>
-<p>You should use IFEct if you believe parallel trends is violated, and you have a large panel dataset. You should use MC if you believe parallel trends is violated but your data is smaller.</p>
+<p>You should generally run a FEct model first - and check if parallel trends are met. If parallel trends are violated, you should test IFEct and MC and see if parallel trends are met in those estimators.</p>
 <p><br></p>
 </section>
 <section id="r-estimating-the-att" class="level3">
@@ -300,8 +305,8 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 7%">
-<col style="width: 92%">
+<col style="width: 18%">
+<col style="width: 81%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -944,8 +949,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./etwfe.html" class="pagination-link" aria-label="ETWFE">
-        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">ETWFE</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./did2s.html" class="pagination-link" aria-label="2-Stage DiD">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">2-Stage DiD</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

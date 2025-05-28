@@ -18,6 +18,7 @@ book:
     - didmultiple.qmd
     - panelmatch.qmd
     - fect.qmd
+    - did2s.qmd
     - etwfe.qmd
     - text: "---"
     - panelview.qmd

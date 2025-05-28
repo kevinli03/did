@@ -10,7 +10,7 @@ The Imputation method, also known as the fixed-effects counterfactual estimator 
 I will only use the **fect** package from Liu, Xu, and Wang (2024), not the **DIDimputation package** from Borusyak, Jaravel, and Spiess (2021), or the **did2s** package from Gardner (2021). These do almost the identical thing, but fect has additional estimators and tools that make it more useful.
 :::
 
-FEct is a imputation estimator - a class of estimators that estimates causal effects directly by imputing missing potential outcomes. For treated units $D_{it} = 1$, the potential outcome $Y_{it}(0)$ is a counterfactual we do not observe. Imputation estimators try to estimate $Y_{it}(0)$, which allows us to compute individual treatment effects $\tau_i$ and find the ATT. FEct estimates $Y_{it}(0)$ for treated units by using the following model:
+For treated units $D_{it} = 1$, the potential outcome $Y_{it}(0)$ is a counterfactual we do not observe. Imputation estimators try to estimate $Y_{it}(0)$, which allows us to compute individual treatment effects $\tau_i$ and find the ATT. FEct estimates $Y_{it}(0)$ for treated units by using the following model:
 
 $$
 Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_{it}
@@ -20,15 +20,13 @@ $$
 This is literally a TWFE model with $D_{it} = 0$, which is the case for potential outcome $Y_{it}(0)$.
 :::
 
-This model is estimated with all units $D_{it} = 0$, which allows us to estimate $\hat\alpha_i$, $\hat\gamma_t$, and $\hat{\b\beta}$. Using these estimates, we can estimate missing counterfactuals $\hat Y_{it}(0)$.
+Imputation estimators will use OLS to estimate $\hat\alpha_i$, $\hat\gamma_t$, and $\hat{\b\beta}$, using only untreated observations $D_{it} = 0$. Using these estimates, we can estimate missing counterfactuals $\hat Y_{it}(0)$. There are three versions of imputation estimators:
 
-There are three versions of imputation estimators that are implemented in the fect package:
-
-1.  **FEct** (fixed effects counterfactual): this is exactly the same as described above.
+1.  **FEct** (fixed effects counterfactual): this is what is described above.
 2.  **IFEct** (interactive fixed effects counterfactual): This is the above model for $Y_{it}(0)$, but with the inclusion of a term $\b\lambda_i' \b\xi_t$. The $\b\xi_t$ is a vector of latent variable that change over time, and $\b\lambda_i$ is a vector of how much each unit is related to each latent variable. More simply, this allows IFEct to be more robust to minor parallel trends violations.
 3.  **MC** (matrix completion). This is a more machine-learning based approach of estimating $Y_{it}(0)$ that does not rely on the fixed-effects specification.
 
-You should use IFEct if you believe parallel trends is violated, and you have a large panel dataset. You should use MC if you believe parallel trends is violated but your data is smaller.
+You should generally run a FEct model first - and check if parallel trends are met. If parallel trends are violated, you should test IFEct and MC and see if parallel trends are met in those estimators.
 
 <br />
 
