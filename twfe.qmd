@@ -1,59 +1,31 @@
-# Two-Way Fixed Effects {.unnumbered}
-
-### What is TWFE?
-
-Two-way fixed effects (TWFE) is the primary estimator used to estimate causal effects in difference-in-differences. The TWFE estimator is a regression model specified as follows:
-
-$$
-Y_{it} = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + D_{it}\tau + \cov + \eps_{it}
-$$
+# twfe (fixest) {.unnumbered}
 
 ::: small
-$Y_{it}$ is the outcome, $D_{it}$ is the treatment, $\b X_{it}$ is a vector of covariates (optional) for parallel trends, and $\tau$ is the causal effect.
+non-staggered, absorbing, binary treatment
 :::
 
-For dynamic treatment effects, the TWFE model is estimated as:
+The two-way fixed effects (TWFE) estimator is the standard estimator used for classical and generalised DID, when there is non-staggered treatment implementation and absorbing treatment. The model takes the following form.
 
 $$
-Y_{it} = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \sum_{r ≠ -1} 1\{R_{it} = r\} \cdot \tau_r + \eps_{it}
+Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{it}^\top\hat{\b\beta} + \hat\eps_{it}
 $$
+
+The TWFE $\hat\tau_\text{ATT}$ estimate is an unbiased esitmator of the ATT if treatment is non-staggered and absorbing, and the identification assumptions (parallel trends, no anticipation, SUTVA) hold.
 
 ::: small
-$R_{it}$ is a relative-time variable, that is equal to the time period $t$ minus the initial treatment period of unit $i$. $1\{R_{it}=r\}$ is an indicator variable that equals 1 if $R_{it} = r$, and 0 otherwise.
+TWFE can be severely biased if there is staggered treatment or non-absorbing treatment.
 :::
 
-Fixed effect $\alpha_i$ accounts/controls for differences between units, and $\gamma_t$ accounts/controls for differences between time periods. If we account for differences between units and differences between time periods, the only possible confounders remaining are unit-specific trends over time. But with the parallel trends assumption, we rule out this type of confounder.
+```{r}
+#| message: false
+#| warning: false
 
-Thus, under the parallel trends assumption, there are no omitted confounders/variables, and our regression is exogenous. Since OLS is unbiased under exogeneity, our TWFE estimator for $\tau$ is unbiased.
+# packages needed: 
+library(fixest)
+library(ggfixest)
+```
 
 <br />
-
-### Issues with TWFE {data-link="issues with TWFE"}
-
-TWFE has been shown to be a **biased** estimator (bad estimator) for the ATT and dynamic treatment effects when dealing with staggered treatment implementation. So when units begin treatment at different times, TWFE is biased.
-
-Why is this? [Goodman-Bacon (2021)](https://www.nber.org/papers/w25018) shows that in a staggered setting, TWFE is actually a weighted average of 4 comparisons:
-
-1.  Early-treated units vs. untreated units.
-2.  Late-treated units vs. untreated units.
-3.  Early-treated units vs. late-treated units before treatment.
-4.  Early-treated units after treatment vs. late-treated units before **and** **after** treatment.
-
-When we compare treatment to control, we want to compare treated to untreated units. The issue comes with the 4th comparison - we actually use late-treated units **after** receiving treatment as a untreated comparison. This is called the "forbidden comparison" problem of TWFE.
-
-[De Chaisemartin and D'Haultœuille (2020)](https://www.nber.org/system/files/working_papers/w25904/w25904.pdf) show that there is another problem with TWFE - the weighting of these comparisons when aggregating these comparisons. For an accurate **average treatment effect** on the treated (ATT), we in theory want to weight each comparison by the proportion of the sample size each comparison contains. For example, if more units are in the early-treated units, we would want to weight that comparison more.
-
-The issue with TWFE is that not only does it not weight by group size, it doesn't even always give positive weights. In fact, sometimes, TWFE will assign **negative** weights to certain comparisons. This is completely nonsensical, and has been shown to even **reverse** the sign of the true ATT in simulations.
-
-Thus, TWFE is a **biased** estimator [when it comes to staggered treatment]{.underline} designs. Since 2021, Econometricians have started developing **modern estimators** that resolve the issues with TWFE.
-
-::: small
-Brantly Callaway has a more detailed page on the [issues with TWFE](https://bcallaway11.github.io/did/articles/TWFE.html). Pedro Sant'Anna also has a [powerpoint](https://psantanna.com/DiD/11_Staggered_problems.pdf) on the Bacon-Goodman decomposition.
-:::
-
-<br />
-
-### R: Setting Up the Data
 
 ```{r}
 #| echo: false
@@ -63,14 +35,38 @@ Brantly Callaway has a more detailed page on the [issues with TWFE](https://bcal
 library(fixest)
 data(base_stagg, package = "fixest")
 df <- base_stagg
-colnames(df) <- c("unit", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
+colnames(df) <- c("unit", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
+
+::: panel-tabset
+## Syntax
+
+We use the `feols()` function to run the TWFE model.
+
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+
+m1 = feols(
+  fml   = outcome ~ treat + covar | unit + time,  # covariate is optional
+  data  = df,                                     # your data
+  vcov  = ~ unit                                  # cluster SE by unit
+)
+
+summary(m1)
+```
+
+The coefficient of `treat` is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by `Pr(>|t|)` (the p-value) and the stars `***` .
+
+## Variables
 
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable   | Description                                                                                                                                                                                                                                                            |
-|------------|------------------------------------------------------------|
+|---------------|---------------------------------------------------------|
 | `unit`     | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
 | `time`     | A variable indicating time-periods in our study for each observation.                                                                                                                                                                                                  |
 | `outcome`  | Outcome variable for each observation.                                                                                                                                                                                                                                 |
@@ -81,45 +77,16 @@ Our dataset `df` should be a panel or repeated cross-section, and have the follo
 ::: small
 \*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
 :::
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Creating a rel.time Variable
-
-To create a rel.time variable if your dataset does not have one, we first need to create a first.treat variable, which indicates the period that a unit first gets treated.
-
-```{r}
-#| eval: false
-
-library(tidyverse)
-
-# create first.treat
-first.treat <- df %>%
-  select(treat, time, unit) %>%
-  filter(treat == 1) %>%
-  group_by(unit) %>%
-  summarise(first.treat = min(time))
-
-# join first.treat to df
-df <- left_join(df, first.treat)
-```
-
-Now, we can create a rel.time variable:
-
-```{r}
-#| eval: false
-
-df$rel.time <- df$time - df$first.treat
-
-# now set our never-treated rel.time values to a super large or small num
-df$rel.time <- replace_na(df$rel.time, -1000)
-```
 :::
 
 <br />
 
-### R: Estimating the ATT
+We can also estimate event-study dynamic effects for pre and post-treatment periods.
 
-We use the **fixest** package to run a TWFE model:
+::: panel-tabset
+## Syntax
+
+We use the `feols()` function to run the TWFE event study.
 
 ```{r}
 #| message: false
@@ -127,159 +94,45 @@ We use the **fixest** package to run a TWFE model:
 #| comment: "#>"
 #| class-output: r
 
-library(fixest)
-
-att <- feols(
-  fml   = outcome ~ treat + covar | unit + time,  # covariate is optional
-  data  = df,                                     # your data
-  vcov  = ~unit                                   # cluster SE by unit
+m2 = feols(
+  fml   = outcome ~ i(rel.time, group, ref = -1) + covar | unit + time,  # group = treat/never-treat
+  data  = df,                                                            # your data
+  vcov  = ~ unit                                                         # cluster SE by unit
 )
-
-summary(att)
-```
-
-The coefficient of `treat` is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by `Pr(>|t|)` (the p-value) and the stars `***` .
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Extracting ATT Directly
-
-If you need to extract the att directly (to create tables or graphs), we can use the **coef()** function in the fixest package:
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-
-coef(att)
-```
-
-This is a table, so we can subset the treatment coefficient directly to extract it.
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-
-coef(att)[1]
-```
-
-We can also directly extract confidence intervals in a similar way.
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-
-confint(att)
-```
-
-This is a table, so we can subset the treatment coefficient directly to extract it.
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-#| results: hold
-
-confint(att)[1,1]
-confint(att)[1,2]
-```
-:::
-
-<br />
-
-### R: Estimating Dynamic Effects
-
-We use the **fixest** package to run a TWFE model for dynamic effects:
-
-```{r}
-#| message: false
-#| warning: false
-#| comment: "#>"
-#| class-output: r
-
-library(fixest)
-
-dynamic <- feols(
-  fml   = outcome ~ i(rel.time, ref = c(-1, -1000)) + covar | unit + time,
-  # Do not change -1 in c(). You change -1000 to the value of never-treated for rel.time
-  
-  data  = df,     # your data
-  vcov  = ~unit   # cluster SE by unit
-)
-
-# summary(dynamic) if you want to find the actual values of coefficients
 ```
 
 We can plot these results.
 
 ```{r}
-#| eval: false
-
-library(ggfixest)
-library(ggplot2)
-
-plot <- ggiplot(
-  # required options
-  object   = dynamic,           # input your dynamic model object
-  ref.line = FALSE,             # we will add our own line later
-  
-  # optional aesthetic options
-  xlab     = "Time Relative to Treatment",  # x-axis label
-  ylab     = "Dynamic ATT Estimate",        # y-axis label
-  main     = "Dynamic Treatment Effects",   # title for plot
-)
-
-plot +
-  # select how many period to display
-  xlim(-8, 8) +
-  
-  # add reference lines for treatment beginning and 0 causal effect
-  geom_vline(xintercept = -0.5, linetype = 3) +
-  geom_hline(yintercept = 0, linetype = 3, color = "red") +
-  
-  # ggplot theme (optional, change to your liking)
-  theme_bw()
-```
-
-```{r}
 #| message: false
 #| warning: false
 #| fig-height: 3
-#| echo: false
 #| fig-align: center
 
-library(ggdark)
-library(ggfixest)
-
-plot <- ggiplot(
+ggiplot(
   # required options
-  object   = dynamic,           # input your dynamic model object
-  ref.line = FALSE,             # we will add our own line later
+  object  = m2,                            # input your dynamic model object
   
-  # optional aesthetic options
-  xlab     = "Time Relative to Treatment",  # x-axis label
-  ylab     = "Dynamic ATT Estimate",        # y-axis label
-  main     = "Dynamic Treatment Effects",   # title for plot
-)
-
-plot +
-  # select how many period to display
-  xlim(-8, 8) +
-  
-  # add reference lines for treatment beginning and 0 causal effect
-  geom_vline(xintercept = -0.5, linetype = 3) +
-  geom_hline(yintercept = 0, linetype = 3, color = "red") +
-  dark_mode(theme_bw())
-
+  # optional options
+  xlab    = "Time Relative to Treatment",  # x-axis label
+  ylab    = "Dynamic ATT Estimate",        # y-axis label
+  main    = "Dynamic Treatment Effects",   # title for plot
+) +
+  xlim(-8, 8) # select how many periods to display
 ```
 
-Here we can see all of our dynamic treatment effects plotted. We can split the dynamic treatment effects into 2 groups for interpretation purposes.
+## Variables
 
-1.  Pre-treatment (before the white dotted line). If parallel trends assumption is met, then the confidence intervals of the estimates should cover 0 (the red line).
+Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
-::: small
-In this example, we can see evidence that parallel trends is violated.
+| Variable   | Description                                                                                                                                                                                                                                                            |
+|-----------------|-------------------------------------------------------|
+| `unit`     | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
+| `time`     | A variable indicating time-periods in our study for each observation.                                                                                                                                                                                                  |
+| `outcome`  | Outcome variable for each observation.                                                                                                                                                                                                                                 |
+| `group`    | Variable specifying if a unit is part of the treatment group or never-treated (control group). For units never receiving treatment, they get value 0, and for units that do end up receiving treatment sometime within the study, they get value 1.                    |
+| `rel.time` | A relative time variable that indicates for the given period $t$ of an observation, how many time-periods away did the unit $i$ first get the treatment. For the never-treated observations, set the value to a very large or small number (-1000 is a common choice). |
+| `covar`    | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                                                                              |
 :::
 
-2.  Post-treatment (after the white dotted line). These coefficients represent the treatment effect over time. If their confidence intervals do not include 0, that means the treatment effect is significant.
-
-::: small
-In this example, we can see the initial post-treatment periods have negative effects, but this becomes positive as the years go on.
-:::
+<br />

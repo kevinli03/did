@@ -1,22 +1,28 @@
-# Doubly-Robust
+# csdid (did) {.unnumbered}
 
-##### Callaway and Sant'Anna (2021)
-
-### What is csdid?
+::: small
+staggered, absorbing, binary treatment
+:::
 
 The doubly-robust DiD estimator, also called **csdid**, is an estimator for DiD that solves the issues with TWFE in staggered settings. The estimator was proposed by Callaway and Sant'Anna (2021).
 
-*csdid* is a **matching and reweighting estimator** for DiD, with the matching part solving the "forbidden comparisons" problem of TWFE, and the reweighting part solving the "negative weighting" problem of TWFE.
+The csdid estimator "matches" treated units to control units in correct non-forbidden comparisons. It does this by separating all treated units into groups, grouped by their initial treatment year. Then, it compares each group to the never-treated units, calculating dynamic effects $\tau_{g,t}$ for each group.
 
-First, the csdid estimator "matches" treated units to control units in correct non-forbidden comparisons. It does this by separating all treated units into groups, grouped by their initial treatment year. Then, it compares each group to the never-treated units, calculating dynamic effects $\tau_{g,t}$ for each group. These dynamic effects $\tau_{g,t}$ are calculated with a combination of regression-adjustment and inverse probability weighting (hence the "double" in doubly robust).
+::: small
+These effects are calculated with adjusted regression, inverse probability weighting, or both combined (called "doubly robust"). Doubly-robust is the default, and should be used unless there are issues.
+:::
 
-These $\tau_{g,t}$ are reweighted together, with weights determined by how many observations fall into each group $g$ and time period $t$. The $\tau_{g,t}$ can be aggregated into the overall ATT, Dynamic ATT's with all groups combined together, and the overall ATT for each group $g$ separately.
+The $\tau_{g,t}$ can be aggregated into the overall ATT, Dynamic ATT's with all groups combined together, and the overall ATT for each group $g$ separately.
 
-*csdid* does not accommodate non-absorbing treatment. Because it is semi-parametric (with the inverse probability weighting), *csdid* is more flexible with dealing with covariates than the interaction-weighted estimator.
+```{r}
+#| message: false
+#| warning: false
+
+# packages needed:
+library(did)
+```
 
 <br />
-
-### R: Running the Model
 
 ```{r}
 #| echo: false
@@ -28,59 +34,13 @@ data(base_stagg, package = "fixest")
 df <- base_stagg
 colnames(df) <- c("unit", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
-```
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable      | Description                                                                                                                                                                                                                |
-|----------------|--------------------------------------------------------|
-| `unit`        | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}.                                                                                        |
-| `time`        | A variable indicating time-periods in our study for each observation.                                                                                                                                                      |
-| `outcome`     | Outcome variable for each observation.                                                                                                                                                                                     |
-| `covar`       | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                                  |
-| `first.treat` | This variable indicates the initial year of treatment adoption for each unit. For the never-treated, we should set the value of `first.treat` to a very large positive/negative value that is outside the range of `time`. |
-
-::: small
-\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
-:::
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Creating a first.treat Variable
-
-If your dataset lacks a first.treat variable, this is how you create one, using the other variables above.
-
-```{r}
-#| warning: false
-#| message: false
-
-library(tidyverse)
-
-# create first.treat
-first.treat <- df %>%
-  select(treat, time, unit) %>%
-  filter(treat == 1) %>%
-  group_by(unit) %>%
-  summarise(first.treat = min(time))
-
-# join first.treat to df
-df <- left_join(df, first.treat)
-
-# replace NA's (never-treated) in first.treat with big number
-df$first.treat <- replace_na(df$first.treat, 10000)
-```
-
-::: small
-\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. The `treat` variable should also be grouped by the same group/level.
-:::
-:::
-
-Note for csdid, the `unit` variable must be an integer, not a character variable. You can ensure it is an integer with the following code:
-
-```{r}
 df$unit <- as.integer(as.factor(df$unit))
 ```
 
-With all the proper variables, we can estimate a csdid model with the **did** package:
+::: panel-tabset
+## Syntax
+
+We use the `att_gt()` function to run the matching process of csdid:
 
 ```{r}
 #| warning: false
@@ -88,36 +48,92 @@ With all the proper variables, we can estimate a csdid model with the **did** pa
 
 library(did)
 
-csdid <- att_gt(
+m1 = att_gt(
   # required arguments
-  yname                  = "outcome",
-  tname                  = "time",
-  idname                 = "unit",          # must be a integer-variable
-  gname                  = "first.treat",
-  base_period            = 'universal',     # do not change
-  allow_unbalanced_panel = T,               # generally good to keep this T
-  data                   = df,
+  yname                   = "outcome",
+  tname                   = "time",
+  idname                  = "unit",          # must be a integer-variable
+  gname                   = "cohort",
+  est_method              = "dr",            # change to ipw if you are having issues
+  base_period             = "universal",     # do not change
+  allow_unbalanced_panel  = T,               # generally good to keep this T
+  data                    = df,
   
   # optional arguments
-  xformla                = ~covar,          # you may have difficulties with covariates
-  control_group          = "nevertreated"   # use "notyettreated" if sample size is small
+  xformla                 = ~ covar,          # include like formula for regression
+  control_group           = "nevertreated",  # use "notyettreated" if sample size is small
+  panel                   = T                # change to F if you are using rep. cross-section
 )
 ```
 
-This model has now done the matching and estimating $\tau_{g,t}$. We now can choose different ways to aggregate these.
+This completes the matching process. We then need to aggregate to obtain the treatment effects.
+
+## Variables
+
+Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
+
++----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Variable       | Description                                                                                                                                                                                                                |
++================+============================================================================================================================================================================================================================+
+| `unit`         | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}.                                                                                        |
+|                |                                                                                                                                                                                                                            |
+|                | For repeated cross section data, you do not need this variable.                                                                                                                                                            |
++----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `time`         | A variable indicating time-periods in our study for each observation.                                                                                                                                                      |
++----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `outcome`      | Outcome variable for each observation.                                                                                                                                                                                     |
++----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `covar`        | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                                  |
++----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| `first.treat`  | This variable indicates the initial year of treatment adoption for each unit. For the never-treated, we should set the value of `first.treat` to a very large positive/negative value that is outside the range of `time`. |
++----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+::: small
+\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
+:::
+
+Note for csdid, the `unit` variable must be an integer, not a character variable. You can ensure it is an integer with the following code:
+
+```{r}
+#| eval: false
+df$unit = as.integer(as.factor(df$unit))
+```
+
+## Notes
+
+For csdid, the `unit` variable must be an integer, not a character variable. You can ensure it is an integer with the following code:
+
+```{r}
+#| eval: false
+df$unit = as.integer(as.factor(df$unit))
+```
+
+The argument `panel =` should be set to `F` if you are using repeated-cross section data. This will automatically turn off the `idname =` argument as well.
+
+If your sample size is small, set the argument `control_group =` to `"notyettreated"`.
+
+If you are having issues with irreversable matrices and collinearity, change `est_method =` to `"ipw"`. This will use the inverse probability weighting estimation method only.
+
+Research has shown that there are issues if `base_period =` is not set to `"universal"`, so do not change this.
+
+The argument `allow_unbalanced_panel =` essentially allows for some units to have observations not in all time periods. Allowing this to be true will increase sample size. However, we should ask why some units do not have observations in certain years.
+:::
 
 <br />
 
-### R: Aggregating the ATT
+After completing the matching process, we can aggregate our effects into an overall ATT, dynamic ATTs, calendar ATTs, and cohort-ATTs.
 
-To aggregate the matched treatment effects $\tau_{g,t}$ into a singular ATT causal estimate for all treated observations, we can use the **aggte()** function:
+::: panel-tabset
+## ATT
+
+We use the `aggte()` function to aggregate our matched treatment effects into an overall treatment effect.
 
 ```{r}
 #| comment: "#>"
 #| class-output: r
 
-att <- aggte(
-  MP    = csdid,     # model from att_gt
+att = aggte(
+  MP    = m1,        # model from att_gt
   type  = "simple",  # this tells R aggregate for ATT
   na.rm = T
 )
@@ -125,84 +141,40 @@ att <- aggte(
 summary(att)
 ```
 
-::: {.callout-note collapse="true" appearance="simple"}
-## Extract the ATT Directly
+## Dynamic
 
-If you are interested in extracting the ATT and confidence intervals directly from the att object for tables/figures, you can do the following:
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-
-att$overall.att
-```
-
-To extract the standard errors, we do the following:
+We can estimate dynamic treatment effects with the `aggte()` function:
 
 ```{r}
 #| comment: "#>"
 #| class-output: r
 
-att$overall.se
-```
-:::
-
-<br />
-
-### R: Aggregating Dynamic Effects
-
-We can estimate dynamic treatment effects with the **aggte** function:
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-
-dynamic <- aggte(
-  MP    = csdid,      # model from att_gt
-  type  = "dynamic",  # this tells R aggregate for dynamic effects
-  na.rm = T
+dynamic = aggte(
+  MP     = m1,         # model from att_gt
+  type   = "dynamic",  # this tells R aggregate for dynamic effects
+  na.rm  = T
 )
-
-# summary(dynamic) if you want to see the exact dynamic effect numbers
 ```
 
-We can then plot these effects with the **ggdid** package included in the **did** package:
+We can then plot these effects with the `ggdid()` function included in the **did** package:
 
 ```{r}
-#| eval: false
-graph <- ggdid(
-  # required arguments
-  object = dynamic,              # input your object from aggte
-  
-  # optional arguments
-  xlab   = "Time to Treatment",  # x-axis label
-  ylab   = "Dynamic ATT",        # y-axis label
-  title  = "Dynamic Effects"     # you can include a title string if you want
-) 
-
-graph + geom_vline(xintercept = -0.5, linetype = 3) # line at treat time
-```
-
-```{r}
-#| fig-height: 3
-#| echo: false
+#| fig-height: 3.5
 #| message: false
 #| fig-align: center
 
-library(ggdark)
-m = ggdid(
-  object = dynamic,             # input your object from aggte
-  xlab = "Time to Treatment",  # x-axis label
-  ylab = "Dynamic ATT",        # y-axis label
-  title  = "Dynamic Effects"     # you can include a title string if you want
-) + geom_vline(xintercept = -0.5, linetype = 3)
-
-m + dark_mode(theme_bw())
+ggdid(
+  # required arguments
+  object  = dynamic,              # input your object from aggte
+  
+  # optional arguments
+  xlab    = "Time to Treatment",  # x-axis label
+  ylab    = "Dynamic ATT",        # y-axis label
+  title   = "Dynamic Effects"     # you can include a title string if you want
+)
 ```
 
-<br />
-
-### R: Aggregating Group ATT
+## Cohort
 
 If we are interested in how the ATT differs by year of treatment adoption, we can also aggregate effects by initial treatment period group:
 
@@ -210,49 +182,31 @@ If we are interested in how the ATT differs by year of treatment adoption, we ca
 #| comment: "#>"
 #| class-output: r
 
-group <- aggte(
-  MP    = csdid,    # model from att_gt
-  type  = "group",  # this tells R aggregate for dynamic effects
-  na.rm = T
+group = aggte(
+  MP     = m1,    # model from att_gt
+  type   = "group",  # this tells R aggregate for dynamic effects
+  na.rm  = T
 )
-
-# summary(group) if you want to see the exact group-ATT numbers
 ```
 
 We can then plot these effects with the **ggdid** function included in the **did** package:
 
 ```{r}
-#| eval: false
-
-ggdid(
-  # required arguments
-  object = group,           # input your object from aggte
-  
-  # optional arguments
-  xlab   = "ATT Estimate",  # x-axis label
-  ylab   = "Group",         # y-axis label
-  title  = "Group ATT"      # you can include a title string if you want
-)
-```
-
-```{r}
-#| echo: false
 #| fig-height: 3
 #| fig-align: center
 
-graph <- ggdid(
-  object = group,           # input your object from aggte
-  xlab   = "ATT Estimate",  # x-axis label
-  ylab   = "Group",         # y-axis label
-  title  = "Group ATT"      # you can include a title string if you want
+ggdid(
+  # required arguments
+  object  = group,           # input your object from aggte
+  
+  # optional arguments
+  xlab    = "ATT Estimate",  # x-axis label
+  ylab    = "Group",         # y-axis label
+  title   = "Group ATT"      # you can include a title string if you want
 )
-graph + # line at 0 treat effect
-  dark_mode(theme_bw())
 ```
 
-<br />
-
-### R: Heterogeneity Across Time
+## Calendar
 
 We can also explore how treatment effects change over calendar time (not relative time, but actual time).
 
@@ -260,19 +214,18 @@ We can also explore how treatment effects change over calendar time (not relativ
 #| comment: "#>"
 #| class-output: r
 
-time <- aggte(
-  MP    = csdid,       # model from att_gt
-  type  = "calendar",  # this tells R aggregate for dynamic effects
-  na.rm = T
+time = aggte(
+  MP     = m1,       # model from att_gt
+  type   = "calendar",  # this tells R aggregate for dynamic effects
+  na.rm  = T
 )
-
-# summary(group) if you want to see the exact group-ATT numbers
 ```
 
 We can then plot these effects with the **ggdid** function included in the **did** package:
 
 ```{r}
-#| eval: false
+#| fig-height: 3
+#| fig-align: center
 
 ggdid(
   # required arguments
@@ -284,25 +237,11 @@ ggdid(
   title  = "Calendar Effects"  # you can include a title string if you want
 )
 ```
-
-```{r}
-#| echo: false
-#| fig-height: 3
-#| fig-align: center
-
-graph <- ggdid(
-  object = time,            # input your object from aggte
-  xlab   = "Time Period",  # x-axis label
-  ylab   = "Estimate",       # y-axis label
-  title  = "Calendar Effects"       # you can include a title string if you want
-)
-graph + # line at 0 treat effect
-  dark_mode(theme_bw())
-```
+:::
 
 <br />
 
-### Additional Resources
+**Additional Resources**
 
 Callaway, B. and Sant'Anna, P. H. C. (2021) 'Difference-in-Differences with multiple time periods', *Journal of Econometrics*, 225(2), pp. 200-230. Available at: <https://psantanna.com/files/Callaway_SantAnna_2020.pdf>.
 

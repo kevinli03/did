@@ -1,30 +1,31 @@
-# Interaction-Weighted
+# sunab (fixest) {.unnumbered}
 
-##### Sun and Abraham (2021)
+::: small
+staggered, absorbing, binary treatment
+:::
 
-### What is the IW Estimator?
-
-The Interaction-Weighted (IW) estimator, also known as **sunab**, is an estimator for DiD that solves the issues with TWFE in staggered settings. The estimator was proposed by Sun and Abraham (2021).
-
-IW is a **matching and reweighting estimator** for DiD, with the matching part solving the "forbidden comparisons" problem of TWFE, and the reweighting part solving the "negative weighting" problem of TWFE.
-
-First, the IW estimator "matches" treated units to control units in correct non-forbidden comparisons. It does this by separating all treated units into groups, grouped by their initial treatment year. Then, for group, IW compares treated vs. untreated for every year. This "matching" is done via interactions in regression:
+The **interaction-weighted** (IW) estimator, also called **sunab**, is used for DiD with staggered treatment. The estimator solves the bias of TWFE in staggered settings. The estimator essentially runs smaller DiDs for each different initial treatment period grouping. This is done by interactions in the TWFE model.
 
 $$
-Y_{it} = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \cdot 1\{R_{it} = r\} \cdot \tau_{gr}}_\text{comparisons for each group g and rel.time r} + \cov + \eps_{it}
+Y_{it} = \alpha_i + \delta_t + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \cdot 1\{R_{it} = r\} \cdot \tau_{gr}}_\text{comparisons for each group g and rel.time r} + \cov + \eps_{it}
 $$
 
 ::: small
 $G_i$ is a categorical variable that describes which initial treatment period unit $i$ received treatment. $R_{it}$ is a relative-time variable. Essentially, IW is estimating dynamic treatment effects for each initial treatment period group $g$.
 :::
 
-This matching will produce many different comparison estimates $\tau_{gr}$. These $\tau_{gr}$ are reweighted together, with weights determined by how many observations fall into each group $g$ and relative time period $r$. The $\tau_{gr}$ can be aggregated into the overall ATT, Dynamic ATT's with all groups combined together, and the overall ATT for each group $g$ separately.
+Then, these individual estimates $\tau_{g, r}$ are aggregated to obtain an overall ATT or dynamic ATTs.
 
-IW does not accommodate non-absorbing treatment. IW is also less flexible with covariates for parallel trends, since the linear model assumes a linear relationship between covariates and outcome (which might not always be realistic).
+```{r}
+#| message: false
+#| warning: false
+
+# packages needed:
+library(fixest)
+library(ggfixest)
+```
 
 <br />
-
-### R: Running the Model
 
 ```{r}
 #| echo: false
@@ -34,82 +35,71 @@ IW does not accommodate non-absorbing treatment. IW is also less flexible with c
 library(fixest)
 data(base_stagg, package = "fixest")
 df <- base_stagg
-colnames(df) <- c("unit", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
+colnames(df) <- c("unit", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
 
+::: panel-tabset
+## Syntax
+
+We use the `feols()` function and the `sunab()` function to run the matching process of sunab:
+
+```{r}
+#| message: false
+
+m1 = feols(
+  fml = outcome ~ sunab(cohort, time) + covar | unit + time,
+  data = df,
+  vcov = ~ unit
+)
+
+# see the variables tab for details on the cohort variable
+```
+
+This completes the matching process. We then need to aggregate to obtain the treatment effects.
+
+## Variables
+
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
-| Variable      | Description                                                                                                                                                                                                                |
-|------------|------------------------------------------------------------|
-| `unit`        | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                        |
-| `time`        | A variable indicating time-periods in our study for each observation.                                                                                                                                                      |
-| `outcome`     | Outcome variable for each observation.                                                                                                                                                                                     |
-| `covar`       | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                                  |
-| `first.treat` | This variable indicates the initial year of treatment adoption for each unit. For the never-treated, we should set the value of `first.treat` to a very large positive/negative value that is outside the range of `time`. |
+| Variable  | Description                                                                                                                                                                                                           |
+|------------------|------------------------------------------------------|
+| `unit`    | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
+| `time`    | A variable indicating time-periods in our study for each observation.                                                                                                                                                 |
+| `outcome` | Outcome variable for each observation.                                                                                                                                                                                |
+| `covar`   | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                             |
+| `cohort`  | This variable indicates the initial year of treatment adoption for each unit. For the never-treated, we should set the value of `cohort` to a very large positive/negative value that is outside the range of `time`. |
 
 ::: small
 \*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
 :::
 
-::: {.callout-note collapse="true" appearance="simple"}
-## Creating a first.treat Variable
+## Notes
 
-If your dataset lacks a first.treat variable, this is how you create one, using the other variables above.
+The variable `cohort` should be of the following:
 
-```{r}
-#| warning: false
-#| message: false
+1.  Units that get treated at any time period, should have a `cohort` value of that initial treatment period.
+2.  Units that never get treated at any time, should have a very large/small `cohort` value that is not one of the `time` fixed effects.
 
-library(tidyverse)
-
-# create first.treat
-first.treat <- df %>%
-  select(treat, time, unit) %>%
-  filter(treat == 1) %>%
-  group_by(unit) %>%
-  summarise(first.treat = min(time))
-
-# join first.treat to df
-df <- left_join(df, first.treat)
-
-# replace NA's (never-treated) in first.treat with big number
-df$first.treat <- replace_na(df$first.treat, 10000)
-```
-
-::: small
-\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. The `treat` variable should also be grouped by the same group/level.
+Ensure that `cohort` is **not** equal to `NA` for the never-treated (control) group. This will cause inaccurate estimation.
 :::
-:::
-
-With all the proper variables, we can estimate a IW model with the **fixest** package:
-
-```{r}
-library(fixest)
-
-iw <- feols(
-  fml = outcome ~
-          sunab(first.treat, time) + covar | unit + time,
-  data = df,
-  vcov = ~unit
-)
-```
-
-This model has now done the matching and estimating $\tau_{gr}$. We now can choose different ways to aggregate these.
 
 <br />
 
-### R: Aggregating the ATT
+After completing the matching process, we can aggregate our effects into an overall ATT, dynamic ATTs, and cohort-ATTs.
 
-To aggregate the matched treatment effects $\tau_{gr}$ into a singular ATT causal estimate for all treated observations, we can use the **aggregate()** function:
+::: panel-tabset
+## ATT
+
+We use the `aggregate()` function to aggregate our matched treatment effects into an overall treatment effect.
 
 ```{r}
 #| comment: "#>"
 #| class-output: r
 
-att <- aggregate(
-  x   = iw,    # IW model object
-  agg = "att"  # output the ATT
+att = aggregate(
+  x    = m1,    # IW model object
+  agg  = "att"  # output the ATT
 )
 
 print(att)
@@ -117,117 +107,29 @@ print(att)
 
 We can see the estimated ATT in the output table, as well as the estimated p-value in `Pr(>|t|)`.
 
-::: {.callout-note collapse="true" appearance="simple"}
-## Extract the ATT Directly
-
-If you are interested in extracting the ATT and confidence intervals directly from the att object for tables/figures, you can do the following:
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-#| results: hold
-
-att <- as.data.frame(att)
-
-# extract att
-att[1,1]
-
-# extract std. error
-att[1,2]
-```
-
-::: small
-This can be useful if you are making a graph/table comparing different estimators.
-:::
-:::
-
-<br />
-
-### R: Aggregating Dynamic Effects
+## Dynamic
 
 We can plot the dynamic treatment effects using the IW object estimated when running the model:
 
 ```{r}
 #| message: false
 #| warning: false
-#| eval: false
-
-library(ggfixest)
-library(ggplot)
-
-plot <- ggiplot(
-  # required options
-  object   = iw,                # input your original iw model
-  ref.line = FALSE,             # we will add our own line later
-  
-  # (optional) aesthetic options
-  xlab     = "Time Relative to Treatment",       # x-axis label
-  ylab     = "Dynamic ATT Estimate",             # y-axis label
-  main     = "Dynamic Treatment Effects (IW)",   # title for plot
-)
-
-plot +
-  # select how many period to display
-  xlim(-8, 8) +
-  
-  # add reference lines for treatment beginning and 0 causal effect
-  geom_vline(xintercept = -0.5, linetype = 3) +
-  geom_hline(yintercept = 0, linetype = 3, color = "red") +
-  
-  # ggplot theme (optional, change to your liking)
-  theme_bw()
-
-```
-
-```{r}
-#| message: false
-#| warning: false
 #| fig-height: 3
-#| echo: false
 #| fig-align: center
 
-library(ggdark)
-library(ggfixest)
-
-plot <- ggiplot(
+ggiplot(
   # required options
-  object   = iw,           # input your dynamic model name
-  ref.line = FALSE,             # we will add our own line later
+  object  = m1,                                  # input your original iw model
   
-  # optional aesthetic options
-  xlab     = "Time Relative to Treatment",  # x-axis label
-  ylab     = "Dynamic ATT Estimate",        # y-axis label
-  main     = "Dynamic Treatment Effects (IW)",   # title for plot
-)
-
-plot +
-  xlim(-8, 8) +
-  geom_vline(xintercept = -0.5, linetype = 3) +               # add treatment begin line
-  geom_hline(yintercept = 0, linetype = 3, color = "red") +  # add 0 effect line
-  dark_mode(theme_bw())
+  # optional options
+  xlab    = "Time Relative to Treatment",       # x-axis label
+  ylab    = "Dynamic ATT Estimate",             # y-axis label
+  main    = "Dynamic Treatment Effects (IW)",   # title for plot
+) + 
+  xlim(-8, 8) # how many period to include.
 ```
 
-::: {.callout-note collapse="true" appearance="simple"}
-## Finding Exact Dynamic Coefficient Values
-
-If you want exact dynamic coefficient values (to see or for a table), we have to use the aggregate command
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-
-dynamic <- aggregate(
-  x   = iw,       # IW model object
-  agg = "period"  # output the dynamic effects
-)
-
-head(dynamic) # print(dynamic) to see all the coefficient values
-```
-:::
-
-<br />
-
-### R: Aggregating Group ATT
+## Group
 
 If we are interested in how the ATT differs by year of treatment adoption, we can also aggregate effects by initial treatment period group:
 
@@ -236,96 +138,43 @@ If we are interested in how the ATT differs by year of treatment adoption, we ca
 #| class-output: r
 
 group <- aggregate(
-  x   = iw,       # IW model object
+  x   = m1,       # IW model object
   agg = "cohort"  # output the dynamic effects
 )
-
-# print(group) if you want to see the exact group-ATT numbers
 ```
 
 There isn't a quick way to immediately plot these estimates, but we can manually create a ggplot:
 
 ```{r}
-#| eval: false
-
-library(tidyverse)
-
-# make group a df
-group <- as.data.frame(group)
-
-# add cohort period to group df
-group$period <- rownames(group)
-group$period <- as.factor(group$period)
-
-# calculate lower and upper conf intervals
-group$lower <- group$Estimate - 1.96*group$`Std. Error`
-group$upper <- group$Estimate + 1.96*group$`Std. Error`
-
-# ggplot
-ggplot(data = group, aes(x = Estimate, y = period)) +
-  # vertical line at 0 treatment effect
-  geom_vline(xintercept = 0, color = "red", linetype = 3) +
-  
-  # plot the treatment effects
-  geom_point(color = "blue") +
-  
-  # plot the confidence intervals
-  geom_linerange(aes(xmin = lower, xmax = upper), width = 0.2, color = "blue") +
-  
-  # title (optional)
-  labs(title = "Treatment Effects by Initial Treatment Period") +
-
-  # x-axis and y-axis labels (optional)
-  xlab("Estimated ATT (IW)") + ylab("Initial Treatment Period") +
-  
-  # theme (optional, change to your liking)
-  theme_bw()
-```
-
-```{r}
-#| echo: false
 #| fig-height: 3.5
 #| warning: false
 #| fig-align: center
 
-library(tidyverse)
-
 # make group a df
-group <- as.data.frame(group)
+group = as.data.frame(group)
 
 # add cohort period to group df
-group$period <- rownames(group)
-group$period <- as.factor(group$period)
+group$period = rownames(group)
+group$period = as.factor(group$period)
 
 # calculate lower and upper conf intervals
-group$lower <- group$Estimate - 1.96*group$`Std. Error`
-group$upper <- group$Estimate + 1.96*group$`Std. Error`
+group$lower = group$Estimate - 1.96*group$`Std. Error`
+group$upper = group$Estimate + 1.96*group$`Std. Error`
 
 # ggplot
 ggplot(data = group, aes(x = Estimate, y = period)) +
-  # vertical line at 0 treatment effect
-  geom_vline(xintercept = 0, color = "red", linetype = 3) +
-  
-  # plot the treatment effects
-  geom_point(color = "blue") +
-  
-  # plot the confidence intervals
-  geom_linerange(aes(xmin = lower, xmax = upper), width = 0.2, color = "blue") +
-  
-  # title
-  labs(title = "Treatment Effects by Initial Treatment Period") +
-
-  # x-axis and y-axis labels
-  xlab("Estimated ATT (IW)") + ylab("Initial Treatment Period") +
-  
-  # theme
-  dark_mode(theme_bw())
-
+  geom_vline(xintercept = 0, color = "red", linetype = 3) +  # vertical line at 0 treatment effect
+  geom_point() +  # plot the treatment effects
+  geom_linerange(aes(xmin = lower, xmax = upper), width = 0.2) +  # conf intervals
+  labs(title = "Treatment Effects by Initial Treatment Period") +  # title (optional)
+  xlab("Estimated ATT (IW)") + ylab("Initial Treatment Period") +  # x-axis and y-axis labels (optional)
+  theme_bw() # theme (optional, change to your liking)
 ```
+:::
 
 <br />
 
-### Additional Resources
+**Additional Resources**
 
 Sun, L. and Abraham S. (2021) 'Estimating Dynamic Treatment Effects in Event studies with Heterogenous Treatment Effects', *Journal of Econometrics*, 225(2), pp. 175-199. Available at: <https://arxiv.org/abs/1804.05785>
 

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Two-Way Fixed Effects – Difference-in-Differences (DiD) Resources</title>
+<title>twfe (fixest) – Difference-in-Differences (DiD) Resources</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -59,17 +59,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./did.html" rel="prev">
+<link href="./sunab.html" rel="next">
+<link href="./panelview.html" rel="prev">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "language": {
     "search-no-results-text": "No results",
@@ -129,7 +130,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./twfe.html">Two-Way Fixed Effects</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./twfe.html">twfe (fixest)</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -152,85 +153,59 @@ window.Quarto = {
  <span class="menu-text">Welcome!</span></a>
   </div>
 </li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./did.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Basics of DiD</span></a>
+  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">panelView</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Two-Way Fixed Effects</span></a>
+ <span class="menu-text">twfe (fixest)</span></a>
   </div>
 </li>
-        <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./sunab.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Interaction-Weighted</span></span></a>
+ <span class="menu-text">sunab (fixest)</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./csdid.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Doubly-Robust</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./didmultiple.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">DIDmultiple</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./panelmatch.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">PanelMatch</span></span></a>
+ <span class="menu-text">csdid (did)</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./fect.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Imputation</span></span></a>
+ <span class="menu-text">fect</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./didmultiple.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">DIDmultiplegtDYN</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./panelmatch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">PanelMatch</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./did2s.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">2-Stage DiD</span></span></a>
+ <span class="menu-text">did2s</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">ETWFE</span></span></a>
-  </div>
-</li>
-        <li class="px-0"><hr class="sidebar-divider hi "></li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">PanelView</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./pta.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Parallel Trends</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./honest.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">HonestDiD</span></span></a>
-  </div>
-</li>
-        <li class="px-0"><hr class="sidebar-divider hi "></li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./gsynth.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Gsynth</span></span></a>
+ <span class="menu-text">etwfe</span></a>
   </div>
 </li>
     </ul>
@@ -238,25 +213,15 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#what-is-twfe" id="toc-what-is-twfe" class="nav-link active" data-scroll-target="#what-is-twfe">What is TWFE?</a></li>
-  <li><a href="#issues-with-twfe" id="toc-issues-with-twfe" class="nav-link" data-scroll-target="#issues-with-twfe">Issues with TWFE</a></li>
-  <li><a href="#r-setting-up-the-data" id="toc-r-setting-up-the-data" class="nav-link" data-scroll-target="#r-setting-up-the-data">R: Setting Up the Data</a></li>
-  <li><a href="#r-estimating-the-att" id="toc-r-estimating-the-att" class="nav-link" data-scroll-target="#r-estimating-the-att">R: Estimating the ATT</a></li>
-  <li><a href="#r-estimating-dynamic-effects" id="toc-r-estimating-dynamic-effects" class="nav-link" data-scroll-target="#r-estimating-dynamic-effects">R: Estimating Dynamic Effects</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Two-Way Fixed Effects</h1>
+<h1 class="title">twfe (fixest)</h1>
 </div>
 
 
@@ -273,52 +238,58 @@ window.Quarto = {
 </header>
 
 
-<section id="what-is-twfe" class="level3">
-<h3 class="anchored" data-anchor-id="what-is-twfe">What is TWFE?</h3>
-<p>Two-way fixed effects (TWFE) is the primary estimator used to estimate causal effects in difference-in-differences. The TWFE estimator is a regression model specified as follows:</p>
-<p><span class="math display">\[
-Y_{it} = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + D_{it}\tau + \cov + \eps_{it}
-\]</span></p>
 <div class="small">
-<p><span class="math inline">\(Y_{it}\)</span> is the outcome, <span class="math inline">\(D_{it}\)</span> is the treatment, <span class="math inline">\(\b X_{it}\)</span> is a vector of covariates (optional) for parallel trends, and <span class="math inline">\(\tau\)</span> is the causal effect.</p>
+<p>non-staggered, absorbing, binary treatment</p>
 </div>
-<p>For dynamic treatment effects, the TWFE model is estimated as:</p>
+<p>The two-way fixed effects (TWFE) estimator is the standard estimator used for classical and generalised DID, when there is non-staggered treatment implementation and absorbing treatment. The model takes the following form.</p>
 <p><span class="math display">\[
-Y_{it} = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \sum_{r ≠ -1} 1\{R_{it} = r\} \cdot \tau_r + \eps_{it}
+Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{it}^\top\hat{\b\beta} + \hat\eps_{it}
 \]</span></p>
+<p>The TWFE <span class="math inline">\(\hat\tau_\text{ATT}\)</span> estimate is an unbiased esitmator of the ATT if treatment is non-staggered and absorbing, and the identification assumptions (parallel trends, no anticipation, SUTVA) hold.</p>
 <div class="small">
-<p><span class="math inline">\(R_{it}\)</span> is a relative-time variable, that is equal to the time period <span class="math inline">\(t\)</span> minus the initial treatment period of unit <span class="math inline">\(i\)</span>. <span class="math inline">\(1\{R_{it}=r\}\)</span> is an indicator variable that equals 1 if <span class="math inline">\(R_{it} = r\)</span>, and 0 otherwise.</p>
+<p>TWFE can be severely biased if there is staggered treatment or non-absorbing treatment.</p>
 </div>
-<p>Fixed effect <span class="math inline">\(\alpha_i\)</span> accounts/controls for differences between units, and <span class="math inline">\(\gamma_t\)</span> accounts/controls for differences between time periods. If we account for differences between units and differences between time periods, the only possible confounders remaining are unit-specific trends over time. But with the parallel trends assumption, we rule out this type of confounder.</p>
-<p>Thus, under the parallel trends assumption, there are no omitted confounders/variables, and our regression is exogenous. Since OLS is unbiased under exogeneity, our TWFE estimator for <span class="math inline">\(\tau\)</span> is unbiased.</p>
-<p><br></p>
-</section>
-<section id="issues-with-twfe" class="level3" data-link="issues with TWFE">
-<h3 data-link="issues with TWFE" class="anchored" data-anchor-id="issues-with-twfe">Issues with TWFE</h3>
-<p>TWFE has been shown to be a <strong>biased</strong> estimator (bad estimator) for the ATT and dynamic treatment effects when dealing with staggered treatment implementation. So when units begin treatment at different times, TWFE is biased.</p>
-<p>Why is this? <a href="https://www.nber.org/papers/w25018">Goodman-Bacon (2021)</a> shows that in a staggered setting, TWFE is actually a weighted average of 4 comparisons:</p>
-<ol type="1">
-<li>Early-treated units vs.&nbsp;untreated units.</li>
-<li>Late-treated units vs.&nbsp;untreated units.</li>
-<li>Early-treated units vs.&nbsp;late-treated units before treatment.</li>
-<li>Early-treated units after treatment vs.&nbsp;late-treated units before <strong>and</strong> <strong>after</strong> treatment.</li>
-</ol>
-<p>When we compare treatment to control, we want to compare treated to untreated units. The issue comes with the 4th comparison - we actually use late-treated units <strong>after</strong> receiving treatment as a untreated comparison. This is called the “forbidden comparison” problem of TWFE.</p>
-<p><a href="https://www.nber.org/system/files/working_papers/w25904/w25904.pdf">De Chaisemartin and D’Haultœuille (2020)</a> show that there is another problem with TWFE - the weighting of these comparisons when aggregating these comparisons. For an accurate <strong>average treatment effect</strong> on the treated (ATT), we in theory want to weight each comparison by the proportion of the sample size each comparison contains. For example, if more units are in the early-treated units, we would want to weight that comparison more.</p>
-<p>The issue with TWFE is that not only does it not weight by group size, it doesn’t even always give positive weights. In fact, sometimes, TWFE will assign <strong>negative</strong> weights to certain comparisons. This is completely nonsensical, and has been shown to even <strong>reverse</strong> the sign of the true ATT in simulations.</p>
-<p>Thus, TWFE is a <strong>biased</strong> estimator <u>when it comes to staggered treatment</u> designs. Since 2021, Econometricians have started developing <strong>modern estimators</strong> that resolve the issues with TWFE.</p>
-<div class="small">
-<p>Brantly Callaway has a more detailed page on the <a href="https://bcallaway11.github.io/did/articles/TWFE.html">issues with TWFE</a>. Pedro Sant’Anna also has a <a href="https://psantanna.com/DiD/11_Staggered_problems.pdf">powerpoint</a> on the Bacon-Goodman decomposition.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># packages needed: </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fixest)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggfixest)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
-</section>
-<section id="r-setting-up-the-data" class="level3">
-<h3 class="anchored" data-anchor-id="r-setting-up-the-data">R: Setting Up the Data</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Variables</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>We use the <code>feols()</code> function to run the TWFE model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">=</span> <span class="fu">feols</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml   =</span> outcome <span class="sc">~</span> treat <span class="sc">+</span> covar <span class="sc">|</span> unit <span class="sc">+</span> time,  <span class="co"># covariate is optional</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> df,                                     <span class="co"># your data</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov  =</span> <span class="sc">~</span> unit                                  <span class="co"># cluster SE by unit</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; OLS estimation, Dep. Var.: outcome</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Observations: 950</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Fixed-effects: unit: 95,  time: 10</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Standard-errors: Clustered (unit) </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       Estimate Std. Error  t value  Pr(&gt;|t|)    </span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; treat -3.68310   0.361071 -10.2005 &lt; 2.2e-16 ***</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; covar  1.01833   0.032416  31.4142 &lt; 2.2e-16 ***</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; RMSE: 1.60906     Adj. R2: 0.691054</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 Within R2: 0.623425</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<p>The coefficient of <code>treat</code> is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by <code>Pr(&gt;|t|)</code> (the p-value) and the stars <code>***</code> .</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 16%">
-<col style="width: 83%">
+<col style="width: 20%">
+<col style="width: 79%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -356,191 +327,90 @@ Y_{it} = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \sum_{r ≠ -1}
 <div class="small">
 <p>*For repeated cross-section, the <code>unit</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>unit</code> variable.</p>
 </div>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Creating a rel.time Variable
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>To create a rel.time variable if your dataset does not have one, we first need to create a first.treat variable, which indicates the period that a unit first gets treated.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># create first.treat</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>first.treat <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(treat, time, unit) <span class="sc">%&gt;%</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(treat <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(unit) <span class="sc">%&gt;%</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">first.treat =</span> <span class="fu">min</span>(time))</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># join first.treat to df</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">left_join</span>(df, first.treat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Now, we can create a rel.time variable:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>rel.time <span class="ot">&lt;-</span> df<span class="sc">$</span>time <span class="sc">-</span> df<span class="sc">$</span>first.treat</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># now set our never-treated rel.time values to a super large or small num</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>rel.time <span class="ot">&lt;-</span> <span class="fu">replace_na</span>(df<span class="sc">$</span>rel.time, <span class="sc">-</span><span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </div>
 </div>
 </div>
 <p><br></p>
-</section>
-<section id="r-estimating-the-att" class="level3">
-<h3 class="anchored" data-anchor-id="r-estimating-the-att">R: Estimating the ATT</h3>
-<p>We use the <strong>fixest</strong> package to run a TWFE model:</p>
+<p>We can also estimate event-study dynamic effects for pre and post-treatment periods.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Variables</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>We use the <code>feols()</code> function to run the TWFE event study.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fixest)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>att <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml   =</span> outcome <span class="sc">~</span> treat <span class="sc">+</span> covar <span class="sc">|</span> unit <span class="sc">+</span> time,  <span class="co"># covariate is optional</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> df,                                     <span class="co"># your data</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov  =</span> <span class="sc">~</span>unit                                   <span class="co"># cluster SE by unit</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(att)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; OLS estimation, Dep. Var.: outcome</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Observations: 950</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Fixed-effects: unit: 95,  time: 10</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Standard-errors: Clustered (unit) </span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       Estimate Std. Error  t value  Pr(&gt;|t|)    </span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; treat -3.68310   0.361071 -10.2005 &lt; 2.2e-16 ***</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; covar  1.01833   0.032416  31.4142 &lt; 2.2e-16 ***</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; RMSE: 1.60906     Adj. R2: 0.691054</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 Within R2: 0.623425</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<p>The coefficient of <code>treat</code> is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by <code>Pr(&gt;|t|)</code> (the p-value) and the stars <code>***</code> .</p>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Extracting ATT Directly
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>If you need to extract the att directly (to create tables or graphs), we can use the <strong>coef()</strong> function in the fixest package:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(att)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     treat     covar </span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -3.683101  1.018332</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<p>This is a table, so we can subset the treatment coefficient directly to extract it.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(att)[<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     treat </span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -3.683101</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<p>We can also directly extract confidence intervals in a similar way.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(att)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            2.5 %    97.5 %</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; treat -4.4000165 -2.966186</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; covar  0.9539689  1.082695</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<p>This is a table, so we can subset the treatment coefficient directly to extract it.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(att)[<span class="dv">1</span>,<span class="dv">1</span>]</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(att)[<span class="dv">1</span>,<span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -4.400017</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -2.966186</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<p><br></p>
-</section>
-<section id="r-estimating-dynamic-effects" class="level3">
-<h3 class="anchored" data-anchor-id="r-estimating-dynamic-effects">R: Estimating Dynamic Effects</h3>
-<p>We use the <strong>fixest</strong> package to run a TWFE model for dynamic effects:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fixest)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>dynamic <span class="ot">&lt;-</span> <span class="fu">feols</span>(</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml   =</span> outcome <span class="sc">~</span> <span class="fu">i</span>(rel.time, <span class="at">ref =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">1000</span>)) <span class="sc">+</span> covar <span class="sc">|</span> unit <span class="sc">+</span> time,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Do not change -1 in c(). You change -1000 to the value of never-treated for rel.time</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> df,     <span class="co"># your data</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov  =</span> <span class="sc">~</span>unit   <span class="co"># cluster SE by unit</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(dynamic) if you want to find the actual values of coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">=</span> <span class="fu">feols</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml   =</span> outcome <span class="sc">~</span> <span class="fu">i</span>(rel.time, group, <span class="at">ref =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span> covar <span class="sc">|</span> unit <span class="sc">+</span> time,  <span class="co"># group = treat/never-treat</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> df,                                                            <span class="co"># your data</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov  =</span> <span class="sc">~</span> unit                                                         <span class="co"># cluster SE by unit</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can plot these results.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggfixest)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggiplot</span>(</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required options</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">object   =</span> dynamic,           <span class="co"># input your dynamic model object</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ref.line =</span> <span class="cn">FALSE</span>,             <span class="co"># we will add our own line later</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional aesthetic options</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab     =</span> <span class="st">"Time Relative to Treatment"</span>,  <span class="co"># x-axis label</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab     =</span> <span class="st">"Dynamic ATT Estimate"</span>,        <span class="co"># y-axis label</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">main     =</span> <span class="st">"Dynamic Treatment Effects"</span>,   <span class="co"># title for plot</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>plot <span class="sc">+</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># select how many period to display</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">8</span>, <span class="dv">8</span>) <span class="sc">+</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># add reference lines for treatment beginning and 0 causal effect</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ggplot theme (optional, change to your liking)</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggiplot</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required options</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">object  =</span> m2,                            <span class="co"># input your dynamic model object</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional options</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time Relative to Treatment"</span>,  <span class="co"># x-axis label</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Dynamic ATT Estimate"</span>,        <span class="co"># y-axis label</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Dynamic Treatment Effects"</span>,   <span class="co"># title for plot</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">8</span>, <span class="dv">8</span>) <span class="co"># select how many periods to display</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="twfe_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+<p><img src="twfe_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Here we can see all of our dynamic treatment effects plotted. We can split the dynamic treatment effects into 2 groups for interpretation purposes.</p>
-<ol type="1">
-<li>Pre-treatment (before the white dotted line). If parallel trends assumption is met, then the confidence intervals of the estimates should cover 0 (the red line).</li>
-</ol>
-<div class="small">
-<p>In this example, we can see evidence that parallel trends is violated.</p>
 </div>
-<ol start="2" type="1">
-<li>Post-treatment (after the white dotted line). These coefficients represent the treatment effect over time. If their confidence intervals do not include 0, that means the treatment effect is significant.</li>
-</ol>
-<div class="small">
-<p>In this example, we can see the initial post-treatment periods have negative effects, but this becomes positive as the years go on.</p>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 76%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>unit</code></td>
+<td>A variable indicating the units/individual an observation belongs to in our data.*</td>
+</tr>
+<tr class="even">
+<td><code>time</code></td>
+<td>A variable indicating time-periods in our study for each observation.</td>
+</tr>
+<tr class="odd">
+<td><code>outcome</code></td>
+<td>Outcome variable for each observation.</td>
+</tr>
+<tr class="even">
+<td><code>group</code></td>
+<td>Variable specifying if a unit is part of the treatment group or never-treated (control group). For units never receiving treatment, they get value 0, and for units that do end up receiving treatment sometime within the study, they get value 1.</td>
+</tr>
+<tr class="odd">
+<td><code>rel.time</code></td>
+<td>A relative time variable that indicates for the given period <span class="math inline">\(t\)</span> of an observation, how many time-periods away did the unit <span class="math inline">\(i\)</span> first get the treatment. For the never-treated observations, set the value to a very large or small number (-1000 is a common choice).</td>
+</tr>
+<tr class="even">
+<td><code>covar</code></td>
+<td>(optional) covariate(s) to condition for parallel trends.</td>
+</tr>
+</tbody>
+</table>
 </div>
+</div>
+</div>
+<p><br></p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -965,11 +835,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./did.html" class="pagination-link" aria-label="Basics of DiD">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Basics of DiD</span>
+      <a href="./panelview.html" class="pagination-link" aria-label="panelView">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">panelView</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./sunab.html" class="pagination-link" aria-label="sunab (fixest)">
+        <span class="nav-page-text">sunab (fixest)</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

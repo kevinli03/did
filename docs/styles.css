@@ -17,18 +17,4 @@ table {
 }
 .bolder {
   font-weight: 900;
-  color: #999;
-}
-
-code {
-    background-color: #000000 !important;
-    color: #ffffff; /* Optional: White text for contrast */
-    padding: 1px 4px; /* Optional: Add padding for better appearance */
-    border-radius: 3px; /* Optional: Rounded corners */
-}
-
-pre.sourceCode {
-  border: 1px solid #444; /* Light gray border */
-  border-radius: 4px; /* Optional: rounded corners */
-  padding: 10px; /* Optional: padding for better appearance */
 }

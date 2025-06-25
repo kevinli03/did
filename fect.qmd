@@ -1,16 +1,10 @@
-# Imputation
-
-##### Liu, Xu, and Wang (2024)
-
-### What is Imputation?
-
-The Imputation method, also known as the fixed-effects counterfactual estimator (FEct), is an estimator for DiD that solves the issues with TWFE in staggered settings. The estimator also accomodates non-absorbing treatment. The estimator was proposed by Liu, Xu, and Wang (2024). The same approach is also proposed by Borusyak, Jaravel, and Spiess (2021).
+# fect {.unnumbered}
 
 ::: small
-I will only use the **fect** package from Liu, Xu, and Wang (2024), not the **DIDimputation package** from Borusyak, Jaravel, and Spiess (2021), or the **did2s** package from Gardner (2021). These do almost the identical thing, but fect has additional estimators and tools that make it more useful.
+non-staggered or staggered, absorbing or non-absorbing, binary treatment
 :::
 
-For treated units $D_{it} = 1$, the potential outcome $Y_{it}(0)$ is a counterfactual we do not observe. Imputation estimators try to estimate $Y_{it}(0)$, which allows us to compute individual treatment effects $\tau_i$ and find the ATT. FEct estimates $Y_{it}(0)$ for treated units by using the following model:
+The fixed-effects counterfactual estimator (fect) is an estimator for DiD proposed by Liu, Xu, and Wang (2024). The estimator uses potential outcomes - for treated units $D_{it} = 1$, the potential outcome $Y_{it}(0)$ is a counterfactual we do not observe. Imputation estimators try to estimate $Y_{it}(0)$, which allows us to compute individual treatment effects $\tau_i$ and find the ATT:
 
 $$
 Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_{it}
@@ -20,17 +14,23 @@ $$
 This is literally a TWFE model with $D_{it} = 0$, which is the case for potential outcome $Y_{it}(0)$.
 :::
 
-Imputation estimators will use OLS to estimate $\hat\alpha_i$, $\hat\gamma_t$, and $\hat{\b\beta}$, using only untreated observations $D_{it} = 0$. Using these estimates, we can estimate missing counterfactuals $\hat Y_{it}(0)$. There are three versions of imputation estimators:
+1.  **fect**: this is what is described above.
+2.  **IFEct** (interactive fixed effects counterfactual): This is the above model for $Y_{it}(0)$, but with the inclusion of latent trends. More simply, this allows IFEct to be more robust to minor parallel trends violations.
+3.  **MC** (matrix completion). This is a machine-learning based approach of estimating $Y_{it}(0)$ that does not rely on fixed-effects. More simply, this allows MC to be more robust to minor parallel trends violations.
 
-1.  **FEct** (fixed effects counterfactual): this is what is described above.
-2.  **IFEct** (interactive fixed effects counterfactual): This is the above model for $Y_{it}(0)$, but with the inclusion of a term $\b\lambda_i' \b\xi_t$. The $\b\xi_t$ is a vector of latent variable that change over time, and $\b\lambda_i$ is a vector of how much each unit is related to each latent variable. More simply, this allows IFEct to be more robust to minor parallel trends violations.
-3.  **MC** (matrix completion). This is a more machine-learning based approach of estimating $Y_{it}(0)$ that does not rely on the fixed-effects specification.
-
+::: small
 You should generally run a FEct model first - and check if parallel trends are met. If parallel trends are violated, you should test IFEct and MC and see if parallel trends are met in those estimators.
+:::
+
+```{r}
+#| message: false
+#| warning: false
+
+# packages needed:
+library(fect)
+```
 
 <br />
-
-### R: Estimating the ATT
 
 ```{r}
 #| echo: false
@@ -44,10 +44,42 @@ colnames(df) <- c("unit", "time", "cohort", "rel.time", "treated", "te", "covar"
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
 
+::: panel-tabset
+## Syntax
+
+We use the `fect()` function to estimate fect, ifect, and mc models.
+
+```{r}
+#| comment: "#>"
+#| class-output: r
+#| message: false
+#| warning: false
+
+m1 = fect(
+  # required arguments
+  formula  = outcome ~ treat + covar,  # covar is optional
+  data     = df,
+  index    = c("unit", "time"),        # unit and time var
+  method   = "fe",                     # use "fe", "ife", or "mc"
+  
+  # optional arguments
+  CV       = F,                        # change to T for "ife" or "mc"
+  se       = T,                        # don't change
+  nboots   = 40,                       # usually you should use 200, larger is slower
+  seed     = 1239                      # any number will work
+)
+
+print(m1)
+```
+
+The output contains two different ATT estimates. It is typically conventional to use the first one, `Tr obs equally weighted`, which weights each observation $it$ equally (rather than the second which weights all $i$ equally).
+
+## Variables
+
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                         |
-|-----------|-------------------------------------------------------------------------------------------------------------------------------------|
+|----------------|--------------------------------------------------------|
 | `unit`    | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}. |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                               |
 | `outcome` | Outcome variable for each observation.                                                                                              |
@@ -56,208 +88,114 @@ Our dataset `df` should be a panel or repeated cross-section, and have the follo
 ::: small
 \*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
 :::
-
-With all the proper variables, we can estimate a FEct model with the **fect** package. As noted in the "what is imputation" section, we can choose between three methods: "fe", "ife", and "mc".
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-#| message: false
-
-library(fect)
-
-fect <- fect(
-  # required arguments
-  formula = outcome ~ treat + covar,  # covar is optional
-  data    = df,
-  index   = c("unit", "time"),        # unit and time var
-  method  = "fe",                     # use "fe", "ife", or "mc"
-  
-  # optional arguments
-  se      = T,                        # F means no estimated std error - much quicker
-  nboots  = 40,                       # usually you should use 200, larger is slower
-  seed    = 1239                      # any number. for replication
-)
-
-print(fect)
-```
-
-The output contains two different ATT estimates. It is typically conventional to use the first one, `Tr obs equally weighted`, which weights each observation $it$ equally (rather than the second which weights all $i$ equally).
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Extract the ATT Directly
-
-We can access the dataframe where the ATT and standard errors are stored as follows:
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-#| message: false
-
-fect$est.avg
-```
-
-Thus, we can subset and retrieve the elements of this dataframe:
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-#| message: false
-#| results: hold
-
-# ATT estimate
-fect$est.avg[1]
-
-# Lower confidence interval
-fect$est.avg[3]
-
-# Upper confidence interval
-fect$est.avg[4]
-```
 :::
 
 <br />
 
-### R: Estimating Dynamic Effects
+The fect package allows for a variety of plotting to illustrate our treatment effects. These options work with fe, ife, or mc. The fect package also contains two additional diagonistics to test for parallel trends
 
-The FEct package allows quick aggregation of dynamic effects through plotting. The plot is a ggplot object, if you want to change or make additions to it.
+::: panel-tabset
+## Dynamic
 
-```{r}
-#| eval: false
-
-library(ggplot2)
-
-plot(
-  # required arguments
-  x      = fect,                         # our output object from fect()
-  start0 = T,                            # don't change
-  
-  # optional aesthetic arguments
-  main   = "Dynamic Treatment Effects",  # title
-  ylab   = "Estimate",                   # y-axis label
-  xlab   = "Time to Treatment",          # x-axis label
-  xlim   = c(-7, 7)                      # what time periods to include (offset by +1)
-)
-```
+The fect package allows quick aggregation of dynamic effects through plotting. The plot is a ggplot object, if you want to change or make additions to it.
 
 ```{r}
-#| echo: false
 #| message: false
 #| fig-height: 3.5
 #| fig-align: center
 
-library(ggdark)
-library(ggplot2)
-plot = plot(
-  x      = fect,                         # our output object from fect()
-  main   = "Dynamic Treatment Effects",  # title
-  ylab   = "Estimate",                   # y-axis label
-  xlab   = "Time to Treatment",          # x-axis label
-  start0 = T,                            # don't change
-  xlim   = c(-7, 7)                      # what time periods to include (offset by +1)
-  
-)
-plot + dark_mode(theme_bw())
-```
-
-Note the bars below - it shows the number of observations of units who ever receive treatment in each time period.
-
-The fect package also allows us to conduct some pretty cool parallel trends tests, but that is for a later section.
-
-<br />
-
-### R: Treatment Heterogeneity
-
-FEct allows us to make some pretty cool graphs that allow us to explore treatment heterogeneity. First, we can explore how treatment effects change over calendar time (not relative time, but actual time). This is somewhat similar to the "grouped" ATT treatment effects of the matching and reweighting estimators.
-
-```{r}
-#| eval: false
-
 plot(
   # required arguments
-  x      = fect,                          # our output object from fect()
-  start0 = T,                             # don't change
+  x       = m1,                         # our output object from fect()
+  start0  = T,                            # don't change
   
   # optional aesthetic arguments
-  type   = "calendar",                    # don't change
-  main   = "Calendar Treatment Effects",  # title
-  ylab   = "Estimate",                    # y-axis label
-  xlab   = "Time Period",                 # x-axis label
-  xlim   = c(1, 10)                       # what time periods to include (offset by +1)
+  main    = "Dynamic Treatment Effects",  # title
+  ylab    = "Estimate",                   # y-axis label
+  xlab    = "Time to Treatment",          # x-axis label
+  xlim    = c(-7, 7)                      # what time periods to include (offset by +1)
 )
 ```
 
+## Calendar
+
+We can explore how treatment effects change over calendar time (not relative time, but actual time).
+
 ```{r}
-#| echo: false
 #| message: false
 #| fig-height: 3.5
 #| fig-align: center
 
-plot <- plot(
-  x      = fect,                          # our output object from fect()
-  type   = "calendar",                    # don't change
-  main   = "Calendar Treatment Effects",  # title
-  ylab   = "Estimate",                    # y-axis label
-  xlab   = "Time Period",                 # x-axis label
-  start0 = T,                             # don't change
-  xlim   = c(1, 10)                       # what time periods to include (offset by +1)
+plot(
+  # required arguments
+  x       = m1,                          # our output object from fect()
+  start0  = T,                             # don't change
+  type    = "calendar",                    # don't change
   
+  # optional aesthetic arguments
+  main    = "Calendar Treatment Effects",  # title
+  ylab    = "Estimate",                    # y-axis label
+  xlab    = "Time Period",                 # x-axis label
+  xlim    = c(1, 10)                       # what time periods to include (offset by +1)
 )
-
-plot + dark_mode(theme_bw())
 ```
 
-The red-line shows the overall ATT estimate. The highlighted area is the confidence intervals of the heterogeneous treatment effects over time.
-
-<br />
-
-### R: Individual Treatment Effects
+## Individual
 
 We can also explore the distributions of individual treatment effects by relative time period:
 
 ```{r}
-#| eval: false
-
-plot(
-  # required arguments
-  x      = fect,                            # our output object from fect()
-  start0 = T,                               # don't change
-  
-  # optional aesthetic options
-  type   = "box",                           # don't change
-  main   = "Individual Treatment Effects",  # title
-  ylab   = "Estimate",                      # y-axis label
-  xlab   = "Time to Treatment",             # x-axis label
-  xlim   = c(-7, 7)                         # what time periods to include (offset by +1)
-  
-)
-```
-
-```{r}
-#| echo: false
 #| message: false
 #| fig-height: 3.5
 #| fig-align: center
 
-plot = plot(
-  x      = fect,                            # our output object from fect()
-  type   = "box",                           # don't change
-  main   = "Individual Treatment Effects",  # title
-  ylab   = "Estimate",                      # y-axis label
-  xlab   = "Time to Treatment",             # x-axis label
-  start0 = T,                               # don't change
-  xlim   = c(-7, 7)                         # what time periods to include (offset by +1)
+plot(
+  # required arguments
+  x       = m1,                            # our output object from fect()
+  start0  = T,                               # don't change
+  type    = "box",                           # don't change
   
+  # optional aesthetic options
+  main    = "Individual Treatment Effects",  # title
+  ylab    = "Estimate",                      # y-axis label
+  xlab    = "Time to Treatment",             # x-axis label
+  xlim    = c(-7, 7)                         # what time periods to include (offset by +1)
 )
-
-plot + dark_mode(theme_bw())
 ```
 
-The fect package also allows us to conduct some pretty cool parallel trends tests, but that is for a later section.
+## Parallel Trends
+
+The fect package contains tools to more rigorously test the parallel trends assumption.
+
+```{r}
+#| message: false
+#| fig-height: 4.5
+#| fig-align: center
+
+plot(
+  # required arguments
+  x           = m1,                        # our output object from fect()
+  start0      = T,                         # don't change
+  type        = "equiv",
+  bound       = "equiv",
+  pre.period  = c(-4, 0),                  # how many pre-treat coef to test
+  
+  # optional aesthetic options
+  main        = "Parallel Trends Tests",   # title
+  ylab        = "Estimate",                # y-axis label
+  xlab        = "Time to Treatment",       # x-axis label
+  xlim        = c(-7, 7)                   # what time periods to include (offset by +1)
+)
+```
+
+An F-test tests if the joint combination of pre-treatment coefficients is statistically significantly different than 0. Since we do not want the coefficients to be different than 0, we want to get a high p-value and fail to reject the null.
+
+An Equivalence (TOST) test tests if the confidence intervals of our pre-treatment coefficients are within 0.36 standard deviations of the outcome variable of 0. Essentially, it tests if there is a substantively significant deviation in parallel trends
+:::
 
 <br />
 
-### Additional Resources
+**Additional Resources**
 
 Liu, L., Wang, Y., and Xu, Y. (2024) 'A Practical Guide to Counterfactual Estimators for Causal Inference with Time-Series Cross-Sectional Data', *American Journal of Political Science*, 68(1), pp. 160-176. Available at: <https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf>
 
