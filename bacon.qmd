@@ -1,1 +1,132 @@
 # bacondecomp {.unnumbered}
+
+::: small
+understanding bias of TWFE in staggered settings
+:::
+
+When the [TWFE estimator](twfe.qmd) is implemented in settings with staggered DiD, the estimated $\hat\tau$ of the TWFE estimator can be biased.
+
+The reason for this is because in staggered settings, TWFE can be "broken down" (decomposed) into a weighted average of other comparisons (which we call $\hat\beta$).
+
+There are two issues with this weighted average of comparisons $\hat\beta$:
+
+1.  Some of these comparisons are non-sensical. For example, sometimes some of these $\hat\beta$ are calculated with already-treated units being the control group, which should not be the case.
+2.  The weighting of these $\hat\beta$ is non-sensical. In theory, the weighted average should weight each $\hat\beta$ by how frequently that comparison occurs. But TWFE actually weights by when each $\hat\beta$ occurs in the timeline - early and late $\hat\beta$ are given less weights (sometimes negative weights).
+
+The result? TWFE can be incorrect in staggered settings. Sometimes, TWFE may even get the wrong direction of treatment effect.
+
+```{r}
+#| message: false
+#| warning: false
+
+# packages needed: 
+library(bacondecomp)
+```
+
+<br />
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+library(fixest)
+data(base_stagg, package = "fixest")
+df <- base_stagg
+colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
+df$treat <- ifelse(df$rel.time >= 0, 1, 0)
+```
+
+We start by breaking down the TWFE into its comparisions $\hat\beta$ with bacon decomposition.
+
+::: panel-tabset
+## Syntax
+
+We use the `bacon()` function to implement decomposition of TWFE:
+
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+#| fig-height: 4
+#| fig-align: center
+#| results: hold
+
+decomp = bacon(
+  formula   = outcome ~ treat,
+  data      = df,
+  id_var    = "id",
+  time_var  = "time"
+)
+
+decomp |> head()  # head() because a lot of comparisons
+```
+
+We can see the top output is a summary of the general comparisons, while the bottom output is the top 6 rows of all the individual $\hat\beta$ comparisons.
+
+We can also see Later vs. Earlier (already) treated is a comparison here, which is nonsensical.
+
+## Variables
+
+Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
+
+| Variable  | Description                                                                                          |
+|-----------------|-------------------------------------------------------|
+| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
+| `time`    | A variable indicating time-periods in our study for each observation.                                |
+| `outcome` | Outcome variable for each observation.                                                               |
+| `treat`   | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units. |
+:::
+
+<br />
+
+We know that any negative weights of any comparisons $\hat\beta$ are non-sensical. Thus, we can use the following code to check if there are any negative weights:
+
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+#| fig-height: 4
+#| fig-align: center
+
+decomp$weight |> min()
+```
+
+We can see in this example, we do not have a negative weight. However, if you do see one, it likely indicates that TWFE is likely very inaccurate in estimating the ATT, and you should use another estimator.
+
+<br />
+
+We can also plot the estimates and weights of all the comparisons.
+
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+#| fig-height: 4
+#| fig-align: center
+
+library(ggplot2)
+
+decomp |>
+  ggplot(aes(x = weight, y = estimate, shape = type, col = type)) +
+  geom_point() +
+  theme_bw() +
+  labs(
+    x      = "Weights",
+    y      = "Estimates",
+    shape  = "Type",
+    col    = "Type",
+    title  = "Decomposition of TWFE"
+  )
+```
+
+The green highlighted comparisons all involve earlier (already) treated units being used as control units, which is nonsensical. Bacon decomposition thus shows us the perils of relying on TWFE for staggered treatment.
+
+<br />
+
+**Additional Resources**
+
+Goodman-Bacon, A. (2021) 'Difference-in-Differences with variation in treatment timing', *Journal of Econometrics*, 225(2), pp. 254-277. Available at: <https://www.nber.org/papers/w25018>

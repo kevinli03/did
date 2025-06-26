@@ -11,7 +11,9 @@ book:
     - text: "Welcome!"
       href: index.qmd
     - text: "---"
+    - panelview.qmd
     - twfe.qmd
+    - bacon.qmd
     - sunab.qmd
     - csdid.qmd
     - fect.qmd
@@ -21,8 +23,6 @@ book:
     - impute.qmd
     - etwfe.qmd
     - text: "---"
-    - panelview.qmd
-    - bacon.qmd
     - fixest.qmd
     
 

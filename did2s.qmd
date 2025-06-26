@@ -79,7 +79,7 @@ The coefficient of `treat::1` is our estimate of the ATT - the causal effect of 
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                          |
-|-------------------|-----------------------------------------------------|
+|-----------|------------------------------------------------------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
 | `time`    | A variable indicating time-periods in our study for each observation.                                |
 | `outcome` | Outcome variable for each observation.                                                               |
@@ -142,7 +142,7 @@ mod |> ggiplot(
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable   | Description                                                                                                                                                                                                                                                            |
-|-------------------|-----------------------------------------------------|
+|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `id`       | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
 | `time`     | A variable indicating time-periods in our study for each observation.                                                                                                                                                                                                  |
 | `outcome`  | Outcome variable for each observation.                                                                                                                                                                                                                                 |

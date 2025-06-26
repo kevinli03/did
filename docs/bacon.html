@@ -20,13 +20,47 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./fixest.html" rel="next">
-<link href="./panelview.html" rel="prev">
+<link href="./sunab.html" rel="next">
+<link href="./twfe.html" rel="prev">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -54,6 +88,35 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <script src="mathjax-config.js"></script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -93,8 +156,20 @@ ul.task-list li input[type="checkbox"] {
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">panelView</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">twfe (fixest)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bacon.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">bacondecomp</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -148,18 +223,6 @@ ul.task-list li input[type="checkbox"] {
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">panelView</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./bacon.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">bacondecomp</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./fixest.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">fixest</span></a>
   </div>
@@ -194,6 +257,126 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<div class="small">
+<p>understanding bias of TWFE in staggered settings</p>
+</div>
+<p>When the <a href="./twfe.html">TWFE estimator</a> is implemented in settings with staggered DiD, the estimated <span class="math inline">\(\hat\tau\)</span> of the TWFE estimator can be biased.</p>
+<p>The reason for this is because in staggered settings, TWFE can be “broken down” (decomposed) into a weighted average of other comparisons (which we call <span class="math inline">\(\hat\beta\)</span>).</p>
+<p>There are two issues with this weighted average of comparisons <span class="math inline">\(\hat\beta\)</span>:</p>
+<ol type="1">
+<li>Some of these comparisons are non-sensical. For example, sometimes some of these <span class="math inline">\(\hat\beta\)</span> are calculated with already-treated units being the control group, which should not be the case.</li>
+<li>The weighting of these <span class="math inline">\(\hat\beta\)</span> is non-sensical. In theory, the weighted average should weight each <span class="math inline">\(\hat\beta\)</span> by how frequently that comparison occurs. But TWFE actually weights by when each <span class="math inline">\(\hat\beta\)</span> occurs in the timeline - early and late <span class="math inline">\(\hat\beta\)</span> are given less weights (sometimes negative weights).</li>
+</ol>
+<p>The result? TWFE can be incorrect in staggered settings. Sometimes, TWFE may even get the wrong direction of treatment effect.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># packages needed: </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bacondecomp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>We start by breaking down the TWFE into its comparisions <span class="math inline">\(\hat\beta\)</span> with bacon decomposition.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Variables</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>We use the <code>bacon()</code> function to implement decomposition of TWFE:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>decomp <span class="ot">=</span> <span class="fu">bacon</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula   =</span> outcome <span class="sc">~</span> treat,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data      =</span> df,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">id_var    =</span> <span class="st">"id"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_var  =</span> <span class="st">"time"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>decomp <span class="sc">|&gt;</span> <span class="fu">head</span>()  <span class="co"># head() because a lot of comparisons</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                       type  weight  avg_est</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 Earlier vs Later Treated 0.14286 -2.45996</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 Later vs Earlier Treated 0.14286 -8.48458</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     Treated vs Untreated 0.71429 -2.66575</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   treated untreated  estimate     weight                 type</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2      10     99999 -8.827665 0.03896104 Treated vs Untreated</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       9     99999 -7.787725 0.06926407 Treated vs Untreated</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4       8     99999 -3.986033 0.09090909 Treated vs Untreated</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5       7     99999 -4.629684 0.10389610 Treated vs Untreated</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6       6     99999 -3.274153 0.10822511 Treated vs Untreated</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7       5     99999 -1.531851 0.10389610 Treated vs Untreated</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<p>We can see the top output is a summary of the general comparisons, while the bottom output is the top 6 rows of all the individual <span class="math inline">\(\hat\beta\)</span> comparisons.</p>
+<p>We can also see Later vs.&nbsp;Earlier (already) treated is a comparison here, which is nonsensical.</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 76%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>id</code></td>
+<td>A variable indicating the units/individual an observation belongs to in our data.*</td>
+</tr>
+<tr class="even">
+<td><code>time</code></td>
+<td>A variable indicating time-periods in our study for each observation.</td>
+</tr>
+<tr class="odd">
+<td><code>outcome</code></td>
+<td>Outcome variable for each observation.</td>
+</tr>
+<tr class="even">
+<td><code>treat</code></td>
+<td>Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><br></p>
+<p>We know that any negative weights of any comparisons <span class="math inline">\(\hat\beta\)</span> are non-sensical. Thus, we can use the following code to check if there are any negative weights:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>decomp<span class="sc">$</span>weight <span class="sc">|&gt;</span> <span class="fu">min</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.0004329004</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<p>We can see in this example, we do not have a negative weight. However, if you do see one, it likely indicates that TWFE is likely very inaccurate in estimating the ATT, and you should use another estimator.</p>
+<p><br></p>
+<p>We can also plot the estimates and weights of all the comparisons.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>decomp <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> weight, <span class="at">y =</span> estimate, <span class="at">shape =</span> type, <span class="at">col =</span> type)) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x      =</span> <span class="st">"Weights"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y      =</span> <span class="st">"Estimates"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">shape  =</span> <span class="st">"Type"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">col    =</span> <span class="st">"Type"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title  =</span> <span class="st">"Decomposition of TWFE"</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="bacon_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The green highlighted comparisons all involve earlier (already) treated units being used as control units, which is nonsensical. Bacon decomposition thus shows us the perils of relying on TWFE for staggered treatment.</p>
+<p><br></p>
+<p><strong>Additional Resources</strong></p>
+<p>Goodman-Bacon, A. (2021) ‘Difference-in-Differences with variation in treatment timing’, <em>Journal of Econometrics</em>, 225(2), pp.&nbsp;254-277. Available at: <a href="https://www.nber.org/papers/w25018" class="uri">https://www.nber.org/papers/w25018</a></p>
 
 
 
@@ -620,13 +803,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./panelview.html" class="pagination-link" aria-label="panelView">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">panelView</span>
+      <a href="./twfe.html" class="pagination-link" aria-label="twfe (fixest)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">twfe (fixest)</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./fixest.html" class="pagination-link" aria-label="fixest">
-        <span class="nav-page-text">fixest</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./sunab.html" class="pagination-link" aria-label="sunab (fixest)">
+        <span class="nav-page-text">sunab (fixest)</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

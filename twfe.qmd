@@ -14,9 +14,7 @@ The idea is that unit fixed effects $\alpha_i$ account for between-unit differen
 
 The TWFE $\hat\tau$ estimate is an unbiased esitmator of the ATT if treatment is non-staggered and absorbing, and the identification assumptions hold.
 
-::: small
-TWFE can be severely biased if there is staggered treatment or non-absorbing treatment. Details are further explained [here](bacom.qmd).
-:::
+TWFE can be severely biased if there is staggered treatment or non-absorbing treatment. Details are further explained [here](bacon.qmd).
 
 ```{r}
 #| message: false
@@ -68,7 +66,7 @@ The coefficient of `treat` is our estimate of the ATT - the causal effect of tre
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                          |
-|-------------------|-----------------------------------------------------|
+|-------------|----------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
 | `time`    | A variable indicating time-periods in our study for each observation.                                |
 | `outcome` | Outcome variable for each observation.                                                               |
@@ -123,7 +121,7 @@ mod |> ggiplot(
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable   | Description                                                                                                                                                                                                                                                            |
-|--------------------|----------------------------------------------------|
+|-----------|------------------------------------------------------------|
 | `id`       | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
 | `time`     | A variable indicating time-periods in our study for each observation.                                                                                                                                                                                                  |
 | `outcome`  | Outcome variable for each observation.                                                                                                                                                                                                                                 |

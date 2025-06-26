@@ -74,7 +74,7 @@ The `estimate` is our ATT estimate.
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                                                                                                           |
-|--------------------|----------------------------------------------------|
+|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                                                                                                                 |
 | `outcome` | Outcome variable for each observation.                                                                                                                                                                                |
@@ -154,7 +154,7 @@ tbl |>
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                                                                                                           |
-|--------------------|----------------------------------------------------|
+|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                                                                                                                 |
 | `outcome` | Outcome variable for each observation.                                                                                                                                                                                |

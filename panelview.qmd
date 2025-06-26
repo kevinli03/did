@@ -1,1 +1,135 @@
 # panelView {.unnumbered}
+
+::: small
+visualisations for DiD and panel analysis
+:::
+
+panelView is a package that focuses on visualising panel treatment data over time. panelView can:
+
+1.  Visaulise treatment adoption over time, allowing us to see if treatment adoption is staggered, and if treatment is absorbing.
+2.  Visualise outcome values over time (or any variable).
+
+```{r}
+#| message: false
+#| warning: false
+
+# packages needed: 
+library(panelView)
+```
+
+<br />
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+library(fixest)
+data(base_stagg, package = "fixest")
+df <- base_stagg
+colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
+df$treat <- ifelse(df$rel.time >= 0, 1, 0)
+```
+
+panelView can help us visualise treatment adoption over time, allowing us to see if treatment adoption is staggered, and if treatment is absorbing.
+
+::: panel-tabset
+## Syntax
+
+We use the `panelview()` function to create the visualisation.
+
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+#| fig-height: 4
+#| fig-align: center
+
+panelview(
+  # required options
+  data        = df,
+  formula     = outcome ~ treat,  # only include these two
+  type        = "treat",          # don't change
+  index       = c("id", "time"),
+  
+  # optional options
+  gridOff     = T,
+  background  = "white",
+  main        = "Treatment Status",
+  xlab        = "Time Period",
+  ylab        = "Unit",
+  cex.axis.y  = 2
+)
+
+```
+
+We can see here, that our treatment is staggered, with the first group receiving treatment in time period 2, and some units receiving treatment in every subsequent period.
+
+## Variables
+
+Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
+
+| Variable  | Description                                                                                          |
+|----------------|--------------------------------------------------------|
+| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
+| `time`    | A variable indicating time-periods in our study for each observation.                                |
+| `outcome` | Outcome variable for each observation.                                                               |
+| `treat`   | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units. |
+:::
+
+<br />
+
+panelView can also help us visualise variable values over time. Most frequently, we will visualise outcome values over time, but you can also test covariate values over time.
+
+::: panel-tabset
+## Syntax
+
+We use the `panelview()` function to create the visualisation.
+
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+#| fig-height: 4
+#| fig-align: center
+
+panelview(
+  # required options
+  data          = df,
+  formula       = outcome ~ treat,  # change to outcome ~ 1 to ignore treat colorcoding
+  type          = "outcome",        # don't change
+  index         = c("id", "time"),
+  pre.post      = F,                # you can try T and see which you like  
+  outcome.type  = "continuous",     # change to "discrete" if outcome is binary
+  
+  # optional options
+  gridOff       = T,
+  background    = "white",
+  main          = "Treatment Status",
+  xlab          = "Time Period",
+  ylab          = "Outcome Values",
+  cex.axis.y    = 2
+)
+
+```
+
+## Variables
+
+Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
+
+| Variable  | Description                                                                                          |
+|-----------------|-------------------------------------------------------|
+| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
+| `time`    | A variable indicating time-periods in our study for each observation.                                |
+| `outcome` | Outcome variable for each observation.                                                               |
+| `treat`   | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units. |
+:::
+
+<br />
+
+**Additional Resources**
+
+-   See the [tutorial of panelView](https://yiqingxu.org/packages/panelview/reference/articles/tutorial.html).
+-   See the [documentation of panelView](https://yiqingxu.org/packages/panelview/reference/reference/panelView.html).
