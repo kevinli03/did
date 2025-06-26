@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Kevin Li (London School of Economics)">
+<meta name="author" content="Kevin Lingfeng Li (London School of Economics)">
 
 <title>Difference-in-Differences (DiD) Resources</title>
 <style>
@@ -92,12 +92,6 @@ ul.task-list li input[type="checkbox"] {
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">panelView</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">twfe (fixest)</span></a>
   </div>
@@ -140,8 +134,33 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./impute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">didimputation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">etwfe</span></a>
+  </div>
+</li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">panelView</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bacondecomp</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./fixest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fixest</span></a>
   </div>
 </li>
     </ul>
@@ -155,6 +174,8 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#welcome" id="toc-welcome" class="nav-link active" data-scroll-target="#welcome">Welcome!</a></li>
+  <li><a href="#types-of-did" id="toc-types-of-did" class="nav-link" data-scroll-target="#types-of-did">Types of DiD</a></li>
+  <li><a href="#identification-assumptions" id="toc-identification-assumptions" class="nav-link" data-scroll-target="#identification-assumptions">Identification Assumptions</a></li>
   <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional Resources</a></li>
   <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements">Acknowledgements</a></li>
   </ul>
@@ -176,7 +197,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Kevin Li (London School of Economics) </p>
+             <p>Kevin Lingfeng Li (London School of Economics) </p>
           </div>
   </div>
     
@@ -191,7 +212,7 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="welcome" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="welcome">Welcome!</h3>
-<p>This repository is a collection of resources on Difference-in-Differences (DiD) and implementation in R.</p>
+<p>This repository is a collection of resources on Difference-in-Differences (DiD) and implementation in R. This repository contains instructions for the implementation of the main DiD estimators, as well as a few R packages useful for DiD.</p>
 <p>Lectures on DiD (from my lectures on causal inference):</p>
 <ol type="1">
 <li><a href="https://kevinli03.github.io/causal/frameworks1.pdf">Exogeneity</a> (Background for DiD and causal inference)</li>
@@ -201,6 +222,83 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="https://kevinli03.github.io/causal/did3.pdf">Staggered DiD</a></li>
 <li><a href="https://kevinli03.github.io/causal/did4.pdf">Extensions to DiD</a></li>
 </ol>
+<p><br></p>
+</section>
+<section id="types-of-did" class="level3">
+<h3 class="anchored" data-anchor-id="types-of-did">Types of DiD</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 38%">
+<col style="width: 38%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td><strong>Non-Staggered</strong></td>
+<td><strong>Staggered</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Absorbing</strong></td>
+<td><p>All units that get treatment begin treatment in the same period.</p>
+<p>Once a unit is treated, they remain treated for the duration of the study.</p></td>
+<td><p>Units that get treatment begin treatment in different periods (staggered adoption).</p>
+<p>Once a unit is treated, they remain treated for the duration of the study.</p></td>
+</tr>
+<tr class="odd">
+<td><strong>Non Absorbing</strong></td>
+<td><p>All units that get treatment begin treatment in the same period.</p>
+<p>A treated unit may become untreated after already receiving the treatment.</p></td>
+<td><p>Units that get treatment begin treatment in different periods (staggered adoption).</p>
+<p>A treated unit may become untreated after already receiving the treatment.</p></td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+</section>
+<section id="identification-assumptions" class="level3">
+<h3 class="anchored" data-anchor-id="identification-assumptions">Identification Assumptions</h3>
+<p>For a quick review, these are the identification assumptions for DiD.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 38%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Assumption</th>
+<th>Description</th>
+<th>Testing/Dealing With</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><u>Parallel Trends Assumption</u></td>
+<td>Had the treated group not received the treatment, they would have followed the same trend in outcomes as the never-treated group.</td>
+<td><p>We can test parallel trends by looking at pre-treatment dynamic treatment effects. If the pre-treatment effects are significantly different than 0, that is evidence against parallel trends.</p>
+<p>We can address this using conditional parallel trends - parallel trends met when conditioning on covariates with differing trends.</p></td>
+</tr>
+<tr class="even">
+<td><u>No Anticipation</u></td>
+<td>The treated group’s outcome variables do not respond to treatment before treatment officially begins.</td>
+<td><p>Testing is done theoretically.</p>
+<p>We address this by altering the treatment variable (move forward/backward) to match the anticipation structure.</p></td>
+</tr>
+<tr class="odd">
+<td><u>Stable Unit Treatment Value (SUTVA)</u></td>
+<td>One unit’s treatment status does not affect the potential outcomes of another unit.</td>
+<td><p>Testing is done theoretically.</p>
+<p>Very little can be done to address this.</p></td>
+</tr>
+<tr class="even">
+<td><u>Stable Group Composition</u></td>
+<td>(Repeated cross-section only). The sample from each time period is consistent in terms of composition of confounders.</td>
+<td><p>Testing can be done with balance tests.</p>
+<p>We can address this issue by controlling for confounders that differ between different samples.</p></td>
+</tr>
+</tbody>
+</table>
 <p><br></p>
 </section>
 <section id="additional-resources" class="level3">

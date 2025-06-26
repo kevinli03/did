@@ -1,6 +1,6 @@
 ### Welcome! {.unnumbered}
 
-This repository is a collection of resources on Difference-in-Differences (DiD) and implementation in R.
+This repository is a collection of resources on Difference-in-Differences (DiD) and implementation in R. This repository contains instructions for the implementation of the main DiD estimators, as well as a few R packages useful for DiD.
 
 Lectures on DiD (from my lectures on causal inference):
 
@@ -13,18 +13,73 @@ Lectures on DiD (from my lectures on causal inference):
 
 <br />
 
+### Types of DiD
+
++-------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------+
+|                   | **Non-Staggered**                                                          | **Staggered**                                                                       |
++-------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------+
+| **Absorbing**     | All units that get treatment begin treatment in the same period.           | Units that get treatment begin treatment in different periods (staggered adoption). |
+|                   |                                                                            |                                                                                     |
+|                   | Once a unit is treated, they remain treated for the duration of the study. | Once a unit is treated, they remain treated for the duration of the study.          |
++-------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------+
+| **Non Absorbing** | All units that get treatment begin treatment in the same period.           | Units that get treatment begin treatment in different periods (staggered adoption). |
+|                   |                                                                            |                                                                                     |
+|                   | A treated unit may become untreated after already receiving the treatment. | A treated unit may become untreated after already receiving the treatment.          |
++-------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------+
+
+: {tbl-colwidths="\[24,38,38\]"}
+
+<br />
+
+### Identification Assumptions
+
+For a quick review, these are the identification assumptions for DiD.
+
++---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Assumption                                        | Description                                                                                                                       | Testing/Dealing With                                                                                                                                                                          |
++===================================================+===================================================================================================================================+===============================================================================================================================================================================================+
+| [Parallel Trends Assumption]{.underline}          | Had the treated group not received the treatment, they would have followed the same trend in outcomes as the never-treated group. | We can test parallel trends by looking at pre-treatment dynamic treatment effects. If the pre-treatment effects are significantly different than 0, that is evidence against parallel trends. |
+|                                                   |                                                                                                                                   |                                                                                                                                                                                               |
+|                                                   |                                                                                                                                   | We can address this using conditional parallel trends - parallel trends met when conditioning on covariates with differing trends.                                                            |
++---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [No Anticipation]{.underline}                     | The treated group's outcome variables do not respond to treatment before treatment officially begins.                             | Testing is done theoretically.                                                                                                                                                                |
+|                                                   |                                                                                                                                   |                                                                                                                                                                                               |
+|                                                   |                                                                                                                                   | We address this by altering the treatment variable (move forward/backward) to match the anticipation structure.                                                                               |
++---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Stable Unit Treatment Value (SUTVA)]{.underline} | One unit's treatment status does not affect the potential outcomes of another unit.                                               | Testing is done theoretically.                                                                                                                                                                |
+|                                                   |                                                                                                                                   |                                                                                                                                                                                               |
+|                                                   |                                                                                                                                   | Very little can be done to address this.                                                                                                                                                      |
++---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| [Stable Group Composition]{.underline}            | (Repeated cross-section only). The sample from each time period is consistent in terms of composition of confounders.             | Testing can be done with balance tests.                                                                                                                                                       |
+|                                                   |                                                                                                                                   |                                                                                                                                                                                               |
+|                                                   |                                                                                                                                   | We can address this issue by controlling for confounders that differ between different samples.                                                                                               |
++---------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: {tbl-colwidths="\[24,38,38\]"}
+
+<br />
+
 ### Additional Resources
 
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | Resource                                                                                        | Author           | Notes                                                               |
-|----------------------------------|---------------|-----------------------|
++=================================================================================================+==================+=====================================================================+
 | [Yiqing Xu: modern advancements in DiD](https://yiqingxu.org/packages/fect/05-panel.html#csdid) | Yiqing Xu        | Useful overview of all modern DiD methods and R code.               |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Asjad Naqvi: repository on DiD](https://asjadnaqvi.github.io/DiD/)                             | Asjad Naqvi      | Useful R and state code for DiD.                                    |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [User Guides for DiD](https://bcallaway11.github.io/did/articles/index.html)                    | Brantly Callaway | Useful guides and explanations of DiD with R.                       |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Lecture: Problems with TWFE](https://psantanna.com/DiD/11_Staggered_problems.pdf)              | Pedro Sant'Anna  | Bacon decomposition and introduction to csdid.                      |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Causal Inference: The Mixtape](https://mixtape.scunning.com/)                                  | Scott Cunningham | Textbook chapter introducing DiD.                                   |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Chiu et al (2025)](https://yiqingxu.org/papers/english/2023_panel/CLLX.pdf)                    | Chiu et al       | Paper exploring new DiD methods and reanalysing old polisci papers. |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Roth et al (2025)](https://www.jonathandroth.com/assets/files/DiD_Review_Paper.pdf)            | Roth et al       | An overview of new DiD methods.                                     |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Liu et al (2025)](https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf)                   | Liu et al        | An overview of imputation DiD methods.                              |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 
 <br />
 

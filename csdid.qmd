@@ -4,15 +4,15 @@
 staggered, absorbing, binary treatment
 :::
 
-The doubly-robust DiD estimator, also called **csdid**, is an estimator for DiD that solves the issues with TWFE in staggered settings. The estimator was proposed by Callaway and Sant'Anna (2021).
+The doubly-robust DiD estimator, also called **csdid**, is an estimator for DiD that solves the issues with TWFE in staggered settings.
 
-The csdid estimator "matches" treated units to control units in correct non-forbidden comparisons. It does this by separating all treated units into groups, grouped by their initial treatment year. Then, it compares each group to the never-treated units, calculating dynamic effects $\tau_{g,t}$ for each group.
+The estimator essentially runs smaller event study DiDs for each different initial treatment period grouping. It does this by separating all treated units into groups, grouped by their initial treatment year. Then, it compares each group to the never-treated units, calculating dynamic effects $\tau_{g,t}$ for each group.
 
 ::: small
 These effects are calculated with adjusted regression, inverse probability weighting, or both combined (called "doubly robust"). Doubly-robust is the default, and should be used unless there are issues.
 :::
 
-The $\tau_{g,t}$ can be aggregated into the overall ATT, Dynamic ATT's with all groups combined together, and the overall ATT for each group $g$ separately.
+The event-study $\tau_{g,t}$ estimates for each group can be aggregated into the overall ATT, Dynamic ATT's with all groups combined together, and the overall ATT for each group $g$ separately.
 
 ```{r}
 #| message: false
@@ -46,7 +46,7 @@ We use the `att_gt()` function to run the matching process of csdid:
 #| warning: false
 #| message: false
 
-m1 = att_gt(
+mod = att_gt(
   # required arguments
   yname                   = "outcome",
   tname                   = "time",
@@ -130,7 +130,7 @@ We use the `aggte()` function to aggregate our matched treatment effects into an
 #| comment: "#>"
 #| class-output: r
 
-m1 |>
+mod |>
   aggte(type  = "simple", na.rm = T) |>
   summary(att)
 ```
@@ -146,7 +146,7 @@ We can estimate dynamic treatment effects with the `aggte()` function. We can th
 #| message: false
 #| fig-align: center
 
-m1 |>
+mod |>
   aggte(type   = "dynamic", na.rm  = T) |>
   ggdid(
     xlab    = "Time to Treatment",  # x-axis label
@@ -165,7 +165,7 @@ If we are interested in how the ATT differs by year of treatment adoption, we ca
 #| fig-height: 3
 #| fig-align: center
 
-m1 |>
+mod |>
   aggte(type   = "group", na.rm  = T) |>
   ggdid(
     xlab    = "ATT Estimate",  # x-axis label
@@ -184,7 +184,7 @@ We can also explore how treatment effects change over calendar time (not relativ
 #| fig-height: 3
 #| fig-align: center
 
-m1 |>
+mod |>
   aggte(type   = "calendar", na.rm  = T) |>
   ggdid(
     xlab   = "Time Period",      # x-axis label

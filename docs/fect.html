@@ -198,6 +198,12 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./impute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">didimputation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">etwfe</span></a>
   </div>
@@ -207,6 +213,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./panelview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">panelView</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bacondecomp</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./fixest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fixest</span></a>
   </div>
 </li>
     </ul>
@@ -242,7 +260,8 @@ window.Quarto = {
 <div class="small">
 <p>non-staggered or staggered, absorbing or non-absorbing, binary treatment</p>
 </div>
-<p>The fixed-effects counterfactual estimator (fect) is an estimator for DiD proposed by Liu, Xu, and Wang (2024). The estimator uses potential outcomes - for treated units <span class="math inline">\(D_{it} = 1\)</span>, the potential outcome <span class="math inline">\(Y_{it}(0)\)</span> is a counterfactual we do not observe. Imputation estimators try to estimate <span class="math inline">\(Y_{it}(0)\)</span>, which allows us to compute individual treatment effects <span class="math inline">\(\tau_i\)</span> and find the ATT:</p>
+<p>The fixed-effects counterfactual estimator (fect) is an estimator that solves the issues with TWFE in staggered settings and non-absorbing treatment.</p>
+<p>For treated units <span class="math inline">\(D_{it} = 1\)</span>, the potential outcome <span class="math inline">\(Y_{it}(0)\)</span> is a counterfactual we do not observe. fect estimates <span class="math inline">\(Y_{it}(0)\)</span>, which allows us to compute individual treatment effects <span class="math inline">\(\tau_i\)</span> and find the ATT:</p>
 <p><span class="math display">\[
 Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_{it}
 \]</span></p>
@@ -263,12 +282,12 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 </div>
 <p><br></p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Variables</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Variables</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Notes</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>We use the <code>fect()</code> function to estimate fect, ifect, and mc models.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">=</span> <span class="fu">fect</span>(</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">=</span> <span class="fu">fect</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula  =</span> outcome <span class="sc">~</span> treat <span class="sc">+</span> covar,  <span class="co"># covar is optional</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data     =</span> df,</span>
@@ -282,7 +301,7 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed     =</span> <span class="dv">1239</span>                      <span class="co"># any number will work</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; fect.formula(formula = outcome ~ treat + covar, data = df, index = c("id", </span></span>
@@ -304,8 +323,8 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 75%">
+<col style="width: 26%">
+<col style="width: 73%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -333,8 +352,17 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 </tbody>
 </table>
 <div class="small">
-<p>*For repeated cross-section, the <code>id</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>id</code> variable.</p>
+<p>*fect does not allow for repeated cross-sections.</p>
 </div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>These models do not work with repeated cross-sections, only panel data.</p>
+<p>The <code>CV =</code> argument is about cross-validiation (from machine learning). This is because for the ife or mc methods, there are a set of tuning parameters that need to be chosen (for ife, this is the number of latent trends, and mc, it is a series of tuning parameters).</p>
+<ul>
+<li><p>Thus, for ife or mc, <code>CV =</code> should be set to <code>T</code> for the automatic selection of these tuning parameters.</p></li>
+<li><p>For fe, there are no tuning parameters, so <code>CV</code> can be dropped or set to <code>F</code>.</p></li>
+</ul>
+<p>The <code>seed =</code> argument ensures reproducable standard errors, as the package uses bootstrap sampling for standard errors.</p>
 </div>
 </div>
 </div>
@@ -346,7 +374,7 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <p>The fect package allows quick aggregation of dynamic effects through plotting. The plot is a ggplot object, if you want to change or make additions to it.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                            <span class="co"># don't change</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Dynamic Treatment Effects"</span>,  <span class="co"># title</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Estimate"</span>,                   <span class="co"># y-axis label</span></span>
@@ -365,7 +393,7 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <p>We can explore how treatment effects change over calendar time (not relative time, but actual time).</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                             <span class="co"># don't change</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type    =</span> <span class="st">"calendar"</span>,                    <span class="co"># don't change</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Calendar Treatment Effects"</span>,  <span class="co"># title</span></span>
@@ -385,7 +413,7 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
 <p>We can also explore the distributions of individual treatment effects by relative time period:</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                               <span class="co"># don't change</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type    =</span> <span class="st">"box"</span>,                           <span class="co"># don't change</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Individual Treatment Effects"</span>,  <span class="co"># title</span></span>
@@ -405,7 +433,7 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
 <p>The fect package contains tools to more rigorously test the parallel trends assumption.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0      =</span> T,                         <span class="co"># don't change</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type        =</span> <span class="st">"equiv"</span>,</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">bound       =</span> <span class="st">"equiv"</span>,</span>
@@ -424,7 +452,7 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 </div>
 </div>
 <p>An F-test tests if the joint combination of pre-treatment coefficients is statistically significantly different than 0. Since we do not want the coefficients to be different than 0, we want to get a high p-value and fail to reject the null.</p>
-<p>An Equivalence (TOST) test tests if the confidence intervals of our pre-treatment coefficients are within 0.36 standard deviations of the outcome variable of 0. Essentially, it tests if there is a substantively significant deviation in parallel trends</p>
+<p>An Equivalence (TOST) test tests if the confidence intervals of our pre-treatment coefficients are within 0.36 standard deviations of the outcome variable of 0. Essentially, it tests if there is a substantively significant deviation in parallel trends.</p>
 </div>
 </div>
 </div>
@@ -437,12 +465,6 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <li>Yiqing Xu’s <a href="https://yiqingxu.org/packages/fect/02-fect.html">page on Fect</a>.</li>
 <li>Yiqing Xu’s page on <a href="https://yiqingxu.org/packages/fect/03-plots.html">Fect plot options</a>.</li>
 <li>R-<a href="https://cran.r-project.org/web/packages/fect/fect.pdf">documentation of the fect package</a>.</li>
-</ul>
-<p><em>More on Other Imputation Estimators</em></p>
-<ul>
-<li>Kyle Butts’ github page on <a href="https://github.com/kylebutts/didimputation">DIDimputation</a>.</li>
-<li>Kyle Butts’ <a href="https://kylebutts.github.io/did2s/articles/Two-Stage-Difference-in-Differences.html">github page on did2s</a>.</li>
-<li>Asjad Naqvi’s <a href="https://asjadnaqvi.github.io/DiD/docs/code_r/07_did2s_r/">github page on did2s</a>.</li>
 </ul>
 
 

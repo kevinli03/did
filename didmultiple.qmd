@@ -4,7 +4,7 @@
 non-staggered or staggered, absorbing or non-absorbing, binary or continuous treatment
 :::
 
-The DIDMultiple estimator is an estimator for DiD that solves the issues with TWFE in staggered settings. It also expands DiD to work with continuous treatments and non-absorbing treatments.
+The **DIDmultiple** estimator is an estimator that solves the issues with TWFE in staggered settings and non-absorbing treatment.
 
 The estimator focuses on **switchers** - those units in a certain period who change their treatment status. In a binary treatment setting, the treatment effect at period $\tau_t$ can be described as:
 
@@ -46,7 +46,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 We use the `did_multiplegt_dyn()` function to complete the estimation process:
 
 ```{r}
-m1 = did_multiplegt_dyn(
+mod = did_multiplegt_dyn(
   # required arguments
   df          = df,
   outcome     = "outcome",
@@ -68,7 +68,7 @@ m1 = did_multiplegt_dyn(
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                         |
-|-----------------|------------------------------------------------------|
+|--------------|----------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\* |
 | `time`    | A variable indicating time-periods in our study for each observation.               |
 | `outcome` | Outcome variable for each observation.                                              |
@@ -81,6 +81,14 @@ Our dataset `df` should be a panel or repeated cross-section, and have the follo
 ## Notes
 
 Covariates for conditional parallel trends are possible to include, but they are used differently, and may cause issues.
+
+The `effects =` argument specifies how many post-treatment dynamic effects you want to estimate.
+
+The `placebo =` argument specifies how many pre-treatment period effects you want to estimate to test the parallel trends assumption.
+
+The `continuous =` argument allows for continuous treatment. Sometimes, even when you do not have a continuous treatment, turning this on may solve your issues.
+
+The `graph_off =` argument specifies if you want the command to print the graph that is generated with the estimation process. If you select `T`, the graph is still created, just not printed.
 :::
 
 <br />
@@ -98,8 +106,14 @@ We can print the results from our object from previously:
 #| comment: "#>"
 #| class-output: r
 
-m1 |> print()
+mod |> print()
 ```
+
+The `Estimation of treatment effects: Event-study effects` are the post-treatment dynamic effects.
+
+The `Average cumulative (total) effect per treatment unit` is the ATT estimate.
+
+The `Testing the parallel trends and no anticipation assumptions` is the pre-treatment coefficient estimates.
 
 ## Plot
 
@@ -114,7 +128,7 @@ We can plot the dynamic treatment effects in a plot:
 library(ggplot2)
 
 # assign plot to plot object
-plot = m1$plot
+plot = mod$plot
 
 # get rid of weird line in default plot
 plot$layers[[1]] <- NULL
@@ -127,9 +141,7 @@ plot +
   # lines for treatment time and 0 treatment effect
   geom_vline(xintercept = 0.5, linetype = 3) +
   geom_hline(yintercept = 0, linetype = 3, color = "red") +
-  
-  # Theme
-  theme_bw()
+  theme_classic()
 ```
 :::
 

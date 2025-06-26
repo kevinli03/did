@@ -198,6 +198,12 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./impute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">didimputation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">etwfe</span></a>
   </div>
@@ -207,6 +213,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./panelview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">panelView</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bacondecomp</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./fixest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fixest</span></a>
   </div>
 </li>
     </ul>
@@ -242,7 +260,7 @@ window.Quarto = {
 <div class="small">
 <p>non-staggered or staggered, absorbing or non-absorbing, binary or continuous treatment</p>
 </div>
-<p>The DIDMultiple estimator is an estimator for DiD that solves the issues with TWFE in staggered settings. It also expands DiD to work with continuous treatments and non-absorbing treatments.</p>
+<p>The <strong>DIDmultiple</strong> estimator is an estimator that solves the issues with TWFE in staggered settings and non-absorbing treatment.</p>
 <p>The estimator focuses on <strong>switchers</strong> - those units in a certain period who change their treatment status. In a binary treatment setting, the treatment effect at period <span class="math inline">\(\tau_t\)</span> can be described as:</p>
 <p><span class="math display">\[
 \tau_t = \frac{\mathbb E[\Delta Y |\text{switchers}] - \mathbb E[\Delta Y |\text{non-switchers}]}{\underbrace{\mathbb E[\Delta D |\text{switchers}]}_\text{=1 if absorbing treatment}}
@@ -262,7 +280,7 @@ window.Quarto = {
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>We use the <code>did_multiplegt_dyn()</code> function to complete the estimation process:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">=</span> <span class="fu">did_multiplegt_dyn</span>(</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">=</span> <span class="fu">did_multiplegt_dyn</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">df          =</span> df,</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome     =</span> <span class="st">"outcome"</span>,</span>
@@ -283,8 +301,8 @@ window.Quarto = {
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 23%">
-<col style="width: 76%">
+<col style="width: 19%">
+<col style="width: 80%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -317,6 +335,10 @@ window.Quarto = {
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <p>Covariates for conditional parallel trends are possible to include, but they are used differently, and may cause issues.</p>
+<p>The <code>effects =</code> argument specifies how many post-treatment dynamic effects you want to estimate.</p>
+<p>The <code>placebo =</code> argument specifies how many pre-treatment period effects you want to estimate to test the parallel trends assumption.</p>
+<p>The <code>continuous =</code> argument allows for continuous treatment. Sometimes, even when you do not have a continuous treatment, turning this on may solve your issues.</p>
+<p>The <code>graph_off =</code> argument specifies if you want the command to print the graph that is generated with the estimation process. If you select <code>T</code>, the graph is still created, just not printed.</p>
 </div>
 </div>
 </div>
@@ -328,7 +350,7 @@ window.Quarto = {
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <p>We can print the results from our object from previously:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
@@ -364,6 +386,9 @@ window.Quarto = {
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ERC REALLYCREDIBLE - GA N. 101043899</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
+<p>The <code>Estimation of treatment effects: Event-study effects</code> are the post-treatment dynamic effects.</p>
+<p>The <code>Average cumulative (total) effect per treatment unit</code> is the ATT estimate.</p>
+<p>The <code>Testing the parallel trends and no anticipation assumptions</code> is the pre-treatment coefficient estimates.</p>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <p>We can plot the dynamic treatment effects in a plot:</p>
@@ -371,7 +396,7 @@ window.Quarto = {
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># assign plot to plot object</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">=</span> m1<span class="sc">$</span>plot</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">=</span> mod<span class="sc">$</span>plot</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># get rid of weird line in default plot</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plot<span class="sc">$</span>layers[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
@@ -384,9 +409,7 @@ window.Quarto = {
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># lines for treatment time and 0 treatment effect</span></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Theme</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">

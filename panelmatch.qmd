@@ -4,7 +4,7 @@
 non-staggered or staggered, absorbing or non-absorbing, binary treatment.
 :::
 
-PanelMatch is an estimator for DiD that solves the issues with TWFE in staggered settings. It also accomodates non-absorbing treatment.
+PanelMatch is an estimator for DiD that solves the issues with TWFE in staggered settings and non-absorbing treatment.
 
 For every treated unit $D_{it}=1$ in a specific time period $t$, PanelMatch finds a group of untreated units $D_{it} = 0$ in the same time period, that have identical past treatment history in a set number of previous treatment periods.
 
@@ -67,7 +67,7 @@ df.panel = PanelData(
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                              |
-|------------------|------------------------------------------------------|
+|-------------|-----------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\* [For PanelMatch, this must be integers]{.underline}. |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                                    |
 | `outcome` | Outcome variable for each observation.                                                                                                   |
@@ -83,6 +83,24 @@ PanelMatch requires `unit` to be an integer variable. We can change a non-intege
 #| eval: false
 
 df$id <- as.integer(as.factor(df$id))
+```
+
+## Notes
+
+PanelMatch requires `unit` to be an integer variable. We can change a non-integer `id` into an integer by:
+
+```{r}
+#| eval: false
+
+df$id <- as.integer(as.factor(df$id))
+```
+
+PanelMatch also dislikes tidyverse data frames, so we want to convert them into base-R data frames before starting.
+
+```{r}
+#| eval: false
+
+df = df |> as.data.frame()
 ```
 :::
 
@@ -151,6 +169,8 @@ match |>
   ) |>
   print()
 ```
+
+The `Point estimates` are the estimated ATT, and the standard errors are provided.
 
 ## Post-Treatment
 

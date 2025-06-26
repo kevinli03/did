@@ -198,6 +198,12 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./impute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">didimputation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">etwfe</span></a>
   </div>
@@ -207,6 +213,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./panelview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">panelView</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bacondecomp</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./fixest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fixest</span></a>
   </div>
 </li>
     </ul>
@@ -242,14 +260,15 @@ window.Quarto = {
 <div class="small">
 <p>staggered, absorbing, binary treatment</p>
 </div>
-<p>The <strong>interaction-weighted</strong> (IW) estimator, also called <strong>sunab</strong>, is used for DiD with staggered treatment. The estimator solves the bias of TWFE in staggered settings. The estimator essentially runs smaller DiDs for each different initial treatment period grouping. This is done by interactions in the TWFE model.</p>
+<p>The <strong>interaction-weighted</strong> (IW) estimator, also called <strong>sunab</strong>, is used for DiD with staggered treatment. The estimator solves the bias of TWFE in staggered settings.</p>
+<p>The estimator essentially runs smaller event study DiDs for each different initial treatment period grouping. This is done by interactions in the TWFE model.</p>
 <p><span class="math display">\[
 Y_{it} = \alpha_i + \delta_t + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \cdot 1\{R_{it} = r\} \cdot \tau_{gr}}_\text{comparisons for each group g and rel.time r} + \cov + \eps_{it}
 \]</span></p>
 <div class="small">
 <p><span class="math inline">\(G_i\)</span> is a categorical variable that describes which initial treatment period unit <span class="math inline">\(i\)</span> received treatment. <span class="math inline">\(R_{it}\)</span> is a relative-time variable. Essentially, IW is estimating dynamic treatment effects for each initial treatment period group <span class="math inline">\(g\)</span>.</p>
 </div>
-<p>Then, these individual estimates <span class="math inline">\(\tau_{g, r}\)</span> are aggregated to obtain an overall ATT or dynamic ATTs.</p>
+<p>Then, these individual event-study estimates <span class="math inline">\(\tau_{g, r}\)</span> for each group are aggregated to obtain an overall ATT or dynamic ATTs.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># packages needed:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fixest)</span>
@@ -262,7 +281,7 @@ Y_{it} = \alpha_i + \delta_t + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>We use the <code>feols()</code> function and the <code>sunab()</code> function to run the matching process of sunab:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">=</span> <span class="fu">feols</span>(</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">=</span> <span class="fu">feols</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml =</span> outcome <span class="sc">~</span> <span class="fu">sunab</span>(cohort, time) <span class="sc">+</span> covar <span class="sc">|</span> id <span class="sc">+</span> time,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df,</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov =</span> <span class="sc">~</span> id</span>
@@ -274,8 +293,8 @@ Y_{it} = \alpha_i + \delta_t + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 26%">
-<col style="width: 73%">
+<col style="width: 4%">
+<col style="width: 95%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -328,7 +347,7 @@ Y_{it} = \alpha_i + \delta_t + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <p>We use the <code>aggregate()</code> function to aggregate our matched treatment effects into an overall treatment effect.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aggregate</span>(<span class="at">agg  =</span> <span class="st">"att"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -341,7 +360,7 @@ Y_{it} = \alpha_i + \delta_t + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <p>We can plot the dynamic treatment effects using the IW object estimated when running the model:</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">ggiplot</span>(</span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">ggiplot</span>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time Relative to Treatment"</span>,       <span class="co"># x-axis label</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Dynamic ATT Estimate"</span>,             <span class="co"># y-axis label</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Dynamic Treatment Effects (IW)"</span>,   <span class="co"># title for plot</span></span>
@@ -359,7 +378,7 @@ Y_{it} = \alpha_i + \delta_t + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \
 <div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
 <p>If we are interested in how the ATT differs by year of treatment adoption, we can also aggregate effects by initial treatment period group.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>group <span class="ot">=</span> m1 <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>group <span class="ot">=</span> mod <span class="sc">|&gt;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aggregate</span>(<span class="at">agg =</span> <span class="st">"cohort"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>There isn’t a quick way to immediately plot these estimates, but we can manually create a ggplot:</p>

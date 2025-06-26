@@ -20,12 +20,46 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./etwfe.html" rel="next">
+<link href="./impute.html" rel="next">
 <link href="./panelmatch.html" rel="prev">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
@@ -54,6 +88,35 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <script src="mathjax-config.js"></script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -135,6 +198,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./impute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">didimputation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">etwfe</span></a>
   </div>
@@ -144,6 +213,18 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="./panelview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">panelView</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bacon.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">bacondecomp</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./fixest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fixest</span></a>
   </div>
 </li>
     </ul>
@@ -176,6 +257,207 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<div class="small">
+<p>staggered, absorbing, binary treatment</p>
+</div>
+<p>The 2-stage difference-in-differences (<strong>did2s</strong>) estimator is an estimator used for staggered treatment. It first uses only treated units <span class="math inline">\(D_{it} = 0\)</span> to estimate the following model:</p>
+<p><span class="math display">\[
+Y_{it} = \hat\alpha_i + \hat\delta_t + \mathbf X^\top_{it}\hat{\b\beta} + \hat\eps_{it}
+\]</span></p>
+<p>Using this model, every unit’s <span class="math inline">\(Y_{it}(0)\)</span> can be estimated as:</p>
+<p><span class="math display">\[
+\widehat Y_{it}(0) = \hat\alpha_i + \hat\delta_t + \mathbf X^\top_{it}\hat{\b\beta}
+\]</span></p>
+<p>Which allows for the computation of the ATT:</p>
+<p><span class="math display">\[
+\tau_\text{ATT} = \mathbb E[\tau_{it}|D_{it} = 1] \approx \mathbb E[Y_{it}(1) - \widehat Y_{it}(0) | D_{it} = 1]
+\]</span></p>
+<div class="small">
+<p>Technically, did2s uses a regression to calculate the ATT in what is called the “second stage”, but the intuition is the same.</p>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># packages needed: </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(did2s)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggfixest)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Variables</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Notes</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>We use the <code>did2s()</code> function to run the did2s model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">=</span> <span class="fu">did2s</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> df,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">yname         =</span> <span class="st">"outcome"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">first_stage   =</span> <span class="sc">~</span> covar <span class="sc">|</span> id <span class="sc">+</span> time,  <span class="co"># if no covar, see notes</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">second_stage  =</span> <span class="sc">~</span> <span class="fu">i</span>(treat),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment     =</span> <span class="st">"treat"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster_var   =</span> <span class="st">"id"</span>                  <span class="co"># clustered se</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; OLS estimation, Dep. Var.: outcome</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Observations: 950</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Standard-errors: Custom </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;               Estimate   Std. Error  t value   Pr(&gt;|t|)    </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; treat::0  6.980000e-17 1.450000e-17  4.82432 1.6362e-06 ***</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; treat::1 -1.091429e+00 4.763818e-01 -2.29108 2.2177e-02 *  </span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; RMSE: 2.0478   Adj. R2: 0.04683</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<p>The coefficient of <code>treat::1</code> is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by <code>Pr(&gt;|t|)</code> (the p-value) and the stars <code>***</code> .</p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 73%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>id</code></td>
+<td>A variable indicating the units/individual an observation belongs to in our data.*</td>
+</tr>
+<tr class="even">
+<td><code>time</code></td>
+<td>A variable indicating time-periods in our study for each observation.</td>
+</tr>
+<tr class="odd">
+<td><code>outcome</code></td>
+<td>Outcome variable for each observation.</td>
+</tr>
+<tr class="even">
+<td><code>treat</code></td>
+<td>Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units.</td>
+</tr>
+<tr class="odd">
+<td><code>covar</code></td>
+<td>(optional) covariate(s) to condition for parallel trends.</td>
+</tr>
+</tbody>
+</table>
+<div class="small">
+<p>*For repeated cross-section, the <code>id</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>id</code> variable.</p>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>The first-stage <code>first_stage =</code> should be in one of two forms:</p>
+<ol type="1">
+<li><code>first_stage = ~ covar | id + time</code> if you have covariates.</li>
+<li><code>first_stage = ~ 0 | id + time</code> if you have no covariates.</li>
+</ol>
+<p>The second-stage <code>second_stage =</code> should generally only include the treatment variable within <code>i()</code>.</p>
+<ul>
+<li>However, if you want heterogenous effects, you can interact the treatment variable with another variable: <code>second_stage = i(treat) + i(treat):othervar</code></li>
+</ul>
+</div>
+</div>
+</div>
+<p><br></p>
+<p>We can also estimate event-study dynamic effects for pre and post-treatment periods.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Variables</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Notes</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>We still use the <code>did2s()</code> function to run the event study model, but we alter the second-stage of the model. We then use the <code>ggiplot()</code> function to plot our results.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">=</span> <span class="fu">did2s</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> df,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">yname         =</span> <span class="st">"outcome"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">first_stage   =</span> <span class="sc">~</span> covar <span class="sc">|</span> id <span class="sc">+</span> time,             <span class="co"># if no covar, see notes</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">second_stage  =</span> <span class="sc">~</span> <span class="fu">i</span>(rel.time, <span class="at">ref =</span> <span class="sc">-</span><span class="dv">1</span>),  <span class="co"># see notes for group</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment     =</span> <span class="st">"treat"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster_var   =</span> <span class="st">"id"</span>                             <span class="co"># clustered se</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span> <span class="fu">ggiplot</span>(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time Relative to Treatment"</span>,  <span class="co"># x-axis label</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Dynamic ATT Estimate"</span>,        <span class="co"># y-axis label</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Dynamic Treatment Effects"</span>,   <span class="co"># title for plot</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">8</span>, <span class="dv">8</span>) <span class="co"># select how many periods to display</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="did2s_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 73%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>id</code></td>
+<td>A variable indicating the units/individual an observation belongs to in our data.*</td>
+</tr>
+<tr class="even">
+<td><code>time</code></td>
+<td>A variable indicating time-periods in our study for each observation.</td>
+</tr>
+<tr class="odd">
+<td><code>outcome</code></td>
+<td>Outcome variable for each observation.</td>
+</tr>
+<tr class="even">
+<td><code>group</code></td>
+<td>Variable specifying if a unit is part of the treatment group or never-treated (control group). For units never receiving treatment, they get value 0, and for units that do end up receiving treatment sometime within the study, they get value 1.</td>
+</tr>
+<tr class="odd">
+<td><code>rel.time</code></td>
+<td>A relative time variable that indicates for the given period <span class="math inline">\(t\)</span> of an observation, how many time-periods away did the unit <span class="math inline">\(i\)</span> first get the treatment. For the never-treated observations, set the value to a very large or small number (-1000 is a common choice).</td>
+</tr>
+<tr class="even">
+<td><code>covar</code></td>
+<td>(optional) covariate(s) to condition for parallel trends.</td>
+</tr>
+</tbody>
+</table>
+<div class="small">
+<p>*For repeated cross-section, the <code>id</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>id</code> variable.</p>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<p>The first-stage <code>first_stage =</code> should be in one of two forms:</p>
+<ol type="1">
+<li><code>first_stage = ~ covar | id + time</code> if you have covariates.</li>
+<li><code>first_stage = ~ 0 | id + time</code> if you have no covariates.</li>
+</ol>
+</div>
+</div>
+</div>
+<p><br></p>
+<p><strong>Additional Resources</strong></p>
+<p>Gardner, J (2021) ‘Two-Stage Difference-in-Differences’. Available at: <a href="https://jrgcmu.github.io/2sdd_current.pdf" class="uri">https://jrgcmu.github.io/2sdd_current.pdf</a></p>
+<p>Additional links:</p>
+<ul>
+<li>Description of the <a href="https://kylebutts.github.io/did2s/articles/Two-Stage-Difference-in-Differences.html">did2s estimation process</a>.</li>
+<li>The <a href="https://kylebutts.github.io/did2s/reference/did2s.html">R documentation for did2s</a>.</li>
+<li>Asjad Naqvi’s <a href="https://asjadnaqvi.github.io/DiD/docs/code_r/07_did2s_r/">page on did2s</a>.</li>
+</ul>
 
 
 
@@ -607,8 +889,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./etwfe.html" class="pagination-link" aria-label="etwfe">
-        <span class="nav-page-text">etwfe</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./impute.html" class="pagination-link" aria-label="didimputation">
+        <span class="nav-page-text">didimputation</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

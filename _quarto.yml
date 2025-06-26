@@ -5,7 +5,7 @@ project:
 book:
   title: "Difference-in-Differences (DiD) Resources"
   subtitle: "Resources for Causal Panel Analysis"
-  author: "Kevin Li (London School of Economics)"
+  author: "Kevin Lingfeng Li (London School of Economics)"
   search: false
   chapters:
     - text: "Welcome!"
@@ -23,6 +23,7 @@ book:
     - text: "---"
     - panelview.qmd
     - bacon.qmd
+    - fixest.qmd
     
 
 

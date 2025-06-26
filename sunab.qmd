@@ -4,7 +4,9 @@
 staggered, absorbing, binary treatment
 :::
 
-The **interaction-weighted** (IW) estimator, also called **sunab**, is used for DiD with staggered treatment. The estimator solves the bias of TWFE in staggered settings. The estimator essentially runs smaller DiDs for each different initial treatment period grouping. This is done by interactions in the TWFE model.
+The **interaction-weighted** (IW) estimator, also called **sunab**, is used for DiD with staggered treatment. The estimator solves the bias of TWFE in staggered settings.
+
+The estimator essentially runs smaller event study DiDs for each different initial treatment period grouping. This is done by interactions in the TWFE model.
 
 $$
 Y_{it} = \alpha_i + \delta_t + \underbrace{\sum_g \sum_{r ≠ -1} 1\{G_i = g\} \cdot 1\{R_{it} = r\} \cdot \tau_{gr}}_\text{comparisons for each group g and rel.time r} + \cov + \eps_{it}
@@ -14,7 +16,7 @@ $$
 $G_i$ is a categorical variable that describes which initial treatment period unit $i$ received treatment. $R_{it}$ is a relative-time variable. Essentially, IW is estimating dynamic treatment effects for each initial treatment period group $g$.
 :::
 
-Then, these individual estimates $\tau_{g, r}$ are aggregated to obtain an overall ATT or dynamic ATTs.
+Then, these individual event-study estimates $\tau_{g, r}$ for each group are aggregated to obtain an overall ATT or dynamic ATTs.
 
 ```{r}
 #| message: false
@@ -47,7 +49,7 @@ We use the `feols()` function and the `sunab()` function to run the matching pro
 ```{r}
 #| message: false
 
-m1 = feols(
+mod = feols(
   fml = outcome ~ sunab(cohort, time) + covar | id + time,
   data = df,
   vcov = ~ id
@@ -61,7 +63,7 @@ This completes the matching process. We then need to aggregate to obtain the tre
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                                                                                                           |
-|-------------------|-----------------------------------------------------|
+|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                                                                                                                 |
 | `outcome` | Outcome variable for each observation.                                                                                                                                                                                |
@@ -95,7 +97,7 @@ We use the `aggregate()` function to aggregate our matched treatment effects int
 #| comment: "#>"
 #| class-output: r
 
-m1 |>
+mod |>
   aggregate(agg  = "att") |>
   print()
 ```
@@ -112,7 +114,7 @@ We can plot the dynamic treatment effects using the IW object estimated when run
 #| fig-height: 3
 #| fig-align: center
 
-m1 |> ggiplot(
+mod |> ggiplot(
   xlab    = "Time Relative to Treatment",       # x-axis label
   ylab    = "Dynamic ATT Estimate",             # y-axis label
   main    = "Dynamic Treatment Effects (IW)",   # title for plot
@@ -128,7 +130,7 @@ If we are interested in how the ATT differs by year of treatment adoption, we ca
 #| comment: "#>"
 #| class-output: r
 
-group = m1 |>
+group = mod |>
   aggregate(agg = "cohort")
 ```
 
