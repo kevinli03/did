@@ -1,28 +1,32 @@
 # DIDmultiplegtDYN {.unnumbered}
 
-##### De Chaisemartin and D'Haultfœuille (2020, 2024)
+::: small
+non-staggered or staggered, absorbing or non-absorbing, binary or continuous treatment
+:::
 
-### What is DIDmultiple?
+The DIDMultiple estimator is an estimator for DiD that solves the issues with TWFE in staggered settings. It also expands DiD to work with continuous treatments and non-absorbing treatments.
 
-The DIDMultiple estimator, also called **csdid**, is an estimator for DiD that solves the issues with TWFE in staggered settings. It also expands DiD to work with continuous treatments and non-absorbing treatments. The estimator was proposed by de Chaisemartin and D'Haultfœuille (2020, 2024).
-
-DIDmultiple is a **matching and reweighting estimator** for DiD, with the matching part solving the "forbidden comparisons" problem of TWFE, and the reweighting part solving the "negative weighting" problem of TWFE.
-
-The estimator focuses on **switchers** - those units in a certain period who change their treatment status. For example, a unit that goes from $D_{it} = 0$ to $D_{it} = 1$. DIDmultiple "matches" these switchers to the group that does not switch (so the group of units that stay $D_{it} = 0$), and estimates the difference in outcomes. In a binary treatment setting, the treatment effect at period $\tau_t$ can be described as:
+The estimator focuses on **switchers** - those units in a certain period who change their treatment status. In a binary treatment setting, the treatment effect at period $\tau_t$ can be described as:
 
 $$
 \tau_t = \frac{\mathbb E[\Delta Y |\text{switchers}] - \mathbb E[\Delta Y |\text{non-switchers}]}{\underbrace{\mathbb E[\Delta D |\text{switchers}]}_\text{=1 if absorbing treatment}}
 $$
 
 ::: small
-This might seem similar to those familar with IV-wald estimator, and in fact, this is a Wald estimator, called Wald-TC.
+For example, a unit that goes from $D_{it} = 0$ to $D_{it} = 1$. DIDmultiple "matches" these switchers to the group that does not switch (so the group of units that stay $D_{it} = 0$), and estimates the difference in outcomes.
 :::
 
-Then, DIDmultiple aggregates these effects of switchers by reweighting them properly. This can be used to estimate both a singular ATT and dynamic effects. The focus on switchers allows DIDmultiple to be applied onto non-binary treatments, including continuous treatments.
+Then, DIDmultiple aggregates these effects into a singular ATT or dynamic effects. The focus on switchers allows DIDmultiple to be applied onto non-binary treatments, including continuous treatments.
+
+```{r}
+#| message: false
+#| warning: false
+
+# packages needed:
+library(DIDmultiplegtDYN)
+```
 
 <br />
-
-### R: Running the Model
 
 ```{r}
 #| echo: false
@@ -32,52 +36,61 @@ Then, DIDmultiple aggregates these effects of switchers by reweighting them prop
 library(fixest)
 data(base_stagg, package = "fixest")
 df <- base_stagg
-colnames(df) <- c("unit", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
+colnames(df) <- c("id", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
 
+::: panel-tabset
+## Syntax
+
+We use the `did_multiplegt_dyn()` function to complete the estimation process:
+
+```{r}
+m1 = did_multiplegt_dyn(
+  # required arguments
+  df          = df,
+  outcome     = "outcome",
+  group       = "id",       # Note: group here refers to unit, not first.treat
+  time        = "time",
+  treatment   = "treat",
+  effects     = 4,          # Number of post-treatment periods dynamic effects
+  placebo     = 4,          # Number of pre-treatment periods of effects
+  
+  # optional arguments
+  controls    = NULL,       # optional, vector (string) of covariates.
+  continuous  = NULL,       # change to 1 if your treatment is true
+  graph_off   = T
+)
+```
+
+## Variables
+
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
-| Variable  | Description                                                                                                                         |
-|-------------|-----------------------------------------------------------|
-| `unit`    | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}. |
-| `time`    | A variable indicating time-periods in our study for each observation.                                                               |
-| `outcome` | Outcome variable for each observation.                                                                                              |
-| `covar`   | (optional) covariate(s) to condition for parallel trends.                                                                           |
+| Variable  | Description                                                                         |
+|-----------------|------------------------------------------------------|
+| `id`      | A variable indicating the units/individual an observation belongs to in our data.\* |
+| `time`    | A variable indicating time-periods in our study for each observation.               |
+| `outcome` | Outcome variable for each observation.                                              |
+| `covar`   | (optional) covariate(s) to condition for parallel trends.                           |
 
 ::: small
 \*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
 :::
 
-With all the proper variables, we can estimate a DIDmultiple model with the **DIDmultiplegtDYN** package:
+## Notes
 
-```{r}
-library(DIDmultiplegtDYN)
-
-DIDmultiple <- did_multiplegt_dyn(
-  # required arguments
-  df         = df,
-  outcome    = "outcome",
-  group      = "unit",    # Note: group here refers to unit, not first.treat
-  time       = "time",
-  treatment  = "treat",
-  effects    = 4,         # Number of post-treatment periods dynamic effects
-  placebo    = 4,         # Number of pre-treatment periods of effects
-  
-  # optional arguments
-  controls   = NULL,      # optional, vector of covariates. I have difficulties.
-  continuous = NULL,      # change to 1 if your treatment is true
-  graph_off  = T
-)
-```
-
-The model has now been run, and we can now output the effects or plot the effects.
+Covariates for conditional parallel trends are possible to include, but they are used differently, and may cause issues.
+:::
 
 <br />
 
-### R: Output the Effects
+Our results can be outputted into print form, or into a plot:
 
-We can output the effects from a DIDmultiple model as follows:
+::: panel-tabset
+## Print
+
+We can print the results from our object from previously:
 
 ```{r}
 #| warning: false
@@ -85,59 +98,29 @@ We can output the effects from a DIDmultiple model as follows:
 #| comment: "#>"
 #| class-output: r
 
-print(DIDmultiple)
+m1 |> print()
 ```
 
-This output contains quite a lot of material.
+## Plot
 
-1.  The first section are dynamic treatment effects for post-treatment periods.
-2.  The second section is the average cumulative effect per treatment unit, also equivalent to the ATT in a binary setting.
-3.  The final section contains pre-treatment effects, which can help us determine if parallel trends is met. The joint-nullity test of the placebos should be non-significant if parallel trends is met.
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Extracting ATT Estimates
-
-We can extract the ATT directly for plots or figures with the following:
+We can plot the dynamic treatment effects in a plot:
 
 ```{r}
-#| comment: "#>"
-#| class-output: r
-#| results: hold
-
-# ATE
-DIDmultiple$results$ATE[1]
-
-# Standard Error
-DIDmultiple$results$ATE[2]
-
-# Lower confidence interval
-DIDmultiple$results$ATE[3]
-
-# Upper confidence interval
-DIDmultiple$results$ATE[4]
-```
-:::
-
-<br />
-
-### R: Plotting Dynamic Effects
-
-The DIDmultiple model automatically generates a ggplot. We can make a few modifications to the plot:
-
-```{r}
-#| eval: false
+#| message: false
+#| warning: false
+#| fig-height: 3
+#| fig-align: center
 
 library(ggplot2)
 
 # assign plot to plot object
-plot <- DIDmultiple$plot
+plot = m1$plot
 
-# get rid of weird line in degault plot
+# get rid of weird line in default plot
 plot$layers[[1]] <- NULL
 
 # customise plot
 plot +
-  # title and axis-labels
   labs(title = "Dynamic Treatment Effects") +
   xlab("Time to Treatment (t=1)") + ylab("Estimate") +
   
@@ -147,42 +130,12 @@ plot +
   
   # Theme
   theme_bw()
-
 ```
-
-```{r}
-#| echo: false
-#| message: false
-#| fig-height: 3
-#| fig-align: center
-
-library(ggdark)
-library(ggplot2)
-
-# assign plot to plot object
-plot <- DIDmultiple$plot
-
-# get rid of weird line in degault plot
-plot$layers[[1]] <- NULL
-
-# customise plot
-plot +
-  # title and axis-labels
-  labs(title = "Dynamic Treatment Effects") +
-  xlab("Time to Treatment (t=1)") + ylab("Estimate") +
-  
-  # lines for treatment time and 0 treatment effect
-  geom_vline(xintercept = 0.5, linetype = 3) +
-  geom_hline(yintercept = 0, linetype = 3, color = "red") +
-  
-  # Theme
-  dark_mode(theme_bw())
-  
-```
+:::
 
 <br />
 
-### Additional Resources
+**Additional Resources**
 
 de Chaisemartin, C. and D'Haultfœuille, X (2024) 'Difference-in-Differences Estimators of Intertemporal Treatment Effects', *The Review of Economics and Statistics*, pp. 1-45. Available at: <https://doi.org/10.1162/rest_a_01414>.
 

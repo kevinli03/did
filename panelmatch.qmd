@@ -1,32 +1,30 @@
 # PanelMatch {.unnumbered}
 
-##### Imai, Kim, and Wang (2023)
+::: small
+non-staggered or staggered, absorbing or non-absorbing, binary treatment.
+:::
 
-### What is PanelMatch
+PanelMatch is an estimator for DiD that solves the issues with TWFE in staggered settings. It also accomodates non-absorbing treatment.
 
-PanelMatch is an estimator for DiD that solves the issues with TWFE in staggered settings. It also accomodates non-absorbing treatment. The estimator was proposed by Imai, Kim, and Wang (2023).
-
-PanelMatch is a **matching and reweighting estimator** for DiD, with the matching part solving the "forbidden comparisons" problem of TWFE, and the reweighting part solving the "negative weighting" problem of TWFE.
-
-First, the PanelMatch estimator "matches" treated units to control units in correct non-forbidden comparisons. For every treated unit $D_{it}=1$ in a specific time period $t$, PanelMatch finds a group of untreated units $D_{it} = 0$ in the same time period, that have identical past treatment history in a set number of previous treatment periods.
+For every treated unit $D_{it}=1$ in a specific time period $t$, PanelMatch finds a group of untreated units $D_{it} = 0$ in the same time period, that have identical past treatment history in a set number of previous treatment periods.
 
 ::: small
-The number of pre-treatment history to match on is called the **lag** period. For example, if lag = 4, then treated units are matched to untreated units with the same treatment history in the 4 periods before this period. Lag is typically between 3 and 5.
+The number of pre-treatment history to match on is called the **lag**. For example, if lag = 4, then treated units are matched to untreated units with the same treatment history in the 4 periods before this period. When lag = 1, PanelMatch is equivalent to DIDmultiple.
 :::
 
 Then, PanelMatch compares the outcome of the treated unit compared to the weighted average of the matched untreated units. When there are no covariates, each matched untreated unit is weighted equally in this weighted average. When there are covariates, weighting depends on the mahalanobis distance of covariates.
 
 This comparison produces a series of treatment effect estimates (one for each treated unit). These are then properly aggregated together to find the causal effects.
 
-::: small
-If the lag period of matching for pre-treatment is exactly 1, and we only estimate effects for the first post-treat period, then PanelMatch is equivalent to DIDmultiple.
-:::
+```{r}
+#| message: false
+#| warning: false
 
-Because of its design, PanelMatch can function properly when there is non-absorbing treatment. Disadvantages revolve on the need for exact pre-treatment history matching, which might not be possible in some datasets.
+# packages needed:
+library(PanelMatch)
+```
 
 <br />
-
-### R: Running the Model
 
 ```{r}
 #| echo: false
@@ -36,50 +34,66 @@ Because of its design, PanelMatch can function properly when there is non-absorb
 library(fixest)
 data(base_stagg, package = "fixest")
 df <- base_stagg
-colnames(df) <- c("unit", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
+colnames(df) <- c("id", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
+df$id <- as.integer(as.factor(df$id))
 ```
 
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
+PanelMatch requires us to pre-process the data with the `PanelData()` function:
 
-| Variable  | Description                                                                                                                              |
-|-------------|-----------------------------------------------------------|
-| `unit`    | A variable indicating the units/individual an observation belongs to in our data.\* [For PanelMatch, this must be integers]{.underline}. |
-| `time`    | A variable indicating time-periods in our study for each observation.                                                                    |
-| `outcome` | Outcome variable for each observation.                                                                                                   |
-| `covar`   | (optional) covariate(s) to condition for parallel trends.                                                                                |
+::: panel-tabset
+## Syntax
 
-::: small
-\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
-:::
-
-PanelMatch requires `unit` to be an integer variable. We can change a non-integer `unit` into an integer by:
-
-```{r}
-df$unit <- as.integer(as.factor(df$unit))
-```
-
-Before starting estimation, PanelMatch requires us to pre-process the data.
+We use the `PanelData()` function to clean our data to fit the later estimation functions.
 
 ```{r}
 #| message: false
 #| warning: false
 
-library(PanelMatch)
-
 # PanelMatch dislikes tidyverse df's, so do this:
-df <- as.data.frame(df)
+df = df |> as.data.frame()
 
-df.panel <- PanelData(
-  panel.data = df,        # your data
-  unit.id    = "unit",    # your unit var (integer only)
-  time.id    = "time",    # your time period var (integer only)
-  treatment  = "treat",   # your treatment var
-  outcome    = "outcome"  # your outcome var
+df.panel = PanelData(
+  panel.data  = df,        # your data
+  unit.id     = "id",    # your unit var (integer only)
+  time.id     = "time",    # your time period var (integer only)
+  treatment   = "treat",   # your treatment var
+  outcome     = "outcome"  # your outcome var
 )
 ```
 
-Now, we can run the PanelMatch matching process:
+## Variables
+
+Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
+
+| Variable  | Description                                                                                                                              |
+|------------------|------------------------------------------------------|
+| `id`      | A variable indicating the units/individual an observation belongs to in our data.\* [For PanelMatch, this must be integers]{.underline}. |
+| `time`    | A variable indicating time-periods in our study for each observation.                                                                    |
+| `outcome` | Outcome variable for each observation.                                                                                                   |
+| `covar`   | (optional) covariate(s) to condition for parallel trends.                                                                                |
+
+::: small
+\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
+:::
+
+PanelMatch requires `unit` to be an integer variable. We can change a non-integer `id` into an integer by:
+
+```{r}
+#| eval: false
+
+df$id <- as.integer(as.factor(df$id))
+```
+:::
+
+<br />
+
+Now, we can run the PanelMatch matching process to match based on lag-period pre-history:
+
+::: panel-tabset
+## Syntax
+
+We use the `PanelMatch()` function to complete the matching process.
 
 ```{r}
 #| message: false
@@ -87,138 +101,102 @@ Now, we can run the PanelMatch matching process:
 
 match = PanelMatch(
   # required arguments
-  lag               = 4,              # number of pre-periods to match treat history
-  panel.data        = df.panel,       # PanelData generated data
-  lead              = c(0:3),         # how many post-treat dynamic effects to estimate
-  qoi               = "att",
-  refinement.method = "mahalanobis",  # set to "none" if no covaraites
-  match.missing     = T,
+  lag                = 4,              # number of pre-periods to match treat history
+  panel.data         = df.panel,       # PanelData generated data
+  lead               = c(0:3),         # how many post-treat dynamic effects to estimate
+  qoi                = "att",
+  refinement.method  = "mahalanobis",  # set to "none" if no covaraites
+  match.missing      = T,
   
   # optional arguments
-  covs.formula      = ~ covar,        # (optional, can exclude)
-  placebo.test      = T               # (optional, but may cause issues)
+  covs.formula       = ~ covar,        # (optional, can exclude)
+  placebo.test       = T               # (optional, but may cause issues)
 )
 ```
 
-Now the matching process is complete, and aggregating the effects is now possible.
+This completes the matching process, but we still need to estimate the treatment effects.
 
-<br />
+## Notes
 
-### R: Aggregating the ATT
+Confusingly, the *lag* and *lead* are opposites in this package compared to traditional usage in difference-in-differences. Thus, please be careful when defining the `lag =` and `lead =` options.
 
-To aggregate all the matched comparisons into a singular ATT, we use the **PanelEstimate()** function.
+-   Lag refers to periods **before** the treatment in which to match on.
+-   Leads refer to periods **after** the treatment on which to match on.
 
-```{r}
-#| comment: "#>"
-#| class-output: r
+If you are not using any covariates, you should change the argument `refinement.method =` to `"none"`. If you do have covariates, it should remain `"mahalanobis"`.
 
-att = PanelEstimate(
-  # required arguments
-  sets       = match,     # PanelMatch object
-  panel.data = df.panel,  # PanelData object
-  pooled     = T,         # tells R to calculate ATT
-  
-  # optional arguments
-  moderator  = NULL       # ("string") var to calculate heterogenous effects
-)
+-   This basically tells PanelMatch what weights to put on different observations when matching, and how to weight certain matches more than others based on the proximity of covariates.
 
-print(att)
-```
-
-::: {.callout-note collapse="true" appearance="simple"}
-## Extract the ATT Directly
-
-If you are interested in extracting the ATT and standard errors directly from the att object for tables/figures, you can do the following:
-
-```{r}
-#| comment: "#>"
-#| class-output: r
-#| results: hold
-
-att$estimate
-att$standard.error
-```
+The placebo test may cause issues, so if there are issues, change `placebo.test =` to `F`.
 :::
 
 <br />
 
-### R: Aggregating Dynamic Effects
+Now the matching process is complete, and aggregating the effects is now possible.
 
-We can estimate dynamic treatment effects with the **PanelEstimate()** function:
+::: panel-tabset
+## ATT
+
+To aggregate all the matched comparisons into a singular ATT, we use the `PanelEstimate()` function.
 
 ```{r}
 #| comment: "#>"
 #| class-output: r
 
-dynamic = PanelEstimate(
-  sets       = match,     # PanelMatch object
-  panel.data = df.panel,  # PanelData object
-  pooled     = F          # tells R to calculate dynamic effects
-)
-
-summary(dynamic)
+match |>
+  PanelEstimate(
+    panel.data = df.panel,  # PanelData object
+    pooled     = T,         # tells R to calculate ATT
+    moderator  = NULL       # optional. character string for var to calculate heterogenous effects
+  ) |>
+  print()
 ```
 
-The above function only estimates post-treatment dynamic effects. We can graph these using the **plot()** function:
+## Post-Treatment
+
+We can estimate dynamic treatment effects with the `PanelEstimate()` function:
 
 ```{r}
-#| eval: false
-
-plot = plot(
-  x    = dynamic,               # object from PanelEstimate
-  ylab = "Estimate",            # y-axis label
-  xlab = "Time to Treatment",   # x-axis label
-  main = "Dynamic Effects"      # title of plot
-)
-```
-
-```{r}
-#| echo: false
+#| comment: "#>"
+#| class-output: r
 #| message: false
 #| fig-height: 3.5
 #| fig-align: center
 
-
-par(
-  bg = "black",
-  col.axis = "white",
-  col.lab = "white",
-  col.main = "white"
-)
-
-plot = plot(
-  x = dynamic,
-  ylab = "Estimate",
-  xlab = "Time to Treatment",
-  main = "Dynamic Treatment Effects",
-  col = "white"
-)
-
-
+match |>
+  PanelEstimate(
+    panel.data = df.panel,  # PanelData object
+    pooled     = F          # tells R to calculate dynamic effects
+  ) |>
+  plot(
+    ylab = "Estimate",            # y-axis label
+    xlab = "Time to Treatment",   # x-axis label
+    main = "Dynamic Effects"      # title of plot
+  )
 ```
 
-<br />
+## Pre-Treatment
 
-### R: Placebo Tests
-
-We can conduct pre-treatment period placebo tests (pre-treatment effects to test for parallel trends) as well. These are done with the **placebo_test()** function.
+We can conduct pre-treatment period placebo tests (pre-treatment effects to test for parallel trends) as well. These are done with the `placebo_test()` function.
 
 ```{r}
 #| results: hold
 #| fig-height: 3.5
 #| fig-align: center
 
-pre = placebo_test(
-  pm.obj     = match,     # PanelMatch object
+match |> placebo_test(
   panel.data = df.panel,  # PanelData object
   lag.in     = 4,         # should equal lag in PanelMatch()
   plot       = T
 )
 ```
 
+Note: the estimate for the last pre-treatment period (t-1) is always 0, so it is not displayed.
+:::
+
 <br />
 
-### Additional Resources
+**Additional Resources**
 
 Imai, K., Kim, I. S., and Wang, E. (2023) 'Matching Methods for Causal Inference with Time-Series Cross-Sectional Data', *American Journal of Political Science*, 67(3), pp. 587-605. Available at: <https://imai.fas.harvard.edu/research/tscs.html>.
 

@@ -60,7 +60,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <link href="./sunab.html" rel="next">
-<link href="./panelview.html" rel="prev">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -156,12 +155,6 @@ window.Quarto = {
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">panelView</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">twfe (fixest)</span></a>
   </div>
@@ -208,6 +201,13 @@ window.Quarto = {
  <span class="menu-text">etwfe</span></a>
   </div>
 </li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">panelView</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -243,9 +243,9 @@ window.Quarto = {
 </div>
 <p>The two-way fixed effects (TWFE) estimator is the standard estimator used for classical and generalised DID, when there is non-staggered treatment implementation and absorbing treatment. The model takes the following form.</p>
 <p><span class="math display">\[
-Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{it}^\top\hat{\b\beta} + \hat\eps_{it}
+Y_{it} = \underbrace{\hat\alpha_i + \hat\delta_t}_\text{fixed effects} + D_{it}\hat\tau  + \mathbf X_{it}^\top\hat{\b\beta} + \hat\eps_{it}
 \]</span></p>
-<p>The TWFE <span class="math inline">\(\hat\tau_\text{ATT}\)</span> estimate is an unbiased esitmator of the ATT if treatment is non-staggered and absorbing, and the identification assumptions (parallel trends, no anticipation, SUTVA) hold.</p>
+<p>The TWFE <span class="math inline">\(\hat\tau\)</span> estimate is an unbiased esitmator of the ATT if treatment is non-staggered and absorbing, and the identification assumptions (parallel trends, no anticipation, SUTVA) hold.</p>
 <div class="small">
 <p>TWFE can be severely biased if there is staggered treatment or non-absorbing treatment.</p>
 </div>
@@ -262,17 +262,17 @@ Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{i
 <p>We use the <code>feols()</code> function to run the TWFE model.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">=</span> <span class="fu">feols</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml   =</span> outcome <span class="sc">~</span> treat <span class="sc">+</span> covar <span class="sc">|</span> unit <span class="sc">+</span> time,  <span class="co"># covariate is optional</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> df,                                     <span class="co"># your data</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov  =</span> <span class="sc">~</span> unit                                  <span class="co"># cluster SE by unit</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml   =</span> outcome <span class="sc">~</span> treat <span class="sc">+</span> covar <span class="sc">|</span> id <span class="sc">+</span> time,  <span class="co"># covariate is optional</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> df,                                   <span class="co"># your data</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov  =</span> <span class="sc">~</span> id                                  <span class="co"># cluster SE by unit</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; OLS estimation, Dep. Var.: outcome</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Observations: 950</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Fixed-effects: unit: 95,  time: 10</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Standard-errors: Clustered (unit) </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Fixed-effects: id: 95,  time: 10</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Standard-errors: Clustered (id) </span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       Estimate Std. Error  t value  Pr(&gt;|t|)    </span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; treat -3.68310   0.361071 -10.2005 &lt; 2.2e-16 ***</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; covar  1.01833   0.032416  31.4142 &lt; 2.2e-16 ***</span></span>
@@ -288,8 +288,8 @@ Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{i
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 79%">
+<col style="width: 23%">
+<col style="width: 76%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -299,7 +299,7 @@ Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{i
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>unit</code></td>
+<td><code>id</code></td>
 <td>A variable indicating the units/individual an observation belongs to in our data.*</td>
 </tr>
 <tr class="even">
@@ -325,7 +325,7 @@ Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{i
 </tbody>
 </table>
 <div class="small">
-<p>*For repeated cross-section, the <code>unit</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>unit</code> variable.</p>
+<p>*For repeated cross-section, the <code>id</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>id</code> variable.</p>
 </div>
 </div>
 </div>
@@ -339,23 +339,19 @@ Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{i
 <p>We use the <code>feols()</code> function to run the TWFE event study.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">=</span> <span class="fu">feols</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml   =</span> outcome <span class="sc">~</span> <span class="fu">i</span>(rel.time, group, <span class="at">ref =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span> covar <span class="sc">|</span> unit <span class="sc">+</span> time,  <span class="co"># group = treat/never-treat</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> df,                                                            <span class="co"># your data</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov  =</span> <span class="sc">~</span> unit                                                         <span class="co"># cluster SE by unit</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">fml   =</span> outcome <span class="sc">~</span> <span class="fu">i</span>(rel.time, group, <span class="at">ref =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span> covar <span class="sc">|</span> id <span class="sc">+</span> time,  <span class="co"># group = treat/never-treat</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data  =</span> df,                                                          <span class="co"># your data</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">vcov  =</span> <span class="sc">~</span> id                                                         <span class="co"># cluster SE by unit</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We can plot these results.</p>
+<p>We can plot these results. The <code>ggiplot()</code> function produces a ggplot2 figure, so any ggplot2 options can be added with a <code>+</code>, including themes, labels, etc.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggiplot</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required options</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">object  =</span> m2,                            <span class="co"># input your dynamic model object</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional options</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time Relative to Treatment"</span>,  <span class="co"># x-axis label</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Dynamic ATT Estimate"</span>,        <span class="co"># y-axis label</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Dynamic Treatment Effects"</span>,   <span class="co"># title for plot</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">8</span>, <span class="dv">8</span>) <span class="co"># select how many periods to display</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>m2 <span class="sc">|&gt;</span> <span class="fu">ggiplot</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time Relative to Treatment"</span>,  <span class="co"># x-axis label</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Dynamic ATT Estimate"</span>,        <span class="co"># y-axis label</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Dynamic Treatment Effects"</span>,   <span class="co"># title for plot</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">8</span>, <span class="dv">8</span>) <span class="co"># select how many periods to display</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -369,8 +365,8 @@ Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{i
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 23%">
-<col style="width: 76%">
+<col style="width: 25%">
+<col style="width: 75%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -380,7 +376,7 @@ Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{i
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>unit</code></td>
+<td><code>id</code></td>
 <td>A variable indicating the units/individual an observation belongs to in our data.*</td>
 </tr>
 <tr class="even">
@@ -405,6 +401,9 @@ Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{i
 </tr>
 </tbody>
 </table>
+<div class="small">
+<p>*For repeated cross-section, the <code>id</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>id</code> variable.</p>
+</div>
 </div>
 </div>
 </div>
@@ -835,9 +834,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./panelview.html" class="pagination-link" aria-label="panelView">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">panelView</span>
-      </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./sunab.html" class="pagination-link" aria-label="sunab (fixest)">

@@ -40,7 +40,7 @@ library(fect)
 library(fixest)
 data(base_stagg, package = "fixest")
 df <- base_stagg
-colnames(df) <- c("unit", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
+colnames(df) <- c("id", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
 
@@ -59,7 +59,7 @@ m1 = fect(
   # required arguments
   formula  = outcome ~ treat + covar,  # covar is optional
   data     = df,
-  index    = c("unit", "time"),        # unit and time var
+  index    = c("id", "time"),          # unit and time var
   method   = "fe",                     # use "fe", "ife", or "mc"
   
   # optional arguments
@@ -69,7 +69,7 @@ m1 = fect(
   seed     = 1239                      # any number will work
 )
 
-print(m1)
+m1 |> print()
 ```
 
 The output contains two different ATT estimates. It is typically conventional to use the first one, `Tr obs equally weighted`, which weights each observation $it$ equally (rather than the second which weights all $i$ equally).
@@ -78,15 +78,15 @@ The output contains two different ATT estimates. It is typically conventional to
 
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
-| Variable  | Description                                                                                                                         |
-|----------------|--------------------------------------------------------|
-| `unit`    | A variable indicating the units/individual an observation belongs to in our data.\* [For csdid, this must be integers]{.underline}. |
-| `time`    | A variable indicating time-periods in our study for each observation.                                                               |
-| `outcome` | Outcome variable for each observation.                                                                                              |
-| `covar`   | (optional) covariate(s) to condition for parallel trends.                                                                           |
+| Variable  | Description                                                                         |
+|------------------|------------------------------------------------------|
+| `id`      | A variable indicating the units/individual an observation belongs to in our data.\* |
+| `time`    | A variable indicating time-periods in our study for each observation.               |
+| `outcome` | Outcome variable for each observation.                                              |
+| `covar`   | (optional) covariate(s) to condition for parallel trends.                           |
 
 ::: small
-\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
+\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
 :::
 :::
 
@@ -104,12 +104,8 @@ The fect package allows quick aggregation of dynamic effects through plotting. T
 #| fig-height: 3.5
 #| fig-align: center
 
-plot(
-  # required arguments
-  x       = m1,                         # our output object from fect()
+m1 |> plot(
   start0  = T,                            # don't change
-  
-  # optional aesthetic arguments
   main    = "Dynamic Treatment Effects",  # title
   ylab    = "Estimate",                   # y-axis label
   xlab    = "Time to Treatment",          # x-axis label
@@ -126,13 +122,9 @@ We can explore how treatment effects change over calendar time (not relative tim
 #| fig-height: 3.5
 #| fig-align: center
 
-plot(
-  # required arguments
-  x       = m1,                          # our output object from fect()
+m1 |> plot(
   start0  = T,                             # don't change
   type    = "calendar",                    # don't change
-  
-  # optional aesthetic arguments
   main    = "Calendar Treatment Effects",  # title
   ylab    = "Estimate",                    # y-axis label
   xlab    = "Time Period",                 # x-axis label
@@ -149,13 +141,9 @@ We can also explore the distributions of individual treatment effects by relativ
 #| fig-height: 3.5
 #| fig-align: center
 
-plot(
-  # required arguments
-  x       = m1,                            # our output object from fect()
+m1 |> plot(
   start0  = T,                               # don't change
   type    = "box",                           # don't change
-  
-  # optional aesthetic options
   main    = "Individual Treatment Effects",  # title
   ylab    = "Estimate",                      # y-axis label
   xlab    = "Time to Treatment",             # x-axis label
@@ -172,15 +160,11 @@ The fect package contains tools to more rigorously test the parallel trends assu
 #| fig-height: 4.5
 #| fig-align: center
 
-plot(
-  # required arguments
-  x           = m1,                        # our output object from fect()
+m1 |> plot(
   start0      = T,                         # don't change
   type        = "equiv",
   bound       = "equiv",
   pre.period  = c(-4, 0),                  # how many pre-treat coef to test
-  
-  # optional aesthetic options
   main        = "Parallel Trends Tests",   # title
   ylab        = "Estimate",                # y-axis label
   xlab        = "Time to Treatment",       # x-axis label

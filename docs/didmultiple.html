@@ -156,12 +156,6 @@ window.Quarto = {
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">panelView</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">twfe (fixest)</span></a>
   </div>
@@ -208,23 +202,20 @@ window.Quarto = {
  <span class="menu-text">etwfe</span></a>
   </div>
 </li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">panelView</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#what-is-didmultiple" id="toc-what-is-didmultiple" class="nav-link active" data-scroll-target="#what-is-didmultiple">What is DIDmultiple?</a></li>
-  <li><a href="#r-running-the-model" id="toc-r-running-the-model" class="nav-link" data-scroll-target="#r-running-the-model">R: Running the Model</a></li>
-  <li><a href="#r-output-the-effects" id="toc-r-output-the-effects" class="nav-link" data-scroll-target="#r-output-the-effects">R: Output the Effects</a></li>
-  <li><a href="#r-plotting-dynamic-effects" id="toc-r-plotting-dynamic-effects" class="nav-link" data-scroll-target="#r-plotting-dynamic-effects">R: Plotting Dynamic Effects</a></li>
-  <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional Resources</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -248,30 +239,52 @@ window.Quarto = {
 </header>
 
 
-<section id="de-chaisemartin-and-dhaultfœuille-2020-2024" class="level5">
-<h5 class="anchored" data-anchor-id="de-chaisemartin-and-dhaultfœuille-2020-2024">De Chaisemartin and D’Haultfœuille (2020, 2024)</h5>
-</section>
-<section id="what-is-didmultiple" class="level3">
-<h3 class="anchored" data-anchor-id="what-is-didmultiple">What is DIDmultiple?</h3>
-<p>The DIDMultiple estimator, also called <strong>csdid</strong>, is an estimator for DiD that solves the issues with TWFE in staggered settings. It also expands DiD to work with continuous treatments and non-absorbing treatments. The estimator was proposed by de Chaisemartin and D’Haultfœuille (2020, 2024).</p>
-<p>DIDmultiple is a <strong>matching and reweighting estimator</strong> for DiD, with the matching part solving the “forbidden comparisons” problem of TWFE, and the reweighting part solving the “negative weighting” problem of TWFE.</p>
-<p>The estimator focuses on <strong>switchers</strong> - those units in a certain period who change their treatment status. For example, a unit that goes from <span class="math inline">\(D_{it} = 0\)</span> to <span class="math inline">\(D_{it} = 1\)</span>. DIDmultiple “matches” these switchers to the group that does not switch (so the group of units that stay <span class="math inline">\(D_{it} = 0\)</span>), and estimates the difference in outcomes. In a binary treatment setting, the treatment effect at period <span class="math inline">\(\tau_t\)</span> can be described as:</p>
+<div class="small">
+<p>non-staggered or staggered, absorbing or non-absorbing, binary or continuous treatment</p>
+</div>
+<p>The DIDMultiple estimator is an estimator for DiD that solves the issues with TWFE in staggered settings. It also expands DiD to work with continuous treatments and non-absorbing treatments.</p>
+<p>The estimator focuses on <strong>switchers</strong> - those units in a certain period who change their treatment status. In a binary treatment setting, the treatment effect at period <span class="math inline">\(\tau_t\)</span> can be described as:</p>
 <p><span class="math display">\[
 \tau_t = \frac{\mathbb E[\Delta Y |\text{switchers}] - \mathbb E[\Delta Y |\text{non-switchers}]}{\underbrace{\mathbb E[\Delta D |\text{switchers}]}_\text{=1 if absorbing treatment}}
 \]</span></p>
 <div class="small">
-<p>This might seem similar to those familar with IV-wald estimator, and in fact, this is a Wald estimator, called Wald-TC.</p>
+<p>For example, a unit that goes from <span class="math inline">\(D_{it} = 0\)</span> to <span class="math inline">\(D_{it} = 1\)</span>. DIDmultiple “matches” these switchers to the group that does not switch (so the group of units that stay <span class="math inline">\(D_{it} = 0\)</span>), and estimates the difference in outcomes.</p>
 </div>
-<p>Then, DIDmultiple aggregates these effects of switchers by reweighting them properly. This can be used to estimate both a singular ATT and dynamic effects. The focus on switchers allows DIDmultiple to be applied onto non-binary treatments, including continuous treatments.</p>
+<p>Then, DIDmultiple aggregates these effects into a singular ATT or dynamic effects. The focus on switchers allows DIDmultiple to be applied onto non-binary treatments, including continuous treatments.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># packages needed:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DIDmultiplegtDYN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p><br></p>
-</section>
-<section id="r-running-the-model" class="level3">
-<h3 class="anchored" data-anchor-id="r-running-the-model">R: Running the Model</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Variables</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Notes</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>We use the <code>did_multiplegt_dyn()</code> function to complete the estimation process:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">=</span> <span class="fu">did_multiplegt_dyn</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">df          =</span> df,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome     =</span> <span class="st">"outcome"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">group       =</span> <span class="st">"id"</span>,       <span class="co"># Note: group here refers to unit, not first.treat</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">time        =</span> <span class="st">"time"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment   =</span> <span class="st">"treat"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">effects     =</span> <span class="dv">4</span>,          <span class="co"># Number of post-treatment periods dynamic effects</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">placebo     =</span> <span class="dv">4</span>,          <span class="co"># Number of pre-treatment periods of effects</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional arguments</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">controls    =</span> <span class="cn">NULL</span>,       <span class="co"># optional, vector (string) of covariates.</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">continuous  =</span> <span class="cn">NULL</span>,       <span class="co"># change to 1 if your treatment is true</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">graph_off   =</span> T</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 81%">
+<col style="width: 23%">
+<col style="width: 76%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -281,8 +294,8 @@ window.Quarto = {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>unit</code></td>
-<td>A variable indicating the units/individual an observation belongs to in our data.* <u>For csdid, this must be integers</u>.</td>
+<td><code>id</code></td>
+<td>A variable indicating the units/individual an observation belongs to in our data.*</td>
 </tr>
 <tr class="even">
 <td><code>time</code></td>
@@ -301,155 +314,92 @@ window.Quarto = {
 <div class="small">
 <p>*For repeated cross-section, the <code>unit</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>unit</code> variable.</p>
 </div>
-<p>With all the proper variables, we can estimate a DIDmultiple model with the <strong>DIDmultiplegtDYN</strong> package:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DIDmultiplegtDYN)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'DIDmultiplegtDYN' was built under R version 4.4.1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>DIDmultiple <span class="ot">&lt;-</span> <span class="fu">did_multiplegt_dyn</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">df         =</span> df,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome    =</span> <span class="st">"outcome"</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">group      =</span> <span class="st">"unit"</span>,    <span class="co"># Note: group here refers to unit, not first.treat</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">time       =</span> <span class="st">"time"</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment  =</span> <span class="st">"treat"</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">effects    =</span> <span class="dv">4</span>,         <span class="co"># Number of post-treatment periods dynamic effects</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">placebo    =</span> <span class="dv">4</span>,         <span class="co"># Number of pre-treatment periods of effects</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional arguments</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">controls   =</span> <span class="cn">NULL</span>,      <span class="co"># optional, vector of covariates. I have difficulties.</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">continuous =</span> <span class="cn">NULL</span>,      <span class="co"># change to 1 if your treatment is true</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">graph_off  =</span> T</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>The model has now been run, and we can now output the effects or plot the effects.</p>
-<p><br></p>
-</section>
-<section id="r-output-the-effects" class="level3">
-<h3 class="anchored" data-anchor-id="r-output-the-effects">R: Output the Effects</h3>
-<p>We can output the effects from a DIDmultiple model as follows:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(DIDmultiple)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Estimation of treatment effects: Event-study effects</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;              Estimate SE      LB CI    UB CI    N   Switchers</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effect_1     -5.04943 0.45371 -5.93869 -4.16017 675 45       </span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effect_2     -3.25734 0.49253 -4.22269 -2.29199 580 40       </span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effect_3     -2.17826 0.54482 -3.24609 -1.11044 490 35       </span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effect_4     -0.03749 0.50608 -1.02940 0.95442  405 30       </span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Test of joint nullity of the effects : p-value = 0.0000</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Average cumulative (total) effect per treatment unit</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Estimate        SE     LB CI     UB CI         N Switchers </span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  -2.89921   0.38159  -3.64711  -2.15131       780       150 </span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Average number of time periods over which a treatment effect is accumulated: 2.3333</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Testing the parallel trends and no anticipation assumptions</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;              Estimate SE      LB CI    UB CI   N   Switchers</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Placebo_1    0.27204  0.49208 -0.69242 1.23651 580 40       </span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Placebo_2    -0.72910 0.61928 -1.94287 0.48467 405 30       </span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Placebo_3    -0.27729 0.55098 -1.35720 0.80262 250 20       </span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Placebo_4    0.00895  1.00786 -1.96642 1.98433 115 10       </span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Test of joint nullity of the placebos : p-value = 0.5860</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The development of this package was funded by the European Union.</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ERC REALLYCREDIBLE - GA N. 101043899</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<p>This output contains quite a lot of material.</p>
-<ol type="1">
-<li>The first section are dynamic treatment effects for post-treatment periods.</li>
-<li>The second section is the average cumulative effect per treatment unit, also equivalent to the ATT in a binary setting.</li>
-<li>The final section contains pre-treatment effects, which can help us determine if parallel trends is met. The joint-nullity test of the placebos should be non-significant if parallel trends is met.</li>
-</ol>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Extracting ATT Estimates
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>We can extract the ATT directly for plots or figures with the following:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ATE</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>DIDmultiple<span class="sc">$</span>results<span class="sc">$</span>ATE[<span class="dv">1</span>]</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard Error</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>DIDmultiple<span class="sc">$</span>results<span class="sc">$</span>ATE[<span class="dv">2</span>]</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Lower confidence interval</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>DIDmultiple<span class="sc">$</span>results<span class="sc">$</span>ATE[<span class="dv">3</span>]</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Upper confidence interval</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>DIDmultiple<span class="sc">$</span>results<span class="sc">$</span>ATE[<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -2.89921</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.38159</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -3.64711</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -2.15131</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>Covariates for conditional parallel trends are possible to include, but they are used differently, and may cause issues.</p>
 </div>
 </div>
 </div>
 <p><br></p>
-</section>
-<section id="r-plotting-dynamic-effects" class="level3">
-<h3 class="anchored" data-anchor-id="r-plotting-dynamic-effects">R: Plotting Dynamic Effects</h3>
-<p>The DIDmultiple model automatically generates a ggplot. We can make a few modifications to the plot:</p>
+<p>Our results can be outputted into print form, or into a plot:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Print</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Plot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>We can print the results from our object from previously:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># assign plot to plot object</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> DIDmultiple<span class="sc">$</span>plot</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># get rid of weird line in degault plot</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>plot<span class="sc">$</span>layers[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># customise plot</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>plot <span class="sc">+</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># title and axis-labels</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dynamic Treatment Effects"</span>) <span class="sc">+</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Time to Treatment (t=1)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Estimate"</span>) <span class="sc">+</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># lines for treatment time and 0 treatment effect</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Theme</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Estimation of treatment effects: Event-study effects</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;              Estimate SE      LB CI    UB CI    N   Switchers</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effect_1     -5.04943 0.45371 -5.93869 -4.16017 675 45       </span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effect_2     -3.25734 0.49253 -4.22269 -2.29199 580 40       </span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effect_3     -2.17826 0.54482 -3.24609 -1.11044 490 35       </span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Effect_4     -0.03749 0.50608 -1.02940 0.95442  405 30       </span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Test of joint nullity of the effects : p-value = 0.0000</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Average cumulative (total) effect per treatment unit</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Estimate        SE     LB CI     UB CI         N Switchers </span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  -2.89921   0.38159  -3.64711  -2.15131       780       150 </span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Average number of time periods over which a treatment effect is accumulated: 2.3333</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Testing the parallel trends and no anticipation assumptions</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------------------------------</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;              Estimate SE      LB CI    UB CI   N   Switchers</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Placebo_1    0.27204  0.49208 -0.69242 1.23651 580 40       </span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Placebo_2    -0.72910 0.61928 -1.94287 0.48467 405 30       </span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Placebo_3    -0.27729 0.55098 -1.35720 0.80262 250 20       </span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Placebo_4    0.00895  1.00786 -1.96642 1.98433 115 10       </span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Test of joint nullity of the placebos : p-value = 0.5860</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The development of this package was funded by the European Union.</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ERC REALLYCREDIBLE - GA N. 101043899</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>We can plot the dynamic treatment effects in a plot:</p>
 <div class="cell" data-layout-align="center">
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: package 'ggplot2' was built under R version 4.4.1</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># assign plot to plot object</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">=</span> m1<span class="sc">$</span>plot</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># get rid of weird line in default plot</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>plot<span class="sc">$</span>layers[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># customise plot</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>plot <span class="sc">+</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dynamic Treatment Effects"</span>) <span class="sc">+</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Time to Treatment (t=1)"</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">"Estimate"</span>) <span class="sc">+</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># lines for treatment time and 0 treatment effect</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fl">0.5</span>, <span class="at">linetype =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="dv">3</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Theme</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="didmultiple_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+<p><img src="didmultiple_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</div>
+</div>
+</div>
 <p><br></p>
-</section>
-<section id="additional-resources" class="level3">
-<h3 class="anchored" data-anchor-id="additional-resources">Additional Resources</h3>
+<p><strong>Additional Resources</strong></p>
 <p>de Chaisemartin, C. and D’Haultfœuille, X (2024) ‘Difference-in-Differences Estimators of Intertemporal Treatment Effects’, <em>The Review of Economics and Statistics</em>, pp.&nbsp;1-45. Available at: <a href="https://doi.org/10.1162/rest_a_01414" class="uri">https://doi.org/10.1162/rest_a_01414</a>.</p>
 <p>de Chaisemartin, C. and D’Haultfœuille, X (2020) ‘Two-Way Fixed Effects Estimators with Heterogenous Treatment Effects’, <em>American Economic Review</em>, 110(9), pp.&nbsp;2964-2996. Available at: <a href="https://www.nber.org/system/files/working_papers/w25904/w25904.pdf" class="uri">https://www.nber.org/system/files/working_papers/w25904/w25904.pdf</a>.</p>
 <p><em>Additional Links</em>:</p>
@@ -460,7 +410,6 @@ Extracting ATT Estimates
 </ul>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

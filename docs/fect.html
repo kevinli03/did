@@ -156,12 +156,6 @@ window.Quarto = {
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">panelView</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">twfe (fixest)</span></a>
   </div>
@@ -206,6 +200,13 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="./etwfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">etwfe</span></a>
+  </div>
+</li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">panelView</span></a>
   </div>
 </li>
     </ul>
@@ -271,7 +272,7 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula  =</span> outcome <span class="sc">~</span> treat <span class="sc">+</span> covar,  <span class="co"># covar is optional</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data     =</span> df,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">index    =</span> <span class="fu">c</span>(<span class="st">"unit"</span>, <span class="st">"time"</span>),        <span class="co"># unit and time var</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">index    =</span> <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"time"</span>),          <span class="co"># unit and time var</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">method   =</span> <span class="st">"fe"</span>,                     <span class="co"># use "fe", "ife", or "mc"</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional arguments</span></span>
@@ -281,10 +282,10 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed     =</span> <span class="dv">1239</span>                      <span class="co"># any number will work</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; fect.formula(formula = outcome ~ treat + covar, data = df, index = c("unit", </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; fect.formula(formula = outcome ~ treat + covar, data = df, index = c("id", </span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     "time"), CV = F, method = "fe", se = T, nboots = 40, seed = 1239)</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ATT:</span></span>
@@ -303,8 +304,8 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 22%">
-<col style="width: 77%">
+<col style="width: 25%">
+<col style="width: 75%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -314,8 +315,8 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>unit</code></td>
-<td>A variable indicating the units/individual an observation belongs to in our data.* <u>For csdid, this must be integers</u>.</td>
+<td><code>id</code></td>
+<td>A variable indicating the units/individual an observation belongs to in our data.*</td>
 </tr>
 <tr class="even">
 <td><code>time</code></td>
@@ -332,7 +333,7 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 </tbody>
 </table>
 <div class="small">
-<p>*For repeated cross-section, the <code>unit</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>unit</code> variable.</p>
+<p>*For repeated cross-section, the <code>id</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>id</code> variable.</p>
 </div>
 </div>
 </div>
@@ -345,17 +346,13 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <p>The fect package allows quick aggregation of dynamic effects through plotting. The plot is a ggplot object, if you want to change or make additions to it.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x       =</span> m1,                         <span class="co"># our output object from fect()</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                            <span class="co"># don't change</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional aesthetic arguments</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Dynamic Treatment Effects"</span>,  <span class="co"># title</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Estimate"</span>,                   <span class="co"># y-axis label</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time to Treatment"</span>,          <span class="co"># x-axis label</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim    =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>)                      <span class="co"># what time periods to include (offset by +1)</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                            <span class="co"># don't change</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Dynamic Treatment Effects"</span>,  <span class="co"># title</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Estimate"</span>,                   <span class="co"># y-axis label</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time to Treatment"</span>,          <span class="co"># x-axis label</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim    =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>)                      <span class="co"># what time periods to include (offset by +1)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -368,18 +365,14 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <p>We can explore how treatment effects change over calendar time (not relative time, but actual time).</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x       =</span> m1,                          <span class="co"># our output object from fect()</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                             <span class="co"># don't change</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">type    =</span> <span class="st">"calendar"</span>,                    <span class="co"># don't change</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional aesthetic arguments</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Calendar Treatment Effects"</span>,  <span class="co"># title</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Estimate"</span>,                    <span class="co"># y-axis label</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time Period"</span>,                 <span class="co"># x-axis label</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim    =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>)                       <span class="co"># what time periods to include (offset by +1)</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                             <span class="co"># don't change</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type    =</span> <span class="st">"calendar"</span>,                    <span class="co"># don't change</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Calendar Treatment Effects"</span>,  <span class="co"># title</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Estimate"</span>,                    <span class="co"># y-axis label</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time Period"</span>,                 <span class="co"># x-axis label</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim    =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>)                       <span class="co"># what time periods to include (offset by +1)</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -392,18 +385,14 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
 <p>We can also explore the distributions of individual treatment effects by relative time period:</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x       =</span> m1,                            <span class="co"># our output object from fect()</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                               <span class="co"># don't change</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">type    =</span> <span class="st">"box"</span>,                           <span class="co"># don't change</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional aesthetic options</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Individual Treatment Effects"</span>,  <span class="co"># title</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Estimate"</span>,                      <span class="co"># y-axis label</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time to Treatment"</span>,             <span class="co"># x-axis label</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim    =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>)                         <span class="co"># what time periods to include (offset by +1)</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0  =</span> T,                               <span class="co"># don't change</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type    =</span> <span class="st">"box"</span>,                           <span class="co"># don't change</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">main    =</span> <span class="st">"Individual Treatment Effects"</span>,  <span class="co"># title</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab    =</span> <span class="st">"Estimate"</span>,                      <span class="co"># y-axis label</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab    =</span> <span class="st">"Time to Treatment"</span>,             <span class="co"># x-axis label</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim    =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>)                         <span class="co"># what time periods to include (offset by +1)</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -416,20 +405,16 @@ Y_{it}(0) = \underbrace{\alpha_i + \gamma_t}_\text{fixed effects} + \cov + \eps_
 <div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
 <p>The fect package contains tools to more rigorously test the parallel trends assumption.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x           =</span> m1,                        <span class="co"># our output object from fect()</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0      =</span> T,                         <span class="co"># don't change</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">type        =</span> <span class="st">"equiv"</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">bound       =</span> <span class="st">"equiv"</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">pre.period  =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">0</span>),                  <span class="co"># how many pre-treat coef to test</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional aesthetic options</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">main        =</span> <span class="st">"Parallel Trends Tests"</span>,   <span class="co"># title</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab        =</span> <span class="st">"Estimate"</span>,                <span class="co"># y-axis label</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab        =</span> <span class="st">"Time to Treatment"</span>,       <span class="co"># x-axis label</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim        =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>)                   <span class="co"># what time periods to include (offset by +1)</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="sc">|&gt;</span> <span class="fu">plot</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">start0      =</span> T,                         <span class="co"># don't change</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type        =</span> <span class="st">"equiv"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">bound       =</span> <span class="st">"equiv"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pre.period  =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">0</span>),                  <span class="co"># how many pre-treat coef to test</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">main        =</span> <span class="st">"Parallel Trends Tests"</span>,   <span class="co"># title</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab        =</span> <span class="st">"Estimate"</span>,                <span class="co"># y-axis label</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab        =</span> <span class="st">"Time to Treatment"</span>,       <span class="co"># x-axis label</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim        =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>)                   <span class="co"># what time periods to include (offset by +1)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">

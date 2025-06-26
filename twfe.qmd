@@ -7,10 +7,10 @@ non-staggered, absorbing, binary treatment
 The two-way fixed effects (TWFE) estimator is the standard estimator used for classical and generalised DID, when there is non-staggered treatment implementation and absorbing treatment. The model takes the following form.
 
 $$
-Y_{it} = \hat\alpha_i + \hat\delta_t + D_{it}\hat\tau_\text{ATT}  + \mathbf X_{it}^\top\hat{\b\beta} + \hat\eps_{it}
+Y_{it} = \underbrace{\hat\alpha_i + \hat\delta_t}_\text{fixed effects} + D_{it}\hat\tau  + \mathbf X_{it}^\top\hat{\b\beta} + \hat\eps_{it}
 $$
 
-The TWFE $\hat\tau_\text{ATT}$ estimate is an unbiased esitmator of the ATT if treatment is non-staggered and absorbing, and the identification assumptions (parallel trends, no anticipation, SUTVA) hold.
+The TWFE $\hat\tau$ estimate is an unbiased esitmator of the ATT if treatment is non-staggered and absorbing, and the identification assumptions (parallel trends, no anticipation, SUTVA) hold.
 
 ::: small
 TWFE can be severely biased if there is staggered treatment or non-absorbing treatment.
@@ -35,7 +35,7 @@ library(ggfixest)
 library(fixest)
 data(base_stagg, package = "fixest")
 df <- base_stagg
-colnames(df) <- c("unit", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
+colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
 
@@ -51,12 +51,12 @@ We use the `feols()` function to run the TWFE model.
 #| class-output: r
 
 m1 = feols(
-  fml   = outcome ~ treat + covar | unit + time,  # covariate is optional
-  data  = df,                                     # your data
-  vcov  = ~ unit                                  # cluster SE by unit
+  fml   = outcome ~ treat + covar | id + time,  # covariate is optional
+  data  = df,                                   # your data
+  vcov  = ~ id                                  # cluster SE by unit
 )
 
-summary(m1)
+m1 |> summary()
 ```
 
 The coefficient of `treat` is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by `Pr(>|t|)` (the p-value) and the stars `***` .
@@ -66,8 +66,8 @@ The coefficient of `treat` is our estimate of the ATT - the causal effect of tre
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable   | Description                                                                                                                                                                                                                                                            |
-|---------------|---------------------------------------------------------|
-| `unit`     | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
+|-----------------|-------------------------------------------------------|
+| `id`       | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
 | `time`     | A variable indicating time-periods in our study for each observation.                                                                                                                                                                                                  |
 | `outcome`  | Outcome variable for each observation.                                                                                                                                                                                                                                 |
 | `treat`    | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units.                                                                                                                                                                   |
@@ -75,7 +75,7 @@ Our dataset `df` should be a panel or repeated cross-section, and have the follo
 | `covar`    | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                                                                              |
 
 ::: small
-\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
+\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
 :::
 :::
 
@@ -95,13 +95,13 @@ We use the `feols()` function to run the TWFE event study.
 #| class-output: r
 
 m2 = feols(
-  fml   = outcome ~ i(rel.time, group, ref = -1) + covar | unit + time,  # group = treat/never-treat
-  data  = df,                                                            # your data
-  vcov  = ~ unit                                                         # cluster SE by unit
+  fml   = outcome ~ i(rel.time, group, ref = -1) + covar | id + time,  # group = treat/never-treat
+  data  = df,                                                          # your data
+  vcov  = ~ id                                                         # cluster SE by unit
 )
 ```
 
-We can plot these results.
+We can plot these results. The `ggiplot()` function produces a ggplot2 figure, so any ggplot2 options can be added with a `+`, including themes, labels, etc.
 
 ```{r}
 #| message: false
@@ -109,11 +109,7 @@ We can plot these results.
 #| fig-height: 3
 #| fig-align: center
 
-ggiplot(
-  # required options
-  object  = m2,                            # input your dynamic model object
-  
-  # optional options
+m2 |> ggiplot(
   xlab    = "Time Relative to Treatment",  # x-axis label
   ylab    = "Dynamic ATT Estimate",        # y-axis label
   main    = "Dynamic Treatment Effects",   # title for plot
@@ -126,13 +122,17 @@ ggiplot(
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable   | Description                                                                                                                                                                                                                                                            |
-|-----------------|-------------------------------------------------------|
-| `unit`     | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
+|------------------|------------------------------------------------------|
+| `id`       | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
 | `time`     | A variable indicating time-periods in our study for each observation.                                                                                                                                                                                                  |
 | `outcome`  | Outcome variable for each observation.                                                                                                                                                                                                                                 |
 | `group`    | Variable specifying if a unit is part of the treatment group or never-treated (control group). For units never receiving treatment, they get value 0, and for units that do end up receiving treatment sometime within the study, they get value 1.                    |
 | `rel.time` | A relative time variable that indicates for the given period $t$ of an observation, how many time-periods away did the unit $i$ first get the treatment. For the never-treated observations, set the value to a very large or small number (-1000 is a common choice). |
 | `covar`    | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                                                                              |
+
+::: small
+\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
+:::
 :::
 
 <br />

@@ -35,7 +35,7 @@ library(ggfixest)
 library(fixest)
 data(base_stagg, package = "fixest")
 df <- base_stagg
-colnames(df) <- c("unit", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
+colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
 
@@ -48,12 +48,10 @@ We use the `feols()` function and the `sunab()` function to run the matching pro
 #| message: false
 
 m1 = feols(
-  fml = outcome ~ sunab(cohort, time) + covar | unit + time,
+  fml = outcome ~ sunab(cohort, time) + covar | id + time,
   data = df,
-  vcov = ~ unit
+  vcov = ~ id
 )
-
-# see the variables tab for details on the cohort variable
 ```
 
 This completes the matching process. We then need to aggregate to obtain the treatment effects.
@@ -63,15 +61,15 @@ This completes the matching process. We then need to aggregate to obtain the tre
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                                                                                                           |
-|------------------|------------------------------------------------------|
-| `unit`    | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
+|-------------------|-----------------------------------------------------|
+| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                                                                                                                 |
 | `outcome` | Outcome variable for each observation.                                                                                                                                                                                |
 | `covar`   | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                             |
 | `cohort`  | This variable indicates the initial year of treatment adoption for each unit. For the never-treated, we should set the value of `cohort` to a very large positive/negative value that is outside the range of `time`. |
 
 ::: small
-\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
+\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
 :::
 
 ## Notes
@@ -97,12 +95,9 @@ We use the `aggregate()` function to aggregate our matched treatment effects int
 #| comment: "#>"
 #| class-output: r
 
-att = aggregate(
-  x    = m1,    # IW model object
-  agg  = "att"  # output the ATT
-)
-
-print(att)
+m1 |>
+  aggregate(agg  = "att") |>
+  print()
 ```
 
 We can see the estimated ATT in the output table, as well as the estimated p-value in `Pr(>|t|)`.
@@ -117,30 +112,24 @@ We can plot the dynamic treatment effects using the IW object estimated when run
 #| fig-height: 3
 #| fig-align: center
 
-ggiplot(
-  # required options
-  object  = m1,                                  # input your original iw model
-  
-  # optional options
+m1 |> ggiplot(
   xlab    = "Time Relative to Treatment",       # x-axis label
   ylab    = "Dynamic ATT Estimate",             # y-axis label
   main    = "Dynamic Treatment Effects (IW)",   # title for plot
 ) + 
-  xlim(-8, 8) # how many period to include.
+  xlim(-8, 8) # how many periods to include.
 ```
 
 ## Group
 
-If we are interested in how the ATT differs by year of treatment adoption, we can also aggregate effects by initial treatment period group:
+If we are interested in how the ATT differs by year of treatment adoption, we can also aggregate effects by initial treatment period group.
 
 ```{r}
 #| comment: "#>"
 #| class-output: r
 
-group <- aggregate(
-  x   = m1,       # IW model object
-  agg = "cohort"  # output the dynamic effects
-)
+group = m1 |>
+  aggregate(agg = "cohort")
 ```
 
 There isn't a quick way to immediately plot these estimates, but we can manually create a ggplot:
@@ -151,18 +140,19 @@ There isn't a quick way to immediately plot these estimates, but we can manually
 #| fig-align: center
 
 # make group a df
-group = as.data.frame(group)
+group = group |> as.data.frame()
 
 # add cohort period to group df
-group$period = rownames(group)
-group$period = as.factor(group$period)
+group$period = group |> rownames()
+group$period = group$period |> as.factor()
 
 # calculate lower and upper conf intervals
 group$lower = group$Estimate - 1.96*group$`Std. Error`
 group$upper = group$Estimate + 1.96*group$`Std. Error`
 
 # ggplot
-ggplot(data = group, aes(x = Estimate, y = period)) +
+group |>
+  ggplot(aes(x = Estimate, y = period)) +
   geom_vline(xintercept = 0, color = "red", linetype = 3) +  # vertical line at 0 treatment effect
   geom_point() +  # plot the treatment effects
   geom_linerange(aes(xmin = lower, xmax = upper), width = 0.2) +  # conf intervals

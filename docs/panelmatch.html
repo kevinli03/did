@@ -156,12 +156,6 @@ window.Quarto = {
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">panelView</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./twfe.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">twfe (fixest)</span></a>
   </div>
@@ -208,24 +202,20 @@ window.Quarto = {
  <span class="menu-text">etwfe</span></a>
   </div>
 </li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./panelview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">panelView</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#what-is-panelmatch" id="toc-what-is-panelmatch" class="nav-link active" data-scroll-target="#what-is-panelmatch">What is PanelMatch</a></li>
-  <li><a href="#r-running-the-model" id="toc-r-running-the-model" class="nav-link" data-scroll-target="#r-running-the-model">R: Running the Model</a></li>
-  <li><a href="#r-aggregating-the-att" id="toc-r-aggregating-the-att" class="nav-link" data-scroll-target="#r-aggregating-the-att">R: Aggregating the ATT</a></li>
-  <li><a href="#r-aggregating-dynamic-effects" id="toc-r-aggregating-dynamic-effects" class="nav-link" data-scroll-target="#r-aggregating-dynamic-effects">R: Aggregating Dynamic Effects</a></li>
-  <li><a href="#r-placebo-tests" id="toc-r-placebo-tests" class="nav-link" data-scroll-target="#r-placebo-tests">R: Placebo Tests</a></li>
-  <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional Resources</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -249,32 +239,46 @@ window.Quarto = {
 </header>
 
 
-<section id="imai-kim-and-wang-2023" class="level5">
-<h5 class="anchored" data-anchor-id="imai-kim-and-wang-2023">Imai, Kim, and Wang (2023)</h5>
-</section>
-<section id="what-is-panelmatch" class="level3">
-<h3 class="anchored" data-anchor-id="what-is-panelmatch">What is PanelMatch</h3>
-<p>PanelMatch is an estimator for DiD that solves the issues with TWFE in staggered settings. It also accomodates non-absorbing treatment. The estimator was proposed by Imai, Kim, and Wang (2023).</p>
-<p>PanelMatch is a <strong>matching and reweighting estimator</strong> for DiD, with the matching part solving the “forbidden comparisons” problem of TWFE, and the reweighting part solving the “negative weighting” problem of TWFE.</p>
-<p>First, the PanelMatch estimator “matches” treated units to control units in correct non-forbidden comparisons. For every treated unit <span class="math inline">\(D_{it}=1\)</span> in a specific time period <span class="math inline">\(t\)</span>, PanelMatch finds a group of untreated units <span class="math inline">\(D_{it} = 0\)</span> in the same time period, that have identical past treatment history in a set number of previous treatment periods.</p>
 <div class="small">
-<p>The number of pre-treatment history to match on is called the <strong>lag</strong> period. For example, if lag = 4, then treated units are matched to untreated units with the same treatment history in the 4 periods before this period. Lag is typically between 3 and 5.</p>
+<p>non-staggered or staggered, absorbing or non-absorbing, binary treatment.</p>
+</div>
+<p>PanelMatch is an estimator for DiD that solves the issues with TWFE in staggered settings. It also accomodates non-absorbing treatment.</p>
+<p>For every treated unit <span class="math inline">\(D_{it}=1\)</span> in a specific time period <span class="math inline">\(t\)</span>, PanelMatch finds a group of untreated units <span class="math inline">\(D_{it} = 0\)</span> in the same time period, that have identical past treatment history in a set number of previous treatment periods.</p>
+<div class="small">
+<p>The number of pre-treatment history to match on is called the <strong>lag</strong>. For example, if lag = 4, then treated units are matched to untreated units with the same treatment history in the 4 periods before this period. When lag = 1, PanelMatch is equivalent to DIDmultiple.</p>
 </div>
 <p>Then, PanelMatch compares the outcome of the treated unit compared to the weighted average of the matched untreated units. When there are no covariates, each matched untreated unit is weighted equally in this weighted average. When there are covariates, weighting depends on the mahalanobis distance of covariates.</p>
 <p>This comparison produces a series of treatment effect estimates (one for each treated unit). These are then properly aggregated together to find the causal effects.</p>
-<div class="small">
-<p>If the lag period of matching for pre-treatment is exactly 1, and we only estimate effects for the first post-treat period, then PanelMatch is equivalent to DIDmultiple.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># packages needed:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(PanelMatch)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Because of its design, PanelMatch can function properly when there is non-absorbing treatment. Disadvantages revolve on the need for exact pre-treatment history matching, which might not be possible in some datasets.</p>
 <p><br></p>
-</section>
-<section id="r-running-the-model" class="level3">
-<h3 class="anchored" data-anchor-id="r-running-the-model">R: Running the Model</h3>
+<p>PanelMatch requires us to pre-process the data with the <code>PanelData()</code> function:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Variables</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>We use the <code>PanelData()</code> function to clean our data to fit the later estimation functions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PanelMatch dislikes tidyverse df's, so do this:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> df <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df.panel <span class="ot">=</span> <span class="fu">PanelData</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.data  =</span> df,        <span class="co"># your data</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">unit.id     =</span> <span class="st">"id"</span>,    <span class="co"># your unit var (integer only)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">time.id     =</span> <span class="st">"time"</span>,    <span class="co"># your time period var (integer only)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment   =</span> <span class="st">"treat"</span>,   <span class="co"># your treatment var</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome     =</span> <span class="st">"outcome"</span>  <span class="co"># your outcome var</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 81%">
+<col style="width: 25%">
+<col style="width: 75%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -284,7 +288,7 @@ window.Quarto = {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>unit</code></td>
+<td><code>id</code></td>
 <td>A variable indicating the units/individual an observation belongs to in our data.* <u>For PanelMatch, this must be integers</u>.</td>
 </tr>
 <tr class="even">
@@ -302,155 +306,120 @@ window.Quarto = {
 </tbody>
 </table>
 <div class="small">
-<p>*For repeated cross-section, the <code>unit</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>unit</code> variable.</p>
+<p>*For repeated cross-section, the <code>id</code> variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the <code>id</code> variable.</p>
 </div>
-<p>PanelMatch requires <code>unit</code> to be an integer variable. We can change a non-integer <code>unit</code> into an integer by:</p>
+<p>PanelMatch requires <code>unit</code> to be an integer variable. We can change a non-integer <code>id</code> into an integer by:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>unit <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">as.factor</span>(df<span class="sc">$</span>unit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">as.factor</span>(df<span class="sc">$</span>id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Before starting estimation, PanelMatch requires us to pre-process the data.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(PanelMatch)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># PanelMatch dislikes tidyverse df's, so do this:</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(df)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>df.panel <span class="ot">&lt;-</span> <span class="fu">PanelData</span>(</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.data =</span> df,        <span class="co"># your data</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">unit.id    =</span> <span class="st">"unit"</span>,    <span class="co"># your unit var (integer only)</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">time.id    =</span> <span class="st">"time"</span>,    <span class="co"># your time period var (integer only)</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">treatment  =</span> <span class="st">"treat"</span>,   <span class="co"># your treatment var</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome    =</span> <span class="st">"outcome"</span>  <span class="co"># your outcome var</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now, we can run the PanelMatch matching process:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>match <span class="ot">=</span> <span class="fu">PanelMatch</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag               =</span> <span class="dv">4</span>,              <span class="co"># number of pre-periods to match treat history</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.data        =</span> df.panel,       <span class="co"># PanelData generated data</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">lead              =</span> <span class="fu">c</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>),         <span class="co"># how many post-treat dynamic effects to estimate</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">qoi               =</span> <span class="st">"att"</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">refinement.method =</span> <span class="st">"mahalanobis"</span>,  <span class="co"># set to "none" if no covaraites</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">match.missing     =</span> T,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional arguments</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">covs.formula      =</span> <span class="sc">~</span> covar,        <span class="co"># (optional, can exclude)</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">placebo.test      =</span> T               <span class="co"># (optional, but may cause issues)</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now the matching process is complete, and aggregating the effects is now possible.</p>
+</div>
 <p><br></p>
-</section>
-<section id="r-aggregating-the-att" class="level3">
-<h3 class="anchored" data-anchor-id="r-aggregating-the-att">R: Aggregating the ATT</h3>
-<p>To aggregate all the matched comparisons into a singular ATT, we use the <strong>PanelEstimate()</strong> function.</p>
+<p>Now, we can run the PanelMatch matching process to match based on lag-period pre-history:</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Syntax</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Notes</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>We use the <code>PanelMatch()</code> function to complete the matching process.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>att <span class="ot">=</span> <span class="fu">PanelEstimate</span>(</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>match <span class="ot">=</span> <span class="fu">PanelMatch</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required arguments</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">sets       =</span> match,     <span class="co"># PanelMatch object</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.data =</span> df.panel,  <span class="co"># PanelData object</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pooled     =</span> T,         <span class="co"># tells R to calculate ATT</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional arguments</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">moderator  =</span> <span class="cn">NULL</span>       <span class="co"># ("string") var to calculate heterogenous effects</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(att)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Point estimates:</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -3.617353</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Standard errors:</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.6159777</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag                =</span> <span class="dv">4</span>,              <span class="co"># number of pre-periods to match treat history</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.data         =</span> df.panel,       <span class="co"># PanelData generated data</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">lead               =</span> <span class="fu">c</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">3</span>),         <span class="co"># how many post-treat dynamic effects to estimate</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">qoi                =</span> <span class="st">"att"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">refinement.method  =</span> <span class="st">"mahalanobis"</span>,  <span class="co"># set to "none" if no covaraites</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">match.missing      =</span> T,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional arguments</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">covs.formula       =</span> <span class="sc">~</span> covar,        <span class="co"># (optional, can exclude)</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">placebo.test       =</span> T               <span class="co"># (optional, but may cause issues)</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>This completes the matching process, but we still need to estimate the treatment effects.</p>
 </div>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Extract the ATT Directly
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>If you are interested in extracting the ATT and standard errors directly from the att object for tables/figures, you can do the following:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>att<span class="sc">$</span>estimate</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>att<span class="sc">$</span>standard.error</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -3.617353</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.6159777</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>Confusingly, the <em>lag</em> and <em>lead</em> are opposites in this package compared to traditional usage in difference-in-differences. Thus, please be careful when defining the <code>lag =</code> and <code>lead =</code> options.</p>
+<ul>
+<li>Lag refers to periods <strong>before</strong> the treatment in which to match on.</li>
+<li>Leads refer to periods <strong>after</strong> the treatment on which to match on.</li>
+</ul>
+<p>If you are not using any covariates, you should change the argument <code>refinement.method =</code> to <code>"none"</code>. If you do have covariates, it should remain <code>"mahalanobis"</code>.</p>
+<ul>
+<li>This basically tells PanelMatch what weights to put on different observations when matching, and how to weight certain matches more than others based on the proximity of covariates.</li>
+</ul>
+<p>The placebo test may cause issues, so if there are issues, change <code>placebo.test =</code> to <code>F</code>.</p>
 </div>
 </div>
 </div>
 <p><br></p>
-</section>
-<section id="r-aggregating-dynamic-effects" class="level3">
-<h3 class="anchored" data-anchor-id="r-aggregating-dynamic-effects">R: Aggregating Dynamic Effects</h3>
-<p>We can estimate dynamic treatment effects with the <strong>PanelEstimate()</strong> function:</p>
+<p>Now the matching process is complete, and aggregating the effects is now possible.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">ATT</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Post-Treatment</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Pre-Treatment</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<p>To aggregate all the matched comparisons into a singular ATT, we use the <code>PanelEstimate()</code> function.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dynamic <span class="ot">=</span> <span class="fu">PanelEstimate</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">sets       =</span> match,     <span class="co"># PanelMatch object</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.data =</span> df.panel,  <span class="co"># PanelData object</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">pooled     =</span> F          <span class="co"># tells R to calculate dynamic effects</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dynamic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>match <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PanelEstimate</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.data =</span> df.panel,  <span class="co"># PanelData object</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pooled     =</span> T,         <span class="co"># tells R to calculate ATT</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">moderator  =</span> <span class="cn">NULL</span>       <span class="co"># optional. character string for var to calculate heterogenous effects</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       estimate std.error      2.5%      97.5%</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; t+0 -5.5516448 0.8730523 -7.531374 -3.9073038</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; t+1 -4.7163024 0.6247105 -6.043817 -3.6431413</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; t+2 -3.3294543 0.7709834 -5.017800 -1.8691931</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; t+3 -0.8720093 0.9112713 -2.793114  0.7238091</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Point estimates:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -3.617353</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Standard errors:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.6256079</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-<p>The above function only estimates post-treatment dynamic effects. We can graph these using the <strong>plot()</strong> function:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">=</span> <span class="fu">plot</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x    =</span> dynamic,               <span class="co"># object from PanelEstimate</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">"Estimate"</span>,            <span class="co"># y-axis label</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">"Time to Treatment"</span>,   <span class="co"># x-axis label</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"Dynamic Effects"</span>      <span class="co"># title of plot</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<p>We can estimate dynamic treatment effects with the <code>PanelEstimate()</code> function:</p>
 <div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>match <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PanelEstimate</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.data =</span> df.panel,  <span class="co"># PanelData object</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pooled     =</span> F          <span class="co"># tells R to calculate dynamic effects</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab =</span> <span class="st">"Estimate"</span>,            <span class="co"># y-axis label</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="st">"Time to Treatment"</span>,   <span class="co"># x-axis label</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">main =</span> <span class="st">"Dynamic Effects"</span>      <span class="co"># title of plot</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="panelmatch_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+<p><img src="panelmatch_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p><br></p>
-</section>
-<section id="r-placebo-tests" class="level3">
-<h3 class="anchored" data-anchor-id="r-placebo-tests">R: Placebo Tests</h3>
-<p>We can conduct pre-treatment period placebo tests (pre-treatment effects to test for parallel trends) as well. These are done with the <strong>placebo_test()</strong> function.</p>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<p>We can conduct pre-treatment period placebo tests (pre-treatment effects to test for parallel trends) as well. These are done with the <code>placebo_test()</code> function.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pre <span class="ot">=</span> <span class="fu">placebo_test</span>(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">pm.obj     =</span> match,     <span class="co"># PanelMatch object</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.data =</span> df.panel,  <span class="co"># PanelData object</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag.in     =</span> <span class="dv">4</span>,         <span class="co"># should equal lag in PanelMatch()</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">plot       =</span> T</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>match <span class="sc">|&gt;</span> <span class="fu">placebo_test</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel.data =</span> df.panel,  <span class="co"># PanelData object</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">lag.in     =</span> <span class="dv">4</span>,         <span class="co"># should equal lag in PanelMatch()</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">plot       =</span> T</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="panelmatch_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+<p><img src="panelmatch_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>Note: the estimate for the last pre-treatment period (t-1) is always 0, so it is not displayed.</p>
+</div>
+</div>
+</div>
 <p><br></p>
-</section>
-<section id="additional-resources" class="level3">
-<h3 class="anchored" data-anchor-id="additional-resources">Additional Resources</h3>
+<p><strong>Additional Resources</strong></p>
 <p>Imai, K., Kim, I. S., and Wang, E. (2023) ‘Matching Methods for Causal Inference with Time-Series Cross-Sectional Data’, <em>American Journal of Political Science</em>, 67(3), pp.&nbsp;587-605. Available at: <a href="https://imai.fas.harvard.edu/research/tscs.html" class="uri">https://imai.fas.harvard.edu/research/tscs.html</a>.</p>
 <p><em>Additional Links</em>:</p>
 <ul>
@@ -459,7 +428,6 @@ Extract the ATT Directly
 </ul>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
