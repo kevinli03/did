@@ -1,244 +1,119 @@
----
-execute:
-  env:
-    RPY2_IPYTHON: "False"
----
-
 # fixest {.unnumbered}
 
 ::: small
-versatile package for regression and panel analysis
+R package for TWFE and Interaction-Weighted (Sun and Abraham 2021)
 :::
 
-fixest is arguably the most useful package for an econometrician working with panel data. It can be used to:
+**fixest** (and companion **ggfixest**) is a package for regressions targeted toward econometrics. For DiD, fixest allows the implementation of a basic TWFE model, as well as the Sun and Abraham (2021) interaction-weighted estimator. Documentation can be found [here](https://lrberge.github.io/fixest/).
 
-1.  Run all sorts of regressions, including fixed effects, IV, generalised linear model, and so on.
-2.  Produce professional visualisations for publications, such as regression tables and plots.
-3.  Other quality of life features for an econometrician.
-
-```{r}
-#| message: false
-#| warning: false
-
-# packages needed: 
-library(fixest)
-library(ggfixest)
-```
-
-<br />
-
-```{r}
-#| echo: false
-#| warning: false
-#| message: false
-
-library(fixest)
-data(base_stagg, package = "fixest")
-df <- base_stagg
-colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
-df$treat <- ifelse(df$rel.time >= 0, 1, 0)
-```
-
-Running regressions in fixest is mainly done with the `feols()` function. fixest allows for a variety of standard error specifications, as well as a versatile selection of different regression specifications (see below).
-
-```{r}
-#| message: false
-#| warning: false
-#| comment: "#>"
-#| class-output: r
-#| fig-height: 4
-#| fig-align: center
-
-mod = feols(
-  fml   = outcome ~ treat + covar | id + time,  # see below for more on fml
-  data  = df,
-  se    = "cluster"                             # "standard", "hetero", "cluster", "twoway"
-)
-
-```
-
-::: panel-tabset
-## fml Options
-
-fixest accomodates fixed effects and instruments.
-
--   Standard: `fml = Y ~ D + X1 + X2`
--   One-way fixed effects: `fml = Y ~ D + X1 + X2 | id`
--   Two-way fixed effects: `fml = Y ~ D + X1 + X2 | id + time`
--   Instrumental variables: `fml = Y ~ 1 | D ~ Z`
--   IV with controls: `fml = Y ~ X1 + X2 | D ~ Z`
--   IV with fixed effects: `fml = Y ~ 1 | id + time | D ~ Z`
-
-fixest also has ways to make categorical variables: `fml = Y ~ i(X, ref = 0)`
-
--   Here `X` is a categorical variable with a reference category of 0.
-
-## Non-linear Models
-
-fixest also includes non-linear models. They can be estimated by replacing the `feols()` function with other functions (with the same syntax):
-
--   Poisson regression: `fepois()`
--   Negative binomial: `fenegbin()`
--   Logistic: `femlm()` with argument `family = "logit"`
-
-## Standard Errors
-
-Standard errors are defined by the `se =` argument or the `vcov =` argument.
-
--   `se = "standard"` is normal OLS standard errors. This is default, so you can drop this argument.
--   `se = "hetero"` estimates heteroscedasticity-robust standard errors.
--   `se = "cluster"` estimates clustered standard errors by the **1st** fixed effect (always the first listed one in the formula).
--   `se = "twoway", "threeway", "fourway"` are also possible with fixed effects.
-
-You can also use `vcov = ~ id` to implement clustered standard errors (replace `id` with the variable to be clustered by). This removes ambiguity of the order of the formula fixed effects.
-:::
-
-<br />
-
-The standard way to display results is to use the `summary()` function. This provides information on coefficients, significance tests, RMSE, R\^2, and other metrics.
-
-```{r}
-#| message: false
-#| warning: false
-#| comment: "#>"
-#| class-output: r
-#| fig-height: 4
-#| fig-align: center
-
-mod |> summary()
-```
-
-Fixest has options to present these results more professionally, as well as ways to extract the results for your own tables/visualisations.
-
-::: panel-tabset
-## Table
-
-You can create a R-displayed estimation table with `esttable()`. The `esttex()` command has the same syntax, but creates a latex table which is well formatted and almost ready to include in a publication.
-
-```{r}
-#| message: false
-#| warning: false
-#| comment: "#>"
-#| class-output: r
-#| fig-height: 4
-#| fig-align: center
-
-esttable(
-  mod,                # you can also include a list of multiple models to include in a table
-  se.below      = T,
-  digits        = 3,  # digits for coefs and se
-  digits.stats  = 4,  # digits for R^2
-  title         = "TWFE Estimates",
-  dict          = c(                 # dict renames the var names to more presentable names
-    treat   = "Treatment",
-    outcome = "Outcome",
-    covar   = "Covariate"
-  )
-)
-
-```
-
-The latex version looks much better. You can export automatically to a .tex file by using the `esttex()` with the same syntax, and including the following additional arguments.
+Install the package as follows:
 
 ```{r}
 #| eval: false
 
-file = "doc.tex",  # file name to save to
-replace = T        # overwrite the existing file?
+install.packages('fixest')
+install.packages('ggfixest')
 ```
 
-## Plot
+------------------------------------------------------------------------
 
-We can plot coefficients with native fixest command `coefplot()`, or the `ggfixest` command `ggcoefplot()` (which produces a ggplot).
+#### sample code
+
+Start by loading packages and the data:
+
+```{r}
+#| message: false
+#| warning: false
+
+library(fixest)
+library(ggfixest)
+library(readr)  # for importing data
+df = read_csv('df.csv')
+```
+
+<br />
+
+We use the `feols()` function to run the TWFE model.
 
 ```{r}
 #| message: false
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 4
-#| fig-align: center
 
-mod |> ggcoefplot(
-  xlab    = "Coefficients",       # x-axis label
-  ylab    = "Estimate",           # y-axis label
-  main    = "Coefficient Plot",   # title for plot
+mod = feols(
+  fml   = outcome ~ treat + covar | id + time,  # covar is optional
+  data  = df,                                   # your data
+  vcov  = ~ id                                  # cluster SE by unit
 )
-
+mod |> summary()
 ```
 
-If you use `ggcoefplot()`, the produced ggplot can be modified by any ggplot function, including themes.
+<br />
 
-`iplot()` and `ggiplot()` also work, and they only plot categorical variables. We saw the use of these commands in the [TWFE section](twfe.qmd).
-
-## Extract
-
-You can extract the values of the estimates directly from our fixest ouput object. This allows us to directly build visualisations.
-
-We can extract the coefficient table with `coeftable()`, which can be turned into a dataframe with `as.data.frame()`, allowing us to subset and manipulate it.
+We use the `feols()` function to run the TWFE event study for dynamic treatment effects.
 
 ```{r}
 #| message: false
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 4
+#| fig-height: 3
 #| fig-align: center
 
-mod |> coeftable() |> as.data.frame()
+mod = feols(
+  fml   = outcome ~ i(rel.time, group, ref = -1) + covar | id + time,  # group = treat/never-treat
+  data  = df,                                                          # your data
+  vcov  = ~ id                                                         # cluster SE by unit
+)
+mod |> ggiplot(
+  xlab    = "Time Relative to Treatment",  # x-axis label
+  ylab    = "Dynamic ATT Estimate",        # y-axis label
+  main    = "Dynamic Treatment Effects",   # title for plot
+) +
+  xlim(-8, 8) # select how many periods to display
 ```
 
-We can also extract the coefficients, standard errors, and p-values alone:
+We add the `sunab()` function within `feols()` to implement the staggered DiD "Interaction-Weighted" estimator proposed by Sun and Abraham (2020).
 
-```{r}
-#| message: false
-#| warning: false
-#| comment: "#>"
-#| class-output: r
-#| fig-height: 4
-#| fig-align: center
-#| results: hold
-
-mod |> coef()    # coefficients
-mod |> se()      # standard errors
-mod |> pvalue()  # p-values
-
-```
-
-Instead of manually calculating confidence intervals, we can also extract them with `confint()`:
-
-```{r}
-#| message: false
-#| warning: false
-#| comment: "#>"
-#| class-output: r
-#| fig-height: 4
-#| fig-align: center
-#| results: hold
-
-mod |> confint() |> as.data.frame()
-
-```
+::: small
+Note: The `cohort` value for never-treated units should be a very large or very small number outside of the range of `time`.
 :::
 
+```{r}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+#| fig-height: 3
+#| fig-align: center
+
+mod = feols(
+  fml = outcome ~ sunab(cohort, time) + covar | id + time,  # covar is optional
+  data = df,
+  vcov = ~ id                                               # clusters se by unit (id)
+)
+mod |>
+  aggregate(agg  = "att") |>  # agg can also be "group" or "dynamic"
+  print()
+```
+
 <br />
 
-We can also predict fitted values and new values with R.
+And we can plot the Sun and Abraham event study using the `ggiplot()` function.
 
 ```{r}
 #| message: false
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 4
+#| fig-height: 3
 #| fig-align: center
-#| results: hold
 
-mod |>
-  predict(newdata = df) |> # put the df with ind var to predict y for
-  head()
+mod |> ggiplot(
+  xlab    = "Time Relative to Treatment",       # x-axis label
+  ylab    = "Dynamic ATT Estimate",             # y-axis label
+  main    = "Dynamic Treatment Effects (IW)",   # title for plot
+) + 
+  xlim(-8, 8)                                   # how many periods to include.
 ```
-
-<br />
-
-See [fixest documentation](https://lrberge.github.io/fixest/reference/index.html) for more information.

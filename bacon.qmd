@@ -1,22 +1,12 @@
 # bacondecomp {.unnumbered}
 
 ::: small
-\(R\) understanding bias of TWFE in staggered settings
+R package for understanding bias of TWFE in staggered settings
 :::
 
-When the [TWFE estimator](twfe.qmd) is used in staggered DiD, the estimated $\hat\tau_\text{TWFE}$ of the TWFE estimator can be biased. We can show this by decomposing $\hat\tau_\text{TWFE}$ in staggered settings, which reveals that $\hat\tau_\text{TWFE}$ is a weighted average of different comparisons $\hat\beta$. Two issues arise:
+When the TWFE estimator is used in staggered DiD, the estimated $\hat\tau_\text{TWFE}$ can be biased. The **bacondecomp** package decomposes the TWFE estimator and illustrates why it is biased. Documentation can be found [here](https://github.com/evanjflack/bacondecomp).
 
-1.  Some of these comparisons are forbidden. For example, some of these $\hat\beta$ are calculated with already-treated units being the control group.
-2.  The weighting of these $\hat\beta$ is non-sensical. For the ATT, they should be weighted by the frequency of that comparison. But TWFE weights are a combination of frequency and variance, and can even be negative.
-
-The result? TWFE can be incorrect in staggered settings. Sometimes, TWFE may even get the wrong direction of treatment effect.
-
-::: panel-tabset
-## R
-
-We will need the `bacondecomp` package. Documentation can be found [here](https://github.com/evanjflack/bacondecomp).
-
-If you have not previously installed the package, you can do so as follows:
+Install the packages as follows:
 
 ```{r}
 #| eval: false
@@ -24,34 +14,25 @@ If you have not previously installed the package, you can do so as follows:
 install.packages('bacondecomp')
 ```
 
-Always remember to load the package before starting.
+------------------------------------------------------------------------
+
+#### sample code
+
+Start by loading packages and data.
 
 ```{r}
 #| message: false
 #| warning: false
 
 library(bacondecomp)
-```
-:::
-
-```{r}
-#| echo: false
-#| warning: false
-#| message: false
-
-library(fixest)
-data(base_stagg, package = "fixest")
-df <- base_stagg
-colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
-df$treat <- ifelse(df$rel.time >= 0, 1, 0)
+library(ggplot2)    # for plotting
+library(readr)      # for importing data
+df = read_csv('df.csv')
 ```
 
-We start by breaking down the TWFE into its comparisions $\hat\beta$ with bacon decomposition.
+<br />
 
-::: panel-tabset
-## R
-
-We use the `bacon()` function to implement decomposition of TWFE:
+We start by breaking down the TWFE into its comparisions $\hat\beta$ with bacon decomposition. We use the `bacon()` function to implement this:
 
 ```{r}
 #| message: false
@@ -63,30 +44,17 @@ We use the `bacon()` function to implement decomposition of TWFE:
 #| results: hold
 
 decomp = bacon(
-  formula   = outcome ~ treat,
+  formula   = outcome ~ treat,  # match TWFE variables
   data      = df,
-  id_var    = "id",
-  time_var  = "time"
+  id_var    = "id",             # match TWFE fixed effect
+  time_var  = "time"            # match TWFE fixed effect
 )
-
 decomp |> head()  # head() because a lot of comparisons
 ```
 
-We can see the top output is a summary of the general comparisons, while the bottom output is the top 6 rows of all the individual $\hat\beta$ comparisons.
+We can see the top output is a summary of the general comparisons, while the bottom output is the top 6 rows of all the individual $\hat\beta$ comparisons. We can also see Later vs. Earlier (already) treated is a comparison here, which is a forbidden comparison, biasing our estimates.
 
-We can also see Later vs. Earlier (already) treated is a comparison here, which is nonsensical.
-
-## Variables
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable  | Description                                                                                          |
-|------------------|------------------------------------------------------|
-| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
-| `time`    | A variable indicating time-periods in our study for each observation.                                |
-| `outcome` | Outcome variable for each observation.                                                               |
-| `treat`   | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units. |
-:::
+<br />
 
 We can plot the estimates and weights of all the comparisons to better understand what each comparison's value is, and how they are weighted.
 
@@ -98,10 +66,8 @@ We can plot the estimates and weights of all the comparisons to better understan
 #| fig-height: 4
 #| fig-align: center
 
-library(ggplot2)
-
 decomp |>
-  ggplot(aes(x = weight, y = estimate, shape = type, col = type)) +
+  ggplot(aes(x = weight, y = estimate, shape = type, col = type)) +  # don't change
   geom_point() +
   theme_bw() +
   labs(
@@ -116,9 +82,3 @@ decomp |>
 The green highlighted comparisons all involve earlier (already) treated units being used as control units, which is nonsensical. Bacon decomposition thus shows us the perils of relying on TWFE for staggered treatment.
 
 We know that any negative weights of any comparisons $\hat\beta$ are non-sensical. The graph also allows us to check this. In this example, there are no negative weights.
-
-<br />
-
-**Additional Resources**
-
-Goodman-Bacon, A. (2021) 'Difference-in-Differences with variation in treatment timing', *Journal of Econometrics*, 225(2), pp. 254-277. Available at: <https://www.nber.org/papers/w25018>

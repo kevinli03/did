@@ -1,0 +1,111 @@
+# did {.unnumbered}
+
+::: small
+R package for doubly-robust and ipw DiD estimator (callaway and sant'anna 2021)
+:::
+
+**did** is a package that implements the DiD estimators proposed by Callaway and Sant'Anna (2021) that solve the bias of the TWFE estimator in staggered DiD. Documentation can be found [here](https://bcallaway11.github.io/did/index.html).
+
+Install the package as follows:
+
+```{r}
+#| eval: false
+
+install.packages('did')
+```
+
+------------------------------------------------------------------------
+
+#### sample code
+
+Start by loading packages and the data:
+
+```{r}
+#| message: false
+#| warning: false
+
+# packages needed:
+library(did)
+library(readr)  # for importing data
+df = read_csv('df.csv')
+```
+
+<br />
+
+We use the `att_gt()` function to run the matching process of csdid:
+
+::: small
+Note: `id` variable should be transformed to an integer variable before starting. Set `cohort = 0` for never-treated units.
+:::
+
+```{r}
+#| warning: false
+#| message: false
+
+mod = att_gt(
+  # required arguments
+  yname                   = "outcome",
+  tname                   = "time",
+  idname                  = "id",            # must be a integer-variable
+  gname                   = "cohort",        # cohort = 0 for never-treated
+  est_method              = "dr",            # change to ipw if you are having issues
+  base_period             = "universal",     # do not change
+  allow_unbalanced_panel  = T,               # generally good to keep this T
+  data                    = df,
+  xformla                 = ~ covar,        # (optional)
+  control_group           = "nevertreated",  # use "notyettreated" if sample size is small
+  panel                   = T                # change to F if you are using rep. cross-section
+)
+```
+
+<br />
+
+We use the `aggte()` function to aggregate our matched treatment effects into an overall treatment effect.
+
+```{r}
+#| comment: "#>"
+#| class-output: r
+
+mod |>
+  aggte(type  = "simple", na.rm = T) |>
+  summary(att)
+```
+
+<br />
+
+We can estimate dynamic treatment effects with the `aggte()` function and plot with the `ggdid()` function.
+
+```{r}
+#| comment: "#>"
+#| class-output: r
+#| fig-height: 3.5
+#| message: false
+#| fig-align: center
+
+mod |>
+  aggte(type   = "dynamic", na.rm  = T) |>
+  ggdid(
+    xlab    = "Time to Treatment",  # x-axis label
+    ylab    = "Dynamic ATT",        # y-axis label
+    title   = "Dynamic Effects"     # you can include a title string if you want
+  )
+```
+
+<br />
+
+We can also aggregate effects by initial treatment period group, and with the `ggdid()` function:
+
+```{r}
+#| comment: "#>"
+#| class-output: r
+#| fig-height: 3
+#| fig-align: center
+
+mod |>
+  aggte(type   = "group", na.rm  = T) |>
+  ggdid(
+    xlab    = "ATT Estimate",  # x-axis label
+    ylab    = "Group",         # y-axis label
+    title   = "Group ATT"      # you can include a title string if you want
+  )
+```

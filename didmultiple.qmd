@@ -1,123 +1,71 @@
 # DIDmultiplegtDYN {.unnumbered}
 
 ::: small
-non-staggered or staggered, absorbing or non-absorbing, binary or continuous treatment
+R package for DIDmultiple estimator (de Chaisemartin and D'Haultfœuille 2024)
 :::
 
-The **DIDmultiple** estimator is an estimator that solves the issues with TWFE in staggered settings and non-absorbing treatment.
+**DIDmultiplegtDYN** is a package that implements the DIDmultiple estimator by de Chaisemartin and D'Haultfœuille (2024), that solves the issues with TWFE, handles non-absorbing and continuous treatments. Documentation can be found [here](https://cran.r-project.org/web/packages/DIDmultiplegtDYN/DIDmultiplegtDYN.pdf).
 
-The estimator focuses on **switchers** - those units in a certain period who change their treatment status. In a binary treatment setting, the treatment effect at period $\tau_t$ can be described as:
+Install the package as follows:
 
-$$
-\tau_t = \frac{\mathbb E[\Delta Y |\text{switchers}] - \mathbb E[\Delta Y |\text{non-switchers}]}{\underbrace{\mathbb E[\Delta D |\text{switchers}]}_\text{=1 if absorbing treatment}}
-$$
+```{r}
+#| eval: false
 
-::: small
-For example, a unit that goes from $D_{it} = 0$ to $D_{it} = 1$. DIDmultiple "matches" these switchers to the group that does not switch (so the group of units that stay $D_{it} = 0$), and estimates the difference in outcomes.
-:::
+install.packages('DIDmultiplegtDYN')
+```
 
-Then, DIDmultiple aggregates these effects into a singular ATT or dynamic effects. The focus on switchers allows DIDmultiple to be applied onto non-binary treatments, including continuous treatments.
+------------------------------------------------------------------------
+
+#### sample code
+
+Start by loading packages and the data:
 
 ```{r}
 #| message: false
 #| warning: false
 
-# packages needed:
 library(DIDmultiplegtDYN)
+library(ggplot2)  # for plotting
+library(readr)    # for importing data
+df = read_csv('df.csv')
 ```
 
 <br />
 
+We use the `did_multiplegt_dyn()` function to complete the estimation process.
+
+::: small
+If you have a continuous or quasi-continuous treatment, or are having issues, set `continuous = 1`. Covariates for conditional parallel trends are possible to include, but they are used differently, and may cause issues.
+:::
+
 ```{r}
-#| echo: false
-#| warning: false
+#| comment: "#>"
+#| class-output: r
 #| message: false
+#| warning: false
 
-library(fixest)
-data(base_stagg, package = "fixest")
-df <- base_stagg
-colnames(df) <- c("id", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
-df$treat <- ifelse(df$rel.time >= 0, 1, 0)
-```
-
-::: panel-tabset
-## Syntax
-
-We use the `did_multiplegt_dyn()` function to complete the estimation process:
-
-```{r}
 mod = did_multiplegt_dyn(
   # required arguments
   df          = df,
   outcome     = "outcome",
-  group       = "id",       # Note: group here refers to unit, not first.treat
+  group       = "id",       # Note: group here refers to unit, not cohort
   time        = "time",
   treatment   = "treat",
   effects     = 4,          # Number of post-treatment periods dynamic effects
   placebo     = 4,          # Number of pre-treatment periods of effects
-  
-  # optional arguments
   controls    = NULL,       # optional, vector (string) of covariates.
   continuous  = NULL,       # change to 1 if your treatment is true
   graph_off   = T
 )
-```
-
-## Variables
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable  | Description                                                                         |
-|--------------|----------------------------------------------------------|
-| `id`      | A variable indicating the units/individual an observation belongs to in our data.\* |
-| `time`    | A variable indicating time-periods in our study for each observation.               |
-| `outcome` | Outcome variable for each observation.                                              |
-| `covar`   | (optional) covariate(s) to condition for parallel trends.                           |
-
-::: small
-\*For repeated cross-section, the `unit` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `unit` variable.
-:::
-
-## Notes
-
-Covariates for conditional parallel trends are possible to include, but they are used differently, and may cause issues.
-
-The `effects =` argument specifies how many post-treatment dynamic effects you want to estimate.
-
-The `placebo =` argument specifies how many pre-treatment period effects you want to estimate to test the parallel trends assumption.
-
-The `continuous =` argument allows for continuous treatment. Sometimes, even when you do not have a continuous treatment, turning this on may solve your issues.
-
-The `graph_off =` argument specifies if you want the command to print the graph that is generated with the estimation process. If you select `T`, the graph is still created, just not printed.
-:::
-
-<br />
-
-Our results can be outputted into print form, or into a plot:
-
-::: panel-tabset
-## Print
-
-We can print the results from our object from previously:
-
-```{r}
-#| warning: false
-#| message: false
-#| comment: "#>"
-#| class-output: r
 
 mod |> print()
 ```
 
-The `Estimation of treatment effects: Event-study effects` are the post-treatment dynamic effects.
+The `Estimation of treatment effects: Event-study effects` are the post-treatment dynamic effects. The `Average cumulative (total) effect per treatment unit` is the ATT estimate. The `Testing the parallel trends and no anticipation assumptions` is the pre-treatment coefficient estimates.
 
-The `Average cumulative (total) effect per treatment unit` is the ATT estimate.
+<br />
 
-The `Testing the parallel trends and no anticipation assumptions` is the pre-treatment coefficient estimates.
-
-## Plot
-
-We can plot the dynamic treatment effects in a plot:
+We can plot the dynamic treatment effects in a plot. The original estimation process already creates a (very flawed) plot, so we extract it and input it into ggplot.
 
 ```{r}
 #| message: false
@@ -125,7 +73,7 @@ We can plot the dynamic treatment effects in a plot:
 #| fig-height: 3
 #| fig-align: center
 
-library(ggplot2)
+
 
 # assign plot to plot object
 plot = mod$plot
@@ -143,18 +91,3 @@ plot +
   geom_hline(yintercept = 0, linetype = 3, color = "red") +
   theme_classic()
 ```
-:::
-
-<br />
-
-**Additional Resources**
-
-de Chaisemartin, C. and D'Haultfœuille, X (2024) 'Difference-in-Differences Estimators of Intertemporal Treatment Effects', *The Review of Economics and Statistics*, pp. 1-45. Available at: <https://doi.org/10.1162/rest_a_01414>.
-
-de Chaisemartin, C. and D'Haultfœuille, X (2020) 'Two-Way Fixed Effects Estimators with Heterogenous Treatment Effects', *American Economic Review*, 110(9), pp. 2964-2996. Available at: <https://www.nber.org/system/files/working_papers/w25904/w25904.pdf>.
-
-*Additional Links*:
-
--   Asjad Naqvi's [page on DIDmultipleDYN](https://asjadnaqvi.github.io/DiD/docs/code_r/07_did_multiplegt_dyn_r/).
--   Yiqing Xu's [section on DIDmultiple](https://asjadnaqvi.github.io/DiD/docs/code_r/07_did_multiplegt_dyn_r/).
--   DIDmultiplegtDYN [package documentation](https://cran.r-project.org/web/packages/DIDmultiplegtDYN/DIDmultiplegtDYN.pdf).

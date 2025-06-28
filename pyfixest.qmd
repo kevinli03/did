@@ -1,0 +1,132 @@
+# pyfixest {.unnumbered}
+
+::: small
+Python package for TWFE, 2-stage DiD (Gardner 2021), and interaction-weighted (Sun and Abraham 2021).
+:::
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+library(readr)
+# just to make sure rendering is correct
+```
+
+**pyfixest** is a port of the **fixest** package for python, with slighty different syntax and offerings. **pyfixest** can implement the standard TWFE estimator, the 2-stage DiD estimator proposed by Gardner (2021), and the interaction-weighted estimator proposed by Sun and Abraham (2021). Documentation can be found [here](https://py-econometrics.github.io/pyfixest/pyfixest.html).
+
+Install the package by inputting the following into the terminal:
+
+```{python}
+#| eval: false
+
+pip install -U pyfixest
+```
+
+------------------------------------------------------------------------
+
+#### sample code
+
+Start by loading packages and the data:
+
+```{python}
+#| message: false
+#| warning: false
+
+import pyfixest as pf
+import pandas as pd
+df = pd.read_csv('df.csv')
+```
+
+```{python}
+#| echo: false
+#| message: false
+#| warning: false
+
+df = df.rename(columns = {'rel.time': 'rel_time'})
+```
+
+<br />
+
+We can use the `pf.feols()` function to run the TWFE estimation for the ATT:
+
+```{python}
+#| comment: "#>"
+#| class-output: python
+#| warning: false
+#| message: false
+
+mod = pf.feols(
+  fml   = "outcome ~ treat + covar | id + time",
+  data  = df,
+  vcov  = {"CRV1": "id"},  # change "id", do not touch "CRV1"
+)
+mod.summary()
+```
+
+<br />
+
+Dynamic treatment effects for a TWFE event study can be calculated as follows, but there is no quick plot option:
+
+```{python}
+#| comment: "#>"
+#| class-output: python
+#| warning: false
+#| message: false
+
+mod = pf.feols(
+  fml   = "outcome ~ i(rel_time, group, ref = -1) + covar | id + time",
+  data  = df,
+  vcov  = {"CRV1": "id"},  # change "id", do not touch "CRV1"
+)
+mod.tidy().head()  # .head() because output is long, remove for full output
+```
+
+<br />
+
+We can estimate the ATT using the 2-stage difference-in-differences method (Gardner) using the `pf.did2s()` function. The syntax is almost identical to that of [did2s](did2s.qmd).
+
+::: small
+The `first_stage =` should contain all covariates and fixed effects. If no covariates, the formula should be `"~ 0 | id + time"`. The `second_stage =` should only contain the treatment variable.
+:::
+
+```{python}
+#| comment: "#>"
+#| class-output: python
+#| warning: false
+#| message: false
+
+mod = pf.did2s(
+  data          = df, 
+  yname         = "outcome",
+  first_stage   = "~ covar | id + time",  # if no covar, see above
+  second_stage  = "~ i(treat)",
+  treatment     = "treat",
+  cluster       = "id",                   # clustered se var
+)
+mod.summary()
+```
+
+<br />
+
+We use the `pf.event_study()` function to estimate the dynamic ATTs using the interaction-weighted estimator by Sun and Abraham.
+
+```{python}
+#| message: false
+#| warning: false
+#| comment: "#>"
+#| class-output: r
+
+mod = pf.event_study(
+  data       = df, 
+  yname      = "outcome",
+  idname     = "id",
+  tname      = "time",
+  gname      = "cohort",
+  xfml       = "covar",      # can drop if no covar. Form: covar1 + covar2 ...
+  estimator  = "saturated",  # don't change
+)
+mod.iplot_aggregate()
+```
+
+There is no method to aggregate the dynamic effects into a singular overall ATT for sun and abraham.

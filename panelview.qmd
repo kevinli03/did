@@ -1,107 +1,65 @@
 # panelView {.unnumbered}
 
 ::: small
-visualisations for DiD and panel analysis
+R package for DiD visualisations and panel analysis
 :::
 
-**panelView** visualises treatment adoption and outcome variables for panel data. It is useful for understanding our data before beginning difference-in-differences analysis.
+**panelView** is a package that visualises treatment adoption and outcome variables for panel data. It is useful for understanding our data before beginning difference-in-differences analysis. Documentation can be found [here](https://yiqingxu.org/packages/panelview/).
 
-::: {.panel-tabset group="lang"}
-## R
-
-We will need the `panelView` package. Documentation can be found [here](https://yiqingxu.org/packages/panelview/).
-
-If you have not previously installed the package, you can do so as follows:
+Install the package as follows:
 
 ```{r}
-#| message: false
-#| warning: false
 #| eval: false
 
 install.packages('panelView')
+
 ```
 
-Always remember to load the package before starting:
+------------------------------------------------------------------------
+
+#### sample code
+
+Start by loading the packages and the data:
 
 ```{r}
 #| message: false
 #| warning: false
 
 library(panelView)
+library(readr)  # for importing data
+df = read_csv('df.csv')
 ```
-
-```{r}
-#| echo: false
-#| warning: false
-#| message: false
-
-library(fixest)
-data(base_stagg, package = "fixest")
-df <- base_stagg
-colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
-df$treat <- ifelse(df$rel.time >= 0, 1, 0)
-```
-:::
 
 <br />
 
-#### visualise treatment adoption
-
-panelView can help us visualise treatment adoption over time, allowing us to see if treatment adoption is staggered, and if treatment is absorbing.
-
-::: {.panel-tabset group="lang"}
-## R
-
-We use the `panelview()` function to create the visualisation.
+We use the `panelview()` function to create a visualisation of treatment adoption.
 
 ```{r}
 #| message: false
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 4
+#| fig-height: 3.5
 #| fig-align: center
 
 panelview(
-  # required options
   data        = df,
-  formula     = outcome ~ treat,  # only include these two
-  type        = "treat",          # don't change
+  formula     = outcome ~ treat,
+  type        = "treat",          # don't change - this is not the treat var, but an option
   index       = c("id", "time"),
-  
-  # optional options
   gridOff     = T,
   background  = "white",
-  main        = "Treatment Status",
-  xlab        = "Time Period",
-  ylab        = "Unit",
-  cex.axis.y  = 2
+  main        = "Status",         # title of plot
+  xlab        = "Time Period",    # x-axis label
+  ylab        = "Unit",           # y-axis label
+  cex.axis.y  = 2                 # size of y-axis names
 )
 
 ```
 
 We can see here, that our treatment is staggered, with the first group receiving treatment in time period 2, and some units receiving treatment in every subsequent period.
 
-## Variables
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable  | Description                                                                                          |
-|-----------|------------------------------------------------------------------------------------------------------|
-| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
-| `time`    | A variable indicating time-periods in our study for each observation.                                |
-| `outcome` | Outcome variable for each observation.                                                               |
-| `treat`   | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units. |
-:::
-
-<br />
-
-panelView can also help us visualise variable values over time. Most frequently, we will visualise outcome values over time, but you can also test covariate values over time.
-
-::: panel-tabset
-## R
-
-We use the `panelview()` function to create the visualisation.
+We also can use the `panelview()` function to visualise the outcome variable over time.
 
 ```{r}
 #| message: false
@@ -112,40 +70,18 @@ We use the `panelview()` function to create the visualisation.
 #| fig-align: center
 
 panelview(
-  # required options
   data          = df,
   formula       = outcome ~ treat,  # change to outcome ~ 1 to ignore treat colorcoding
-  type          = "outcome",        # don't change
+  type          = "outcome",        # don't change, this is not a variable, but an option
   index         = c("id", "time"),
   pre.post      = F,                # you can try T and see which you like  
   outcome.type  = "continuous",     # change to "discrete" if outcome is binary
-  
-  # optional options
   gridOff       = T,
   background    = "white",
-  main          = "Treatment Status",
-  xlab          = "Time Period",
-  ylab          = "Outcome Values",
-  cex.axis.y    = 2
+  main          = "Status",         # title
+  xlab          = "Time Period",    # x-axis label
+  ylab          = "Outcome Value",  # y-axis label
+  cex.axis.y    = 2                 # size of y-axis names
 )
 
 ```
-
-## Variables
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable  | Description                                                                                          |
-|-----------|------------------------------------------------------------------------------------------------------|
-| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
-| `time`    | A variable indicating time-periods in our study for each observation.                                |
-| `outcome` | Outcome variable for each observation.                                                               |
-| `treat`   | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units. |
-:::
-
-<br />
-
-**Additional Resources**
-
--   See the [tutorial of panelView](https://yiqingxu.org/packages/panelview/reference/articles/tutorial.html).
--   See the [documentation of panelView](https://yiqingxu.org/packages/panelview/reference/reference/panelView.html).

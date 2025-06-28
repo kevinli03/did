@@ -1,58 +1,42 @@
 # did2s {.unnumbered}
 
 ::: small
-staggered, absorbing, binary treatment
+R package for 2-stage DiD estimator (Gardner 2021)
 :::
 
-The 2-stage difference-in-differences (**did2s**) estimator is an estimator used for staggered treatment. It first uses only treated units $D_{it} = 0$ to estimate the following model:
+**did2s** is a package that implements the 2-stage DiD estimator proposed by Gardner (2021) that solves the bias of the TWFE in staggered settings. Documentation can be found [here](https://kylebutts.github.io/did2s/index.html).
 
-$$
-Y_{it} = \hat\alpha_i + \hat\delta_t + \mathbf X^\top_{it}\hat{\b\beta} + \hat\eps_{it}
-$$
+Install the package as follows:
 
-Using this model, every unit's $Y_{it}(0)$ can be estimated as:
+```{r}
+#| eval: false
 
-$$
-\widehat Y_{it}(0) = \hat\alpha_i + \hat\delta_t + \mathbf X^\top_{it}\hat{\b\beta}
-$$
+install.packages('did2s')
+```
 
-Which allows for the computation of the ATT:
+------------------------------------------------------------------------
 
-$$
-\tau_\text{ATT} = \mathbb E[\tau_{it}|D_{it} = 1] \approx \mathbb E[Y_{it}(1) - \widehat Y_{it}(0) | D_{it} = 1]
-$$
+#### sample code
 
-::: small
-Technically, did2s uses a regression to calculate the ATT in what is called the "second stage", but the intuition is the same.
-:::
+Start by loading packages and the data:
 
 ```{r}
 #| message: false
 #| warning: false
 
-# packages needed: 
 library(did2s)
-library(ggfixest)
+library(ggfixest)  # for plotting
+library(readr)  # for importing data
+df = read_csv('df.csv')
 ```
 
 <br />
 
-```{r}
-#| echo: false
-#| warning: false
-#| message: false
+We use the `did2s()` function to run the did2s estimation for the ATT.
 
-library(fixest)
-data(base_stagg, package = "fixest")
-df <- base_stagg
-colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
-df$treat <- ifelse(df$rel.time >= 0, 1, 0)
-```
-
-::: panel-tabset
-## Syntax
-
-We use the `did2s()` function to run the did2s model.
+::: small
+The `first_stage =` should contain all covariates and fixed effects. If no covariates, the formula should be `~ 0 | id + time`. The `second_stage =` should only contain the treatment variable.
+:::
 
 ```{r}
 #| message: false
@@ -63,51 +47,17 @@ We use the `did2s()` function to run the did2s model.
 mod = did2s(
   data          = df,
   yname         = "outcome",
-  first_stage   = ~ covar | id + time,  # if no covar, see notes
+  first_stage   = ~ covar | id + time,  # if no covar, see above
   second_stage  = ~ i(treat),
   treatment     = "treat",
-  cluster_var   = "id"                  # clustered se
+  cluster_var   = "id"                  # clustered se var
 )
-
 mod |> summary()
 ```
 
-The coefficient of `treat::1` is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by `Pr(>|t|)` (the p-value) and the stars `***` .
-
-## Variables
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable  | Description                                                                                          |
-|-----------|------------------------------------------------------------------------------------------------------|
-| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
-| `time`    | A variable indicating time-periods in our study for each observation.                                |
-| `outcome` | Outcome variable for each observation.                                                               |
-| `treat`   | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units. |
-| `covar`   | (optional) covariate(s) to condition for parallel trends.                                            |
-
-::: small
-\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
-:::
-
-## Notes
-
-The first-stage `first_stage =` should be in one of two forms:
-
-1.  `first_stage = ~ covar | id + time` if you have covariates.
-2.  `first_stage = ~ 0 | id + time` if you have no covariates.
-
-The second-stage `second_stage =` should generally only include the treatment variable within `i()`.
-
--   However, if you want heterogenous effects, you can interact the treatment variable with another variable: `second_stage = i(treat) + i(treat):othervar`
-:::
+The coefficient of `treat::1` is our estimate of the ATT - the causal effect of treatment on those who receive the treatment.
 
 <br />
-
-We can also estimate event-study dynamic effects for pre and post-treatment periods.
-
-::: panel-tabset
-## Syntax
 
 We still use the `did2s()` function to run the event study model, but we alter the second-stage of the model. We then use the `ggiplot()` function to plot our results.
 
@@ -136,40 +86,3 @@ mod |> ggiplot(
   xlim(-8, 8) # select how many periods to display
 
 ```
-
-## Variables
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable   | Description                                                                                                                                                                                                                                                            |
-|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `id`       | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
-| `time`     | A variable indicating time-periods in our study for each observation.                                                                                                                                                                                                  |
-| `outcome`  | Outcome variable for each observation.                                                                                                                                                                                                                                 |
-| `group`    | Variable specifying if a unit is part of the treatment group or never-treated (control group). For units never receiving treatment, they get value 0, and for units that do end up receiving treatment sometime within the study, they get value 1.                    |
-| `rel.time` | A relative time variable that indicates for the given period $t$ of an observation, how many time-periods away did the unit $i$ first get the treatment. For the never-treated observations, set the value to a very large or small number (-1000 is a common choice). |
-| `covar`    | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                                                                              |
-
-::: small
-\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
-:::
-
-## Notes
-
-The first-stage `first_stage =` should be in one of two forms:
-
-1.  `first_stage = ~ covar | id + time` if you have covariates.
-2.  `first_stage = ~ 0 | id + time` if you have no covariates.
-:::
-
-<br />
-
-**Additional Resources**
-
-Gardner, J (2021) 'Two-Stage Difference-in-Differences'. Available at: <https://jrgcmu.github.io/2sdd_current.pdf>
-
-Additional links:
-
--   Description of the [did2s estimation process](https://kylebutts.github.io/did2s/articles/Two-Stage-Difference-in-Differences.html).
--   The [R documentation for did2s](https://kylebutts.github.io/did2s/reference/did2s.html).
--   Asjad Naqvi's [page on did2s](https://asjadnaqvi.github.io/DiD/docs/code_r/07_did2s_r/).

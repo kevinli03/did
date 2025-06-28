@@ -1,51 +1,36 @@
 # didimputation {.unnumbered}
 
 ::: small
-staggered, absorbing, binary treatment
+R package for the imputation estimator (Borusyak et al 2021)
 :::
 
-didimputation is an estimator for DiD that solves the issues with TWFE in staggered settings. It first uses only treated units $D_{it} = 0$ to estimate the following model:
+**didimputation** is a package that implements the imputation DiD estimator proposed by Borusyak, Jaravel, and Speiss (2021) that solves the issues with TWFE in staggered settings. Documentation can be found [here](https://github.com/kylebutts/didimputation).
 
-$$
-Y_{it} = \hat\alpha_i + \hat\delta_t + \mathbf X^\top_{it}\hat{\b\beta} + \hat\eps_{it}
-$$
+Install the package as follows:
 
-Using this model, every unit's $Y_{it}(0)$ can be estimated as:
+```{r}
+#| eval: false
 
-$$
-\widehat Y_{it}(0) = \hat\alpha_i + \hat\delta_t + \mathbf X^\top_{it}\hat{\b\beta}
-$$
+install.packages('didimputation')
+```
 
-Which allows for the computation of the ATT for each treated individual.
+------------------------------------------------------------------------
 
-$$
-\tau_{it} = Y_{it}(1) - \widehat Y_{it}(0)
-$$
+#### sample code
+
+Start by loading packages and the data:
 
 ```{r}
 #| message: false
 #| warning: false
 
-# packages needed: 
 library(didimputation)
+library(ggplot2)  # for plotting
+library(readr)    # for importing data
+df = read_csv('df.csv')
 ```
 
 <br />
-
-```{r}
-#| echo: false
-#| warning: false
-#| message: false
-
-library(fixest)
-data(base_stagg, package = "fixest")
-df <- base_stagg
-colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
-df$treat <- ifelse(df$rel.time >= 0, 1, 0)
-```
-
-::: panel-tabset
-## Syntax
 
 We use the `did_imputation()` function to run the model.
 
@@ -67,37 +52,9 @@ mod = did_imputation(
 mod |> print()
 ```
 
-The `estimate` is our ATT estimate.
-
-## Variables
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable  | Description                                                                                                                                                                                                           |
-|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
-| `time`    | A variable indicating time-periods in our study for each observation.                                                                                                                                                 |
-| `outcome` | Outcome variable for each observation.                                                                                                                                                                                |
-| `cohort`  | This variable indicates the initial year of treatment adoption for each unit. For the never-treated, we should set the value of `cohort` to a very large positive/negative value that is outside the range of `time`. |
-| `covar`   | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                             |
-
-::: small
-\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
-:::
-
-## Notes
-
-If you have no covariates, then you can completely delete the `first_stage =` argument. The function will automatically include unit and time fixed effects if this argument is not specified.
-
-If you do have covariates, include the covariate along with unit and time fixed effects in the `first_stage =` argument as displayed in the syntax.
-:::
-
 <br />
 
 We can also estimate event-study dynamic effects for pre and post-treatment periods.
-
-::: panel-tabset
-## Syntax
 
 ```{r}
 #| message: false
@@ -127,7 +84,6 @@ There is no simple way to plot this, so we will have to manually do so.
 #| fig-height: 3
 #| fig-align: center
 
-library(tidyverse)
 
 # convert output into table
 tbl = mod |> as.data.table()
@@ -148,20 +104,3 @@ tbl |>
   ylab("Estimate") +
   theme_bw()
 ```
-
-## Variables
-
-Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
-
-| Variable  | Description                                                                                                                                                                                                           |
-|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
-| `time`    | A variable indicating time-periods in our study for each observation.                                                                                                                                                 |
-| `outcome` | Outcome variable for each observation.                                                                                                                                                                                |
-| `cohort`  | This variable indicates the initial year of treatment adoption for each unit. For the never-treated, we should set the value of `cohort` to a very large positive/negative value that is outside the range of `time`. |
-| `covar`   | (optional) covariate(s) to condition for parallel trends.                                                                                                                                                             |
-
-::: small
-\*For repeated cross-section, the `id` variable should be instead the group/level of which treatment is assigned. For example, if treatment is assigned by county/state, use that as the `id` variable.
-:::
-:::

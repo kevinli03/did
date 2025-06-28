@@ -10,12 +10,12 @@ book:
   chapters:
     - text: "Welcome!"
       href: index.qmd
+    - var.qmd
     - text: "---"
     - panelview.qmd
-    - twfe.qmd
+    - fixest.qmd
     - bacon.qmd
-    - sunab.qmd
-    - csdid.qmd
+    - did.qmd
     - fect.qmd
     - didmultiple.qmd
     - panelmatch.qmd
@@ -23,8 +23,9 @@ book:
     - impute.qmd
     - etwfe.qmd
     - text: "---"
-    - fixest.qmd
-    
+    - pyfixest.qmd
+    - csdid.qmd
+    - fectpy.qmd
 
 
 format:

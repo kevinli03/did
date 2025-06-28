@@ -59,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
-<link href="./twfe.html" rel="next">
+<link href="./fixest.html" rel="next">
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -123,6 +123,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Welcome!</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./var.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Information</span></a>
+  </div>
+</li>
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
@@ -132,8 +138,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./twfe.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">twfe (fixest)</span></a>
+  <a href="./fixest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fixest</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -144,14 +150,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./sunab.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">sunab (fixest)</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./csdid.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">csdid (did)</span></a>
+  <a href="./did.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">did</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -193,8 +193,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="px-0"><hr class="sidebar-divider hi "></li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./fixest.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">fixest</span></a>
+  <a href="./pyfixest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">pyfixest</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./csdid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">csdid</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./fectpy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fect_python</span></a>
   </div>
 </li>
     </ul>
@@ -228,50 +240,62 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="small">
-<p>visualisations for DiD and panel analysis</p>
+<p>R package for DiD visualisations and panel analysis</p>
 </div>
-<p><strong>panelView</strong> visualises treatment adoption and outcome variables for panel data. It is useful for understanding our data before beginning difference-in-differences analysis.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset" data-group="lang">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">R</a></li></ul>
-<div class="tab-content" data-group="lang">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<p>We will need the <code>panelView</code> package. Documentation can be found <a href="https://yiqingxu.org/packages/panelview/">here</a>.</p>
-<p>If you have not previously installed the package, you can do so as follows:</p>
+<p><strong>panelView</strong> is a package that visualises treatment adoption and outcome variables for panel data. It is useful for understanding our data before beginning difference-in-differences analysis. Documentation can be found <a href="https://yiqingxu.org/packages/panelview/">here</a>.</p>
+<p>Install the package as follows:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'panelView'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Always remember to load the package before starting:</p>
+<hr>
+<section id="sample-code" class="level4">
+<h4 class="anchored" data-anchor-id="sample-code">sample code</h4>
+<p>Start by loading the packages and the data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(panelView)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(panelView)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)  <span class="co"># for importing data</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">'df.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
-<section id="visualise-treatment-adoption" class="level4">
-<h4 class="anchored" data-anchor-id="visualise-treatment-adoption">visualise treatment adoption</h4>
-<p>panelView can help us visualise treatment adoption over time, allowing us to see if treatment adoption is staggered, and if treatment is absorbing.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset" data-group="lang">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Variables</a></li></ul>
-<div class="tab-content" data-group="lang">
-<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
-<p>We use the <code>panelview()</code> function to create the visualisation.</p>
+<p>We use the <code>panelview()</code> function to create a visualisation of treatment adoption.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">panelview</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required options</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data        =</span> df,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula     =</span> outcome <span class="sc">~</span> treat,  <span class="co"># only include these two</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">type        =</span> <span class="st">"treat"</span>,          <span class="co"># don't change</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">index       =</span> <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"time"</span>),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional options</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">gridOff     =</span> T,</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">background  =</span> <span class="st">"white"</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">main        =</span> <span class="st">"Treatment Status"</span>,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab        =</span> <span class="st">"Time Period"</span>,</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab        =</span> <span class="st">"Unit"</span>,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex.axis.y  =</span> <span class="dv">2</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data        =</span> df,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula     =</span> outcome <span class="sc">~</span> treat,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">type        =</span> <span class="st">"treat"</span>,          <span class="co"># don't change - this is not the treat var, but an option</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">index       =</span> <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"time"</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">gridOff     =</span> T,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">background  =</span> <span class="st">"white"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">main        =</span> <span class="st">"Status"</span>,         <span class="co"># title of plot</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab        =</span> <span class="st">"Time Period"</span>,    <span class="co"># x-axis label</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab        =</span> <span class="st">"Unit"</span>,           <span class="co"># y-axis label</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex.axis.y  =</span> <span class="dv">2</span>                 <span class="co"># size of y-axis names</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="panelview_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can see here, that our treatment is staggered, with the first group receiving treatment in time period 2, and some units receiving treatment in every subsequent period.</p>
+<p>We also can use the <code>panelview()</code> function to visualise the outcome variable over time.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">panelview</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> df,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula       =</span> outcome <span class="sc">~</span> treat,  <span class="co"># change to outcome ~ 1 to ignore treat colorcoding</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">type          =</span> <span class="st">"outcome"</span>,        <span class="co"># don't change, this is not a variable, but an option</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">index         =</span> <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"time"</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">pre.post      =</span> F,                <span class="co"># you can try T and see which you like  </span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome.type  =</span> <span class="st">"continuous"</span>,     <span class="co"># change to "discrete" if outcome is binary</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">gridOff       =</span> T,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">background    =</span> <span class="st">"white"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">main          =</span> <span class="st">"Status"</span>,         <span class="co"># title</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab          =</span> <span class="st">"Time Period"</span>,    <span class="co"># x-axis label</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab          =</span> <span class="st">"Outcome Value"</span>,  <span class="co"># y-axis label</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex.axis.y    =</span> <span class="dv">2</span>                 <span class="co"># size of y-axis names</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -280,118 +304,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>We can see here, that our treatment is staggered, with the first group receiving treatment in time period 2, and some units receiving treatment in every subsequent period.</p>
-</div>
-<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
-<p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 9%">
-<col style="width: 90%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Variable</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>id</code></td>
-<td>A variable indicating the units/individual an observation belongs to in our data.*</td>
-</tr>
-<tr class="even">
-<td><code>time</code></td>
-<td>A variable indicating time-periods in our study for each observation.</td>
-</tr>
-<tr class="odd">
-<td><code>outcome</code></td>
-<td>Outcome variable for each observation.</td>
-</tr>
-<tr class="even">
-<td><code>treat</code></td>
-<td>Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units.</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<p><br></p>
-<p>panelView can also help us visualise variable values over time. Most frequently, we will visualise outcome values over time, but you can also test covariate values over time.</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Variables</a></li></ul>
-<div class="tab-content">
-<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<p>We use the <code>panelview()</code> function to create the visualisation.</p>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">panelview</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># required options</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> df,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula       =</span> outcome <span class="sc">~</span> treat,  <span class="co"># change to outcome ~ 1 to ignore treat colorcoding</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">type          =</span> <span class="st">"outcome"</span>,        <span class="co"># don't change</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">index         =</span> <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"time"</span>),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">pre.post      =</span> F,                <span class="co"># you can try T and see which you like  </span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome.type  =</span> <span class="st">"continuous"</span>,     <span class="co"># change to "discrete" if outcome is binary</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># optional options</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">gridOff       =</span> T,</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">background    =</span> <span class="st">"white"</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">main          =</span> <span class="st">"Treatment Status"</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab          =</span> <span class="st">"Time Period"</span>,</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab          =</span> <span class="st">"Outcome Values"</span>,</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">cex.axis.y    =</span> <span class="dv">2</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="panelview_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
-<p>Our dataset <code>df</code> should be a panel or repeated cross-section, and have the following variables:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 9%">
-<col style="width: 90%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Variable</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>id</code></td>
-<td>A variable indicating the units/individual an observation belongs to in our data.*</td>
-</tr>
-<tr class="even">
-<td><code>time</code></td>
-<td>A variable indicating time-periods in our study for each observation.</td>
-</tr>
-<tr class="odd">
-<td><code>outcome</code></td>
-<td>Outcome variable for each observation.</td>
-</tr>
-<tr class="even">
-<td><code>treat</code></td>
-<td>Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units.</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<p><br></p>
-<p><strong>Additional Resources</strong></p>
-<ul>
-<li>See the <a href="https://yiqingxu.org/packages/panelview/reference/articles/tutorial.html">tutorial of panelView</a>.</li>
-<li>See the <a href="https://yiqingxu.org/packages/panelview/reference/reference/panelView.html">documentation of panelView</a>.</li>
-</ul>
 
 
 </section>
@@ -821,8 +733,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   <div class="nav-page nav-page-previous">
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./twfe.html" class="pagination-link" aria-label="twfe (fixest)">
-        <span class="nav-page-text">twfe (fixest)</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./fixest.html" class="pagination-link" aria-label="fixest">
+        <span class="nav-page-text">fixest</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
