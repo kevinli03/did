@@ -42,7 +42,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
 
 ::: panel-tabset
-## Syntax
+## R
 
 We use the `feols()` function and the `sunab()` function to run the matching process of sunab:
 
@@ -63,7 +63,7 @@ This completes the matching process. We then need to aggregate to obtain the tre
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                                                                                                                                           |
-|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|------------|------------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                   |
 | `time`    | A variable indicating time-periods in our study for each observation.                                                                                                                                                 |
 | `outcome` | Outcome variable for each observation.                                                                                                                                                                                |
@@ -87,6 +87,9 @@ Ensure that `cohort` is **not** equal to `NA` for the never-treated (control) gr
 <br />
 
 After completing the matching process, we can aggregate our effects into an overall ATT, dynamic ATTs, and cohort-ATTs.
+
+::: panel-tabset
+## R
 
 ::: panel-tabset
 ## ATT
@@ -162,6 +165,9 @@ group |>
   xlab("Estimated ATT (IW)") + ylab("Initial Treatment Period") +  # x-axis and y-axis labels (optional)
   theme_bw() # theme (optional, change to your liking)
 ```
+:::
+
+## Python
 :::
 
 <br />

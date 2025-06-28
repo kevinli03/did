@@ -1,3 +1,9 @@
+---
+execute:
+  env:
+    RPY2_IPYTHON: "False"
+---
+
 # fixest {.unnumbered}
 
 ::: small

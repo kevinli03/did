@@ -1,31 +1,48 @@
 # twfe (fixest) {.unnumbered}
 
 ::: small
-non-staggered, absorbing, binary treatment
+(R + python) non-staggered, absorbing, binary treatment
 :::
 
-The two-way fixed effects (TWFE) estimator is the standard estimator used for DiD. The model takes the following form.
+The two-way fixed effects (TWFE) estimator is the standard estimator used for DiD.
 
 $$
 Y_{it} = \underbrace{\hat\alpha_i + \hat\delta_t}_\text{fixed effects} + D_{it}\hat\tau  + \mathbf X_{it}^\top\hat{\b\beta} + \hat\eps_{it}
 $$
 
-The idea is that unit fixed effects $\alpha_i$ account for between-unit differences, and time fixed effects $\delta_t$ account for between-period differences. Thus, the only remaining confounders are varying-trends, which are assumed to not be present due to the parallel trends assumption.
+Unit fixed effects $\alpha_i$ account for between-unit differences, and time fixed effects $\delta_t$ account for between-period differences. Thus, the only remaining confounders are varying-trends over time between units, which are assumed to not be present due to the parallel trends assumption.
 
-The TWFE $\hat\tau$ estimate is an unbiased esitmator of the ATT if treatment is non-staggered and absorbing, and the identification assumptions hold.
+::: small
+For repeated cross-section analysis, we use group-fixed effects, where group is the level of treatment assignment. This requires parallel trends at the group level and stable group composition between periods.
+:::
 
-TWFE can be severely biased if there is staggered treatment or non-absorbing treatment. Details are further explained [here](bacon.qmd).
+TWFE can be biased if there is staggered treatment or non-absorbing treatment (see [bacondecomp](bacon.qmd)).
+
+::: panel-tabset
+## R
+
+We will need the `fixest` package and `ggfixest` package. Documentation can be found [here](https://lrberge.github.io/fixest/).
+
+If you have not previously installed the packages, you can do so as follows:
+
+```{r}
+#| message: false
+#| warning: false
+#| eval: false
+
+install.packages('fixest')
+install.packages('ggfixest')
+```
+
+Always remember to load the package before starting:
 
 ```{r}
 #| message: false
 #| warning: false
 
-# packages needed: 
 library(fixest)
 library(ggfixest)
 ```
-
-<br />
 
 ```{r}
 #| echo: false
@@ -33,14 +50,54 @@ library(ggfixest)
 #| message: false
 
 library(fixest)
+library(tidyverse)
 data(base_stagg, package = "fixest")
 df <- base_stagg
 colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
+write_csv(df, "df.csv")
 ```
 
+## Python
+
+We will need the `pyfixest` package. Documentation can be found [here](https://py-econometrics.github.io/pyfixest/pyfixest.html).
+
+If you have not previously installed the packages, you should input the following code into the terminal:
+
+```{python}
+#| eval: false
+
+python -m pip install pyfixest
+```
+
+Always remember to load the package before starting:
+
+```{python}
+#| message: false
+#| warning: false
+
+import pyfixest as pf
+```
+
+```{python}
+#| echo: false
+#| message: false
+#| warning: false
+
+import pandas as pd
+
+df = pd.read_csv('df.csv')
+
+df = df.rename(columns = {'rel.time': 'rel_time'})
+```
+:::
+
+<br />
+
+To estimate the ATT, we run a twfe regression model.
+
 ::: panel-tabset
-## Syntax
+## R
 
 We use the `feols()` function to run the TWFE model.
 
@@ -55,8 +112,28 @@ mod = feols(
   data  = df,                                   # your data
   vcov  = ~ id                                  # cluster SE by unit
 )
-
 mod |> summary()
+```
+
+The coefficient of `treat` is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by `Pr(>|t|)` (the p-value) and the stars `***` .
+
+## Python
+
+We can use the `pf.feols()` function to run the TWFE model:
+
+```{python}
+#| warning: false
+#| message: false
+#| comment: "#>"
+#| class-output: r
+
+mod = pf.feols(
+  fml   = "outcome ~ treat + covar | id + time",
+  data  = df,
+  vcov  = {"CRV1": "id"}
+)
+mod.summary()
+
 ```
 
 The coefficient of `treat` is our estimate of the ATT - the causal effect of treatment on those who receive the treatment. The significance is given by `Pr(>|t|)` (the p-value) and the stars `***` .
@@ -66,7 +143,7 @@ The coefficient of `treat` is our estimate of the ATT - the causal effect of tre
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                          |
-|-------------|----------------------------------------------------------|
+|------------------|------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
 | `time`    | A variable indicating time-periods in our study for each observation.                                |
 | `outcome` | Outcome variable for each observation.                                                               |
@@ -83,7 +160,7 @@ Our dataset `df` should be a panel or repeated cross-section, and have the follo
 We can also estimate event-study dynamic effects for pre and post-treatment periods.
 
 ::: panel-tabset
-## Syntax
+## R
 
 We use the `feols()` function to run the TWFE event study.
 
@@ -116,12 +193,66 @@ mod |> ggiplot(
   xlim(-8, 8) # select how many periods to display
 ```
 
+## Python
+
+We can use the `pf.feols()` function to run the TWFE model:
+
+```{python}
+#| warning: false
+
+mod = pf.feols(
+  fml   = "outcome ~ i(rel_time, group, ref = -1) + covar | id + time",
+  data  = df,
+  vcov  = {"CRV1": "id"}
+)
+```
+
+We can plot these results with the `.iplot()` function. The labelling is quite messy, so it is useful to rename the labels.
+
+```{python}
+#| warning: false
+#| message: false
+
+mod.iplot(
+  # required arguments
+  coord_flip     = False,
+  yintercept     = 0,
+  
+  #optional aesthetic arguments
+  figsize        = (800, 350),
+  rename_models  = {mod._model_name_plot: "TWFE"},
+  rotate_xticks  = 90,
+  labels         = {
+    'C(rel_time, contr.treatment(base=-1))[-9]': "-9",
+    'C(rel_time, contr.treatment(base=-1))[-8]': "-8",
+    'C(rel_time, contr.treatment(base=-1))[-7]': "-7",
+    'C(rel_time, contr.treatment(base=-1))[-6]': "-6",
+    'C(rel_time, contr.treatment(base=-1))[-5]': "-5",
+    'C(rel_time, contr.treatment(base=-1))[-4]': "-4",
+    'C(rel_time, contr.treatment(base=-1))[-3]': "-3",
+    'C(rel_time, contr.treatment(base=-1))[-2]': "-2",
+    'C(rel_time, contr.treatment(base=-1))[0]': "0",
+    'C(rel_time, contr.treatment(base=-1))[1]': "1",
+    'C(rel_time, contr.treatment(base=-1))[2]': "2",
+    'C(rel_time, contr.treatment(base=-1))[3]': "3",
+    'C(rel_time, contr.treatment(base=-1))[4]': "4",
+    'C(rel_time, contr.treatment(base=-1))[5]': "5",
+    'C(rel_time, contr.treatment(base=-1))[6]': "6",
+    'C(rel_time, contr.treatment(base=-1))[7]': "7",
+    'C(rel_time, contr.treatment(base=-1))[8]': "8",
+    'group': ""
+  }
+)
+```
+
+Note: there is no plotting of the pre-treatment -1 period. You may be better off manually plotting.
+
 ## Variables
 
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable   | Description                                                                                                                                                                                                                                                            |
-|-----------|------------------------------------------------------------|
+|-----------------|-------------------------------------------------------|
 | `id`       | A variable indicating the units/individual an observation belongs to in our data.\*                                                                                                                                                                                    |
 | `time`     | A variable indicating time-periods in our study for each observation.                                                                                                                                                                                                  |
 | `outcome`  | Outcome variable for each observation.                                                                                                                                                                                                                                 |

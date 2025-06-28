@@ -4,20 +4,31 @@
 visualisations for DiD and panel analysis
 :::
 
-panelView is a package that focuses on visualising panel treatment data over time. panelView can:
+**panelView** visualises treatment adoption and outcome variables for panel data. It is useful for understanding our data before beginning difference-in-differences analysis.
 
-1.  Visaulise treatment adoption over time, allowing us to see if treatment adoption is staggered, and if treatment is absorbing.
-2.  Visualise outcome values over time (or any variable).
+::: {.panel-tabset group="lang"}
+## R
+
+We will need the `panelView` package. Documentation can be found [here](https://yiqingxu.org/packages/panelview/).
+
+If you have not previously installed the package, you can do so as follows:
+
+```{r}
+#| message: false
+#| warning: false
+#| eval: false
+
+install.packages('panelView')
+```
+
+Always remember to load the package before starting:
 
 ```{r}
 #| message: false
 #| warning: false
 
-# packages needed: 
 library(panelView)
 ```
-
-<br />
 
 ```{r}
 #| echo: false
@@ -30,11 +41,16 @@ df <- base_stagg
 colnames(df) <- c("id", "time", "cohort", "rel.time", "group", "te", "covar", "outcome")
 df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 ```
+:::
+
+<br />
+
+#### visualise treatment adoption
 
 panelView can help us visualise treatment adoption over time, allowing us to see if treatment adoption is staggered, and if treatment is absorbing.
 
-::: panel-tabset
-## Syntax
+::: {.panel-tabset group="lang"}
+## R
 
 We use the `panelview()` function to create the visualisation.
 
@@ -71,7 +87,7 @@ We can see here, that our treatment is staggered, with the first group receiving
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                          |
-|----------------|--------------------------------------------------------|
+|-----------|------------------------------------------------------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
 | `time`    | A variable indicating time-periods in our study for each observation.                                |
 | `outcome` | Outcome variable for each observation.                                                               |
@@ -83,7 +99,7 @@ Our dataset `df` should be a panel or repeated cross-section, and have the follo
 panelView can also help us visualise variable values over time. Most frequently, we will visualise outcome values over time, but you can also test covariate values over time.
 
 ::: panel-tabset
-## Syntax
+## R
 
 We use the `panelview()` function to create the visualisation.
 
@@ -120,7 +136,7 @@ panelview(
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                          |
-|-----------------|-------------------------------------------------------|
+|-----------|------------------------------------------------------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
 | `time`    | A variable indicating time-periods in our study for each observation.                                |
 | `outcome` | Outcome variable for each observation.                                                               |

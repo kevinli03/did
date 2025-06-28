@@ -1,29 +1,38 @@
 # bacondecomp {.unnumbered}
 
 ::: small
-understanding bias of TWFE in staggered settings
+\(R\) understanding bias of TWFE in staggered settings
 :::
 
-When the [TWFE estimator](twfe.qmd) is implemented in settings with staggered DiD, the estimated $\hat\tau$ of the TWFE estimator can be biased.
+When the [TWFE estimator](twfe.qmd) is used in staggered DiD, the estimated $\hat\tau_\text{TWFE}$ of the TWFE estimator can be biased. We can show this by decomposing $\hat\tau_\text{TWFE}$ in staggered settings, which reveals that $\hat\tau_\text{TWFE}$ is a weighted average of different comparisons $\hat\beta$. Two issues arise:
 
-The reason for this is because in staggered settings, TWFE can be "broken down" (decomposed) into a weighted average of other comparisons (which we call $\hat\beta$).
-
-There are two issues with this weighted average of comparisons $\hat\beta$:
-
-1.  Some of these comparisons are non-sensical. For example, sometimes some of these $\hat\beta$ are calculated with already-treated units being the control group, which should not be the case.
-2.  The weighting of these $\hat\beta$ is non-sensical. In theory, the weighted average should weight each $\hat\beta$ by how frequently that comparison occurs. But TWFE actually weights by when each $\hat\beta$ occurs in the timeline - early and late $\hat\beta$ are given less weights (sometimes negative weights).
+1.  Some of these comparisons are forbidden. For example, some of these $\hat\beta$ are calculated with already-treated units being the control group.
+2.  The weighting of these $\hat\beta$ is non-sensical. For the ATT, they should be weighted by the frequency of that comparison. But TWFE weights are a combination of frequency and variance, and can even be negative.
 
 The result? TWFE can be incorrect in staggered settings. Sometimes, TWFE may even get the wrong direction of treatment effect.
+
+::: panel-tabset
+## R
+
+We will need the `bacondecomp` package. Documentation can be found [here](https://github.com/evanjflack/bacondecomp).
+
+If you have not previously installed the package, you can do so as follows:
+
+```{r}
+#| eval: false
+
+install.packages('bacondecomp')
+```
+
+Always remember to load the package before starting.
 
 ```{r}
 #| message: false
 #| warning: false
 
-# packages needed: 
 library(bacondecomp)
 ```
-
-<br />
+:::
 
 ```{r}
 #| echo: false
@@ -40,7 +49,7 @@ df$treat <- ifelse(df$rel.time >= 0, 1, 0)
 We start by breaking down the TWFE into its comparisions $\hat\beta$ with bacon decomposition.
 
 ::: panel-tabset
-## Syntax
+## R
 
 We use the `bacon()` function to implement decomposition of TWFE:
 
@@ -72,33 +81,14 @@ We can also see Later vs. Earlier (already) treated is a comparison here, which 
 Our dataset `df` should be a panel or repeated cross-section, and have the following variables:
 
 | Variable  | Description                                                                                          |
-|-----------------|-------------------------------------------------------|
+|------------------|------------------------------------------------------|
 | `id`      | A variable indicating the units/individual an observation belongs to in our data.\*                  |
 | `time`    | A variable indicating time-periods in our study for each observation.                                |
 | `outcome` | Outcome variable for each observation.                                                               |
 | `treat`   | Treatment variable for each observation. Should equal 1 for treated units and 0 for untreated units. |
 :::
 
-<br />
-
-We know that any negative weights of any comparisons $\hat\beta$ are non-sensical. Thus, we can use the following code to check if there are any negative weights:
-
-```{r}
-#| message: false
-#| warning: false
-#| comment: "#>"
-#| class-output: r
-#| fig-height: 4
-#| fig-align: center
-
-decomp$weight |> min()
-```
-
-We can see in this example, we do not have a negative weight. However, if you do see one, it likely indicates that TWFE is likely very inaccurate in estimating the ATT, and you should use another estimator.
-
-<br />
-
-We can also plot the estimates and weights of all the comparisons.
+We can plot the estimates and weights of all the comparisons to better understand what each comparison's value is, and how they are weighted.
 
 ```{r}
 #| message: false
@@ -124,6 +114,8 @@ decomp |>
 ```
 
 The green highlighted comparisons all involve earlier (already) treated units being used as control units, which is nonsensical. Bacon decomposition thus shows us the perils of relying on TWFE for staggered treatment.
+
+We know that any negative weights of any comparisons $\hat\beta$ are non-sensical. The graph also allows us to check this. In this example, there are no negative weights.
 
 <br />
 
