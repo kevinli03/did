@@ -1,7 +1,0 @@
-# fect_python {.unnumbered}
-
-Note: fect only works in notebooks
-
-```{python}
-import fect_python as fect
-```

@@ -1,8 +1,8 @@
 ### Welcome! {.unnumbered}
 
-This repository is a collection of resources on Difference-in-Differences (DiD) and implementation in **R** and **Python** (and Julia coming soon). Use the left sidebar to navigate between pages.
+This repository is a collection of resources on Difference-in-Differences (DiD) packages in **R** and **Python** (and Julia coming soon). Use the left sidebar to navigate between pages.
 
-Lectures on DiD (from my lectures on causal inference):
+Lectures/Overview on DiD (from my lectures on causal inference):
 
 1.  [Exogeneity](https://kevinli03.github.io/causal/frameworks1.pdf) (Background for DiD and causal inference)
 2.  [Potential Outcomes](https://kevinli03.github.io/causal/frameworks2.pdf) (Background for DiD and causal inference)
@@ -61,16 +61,25 @@ For a quick review, these are the identification assumptions for DiD.
 
 ### Additional Resources
 
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | Resource                                                                                        | Author           | Notes                                                               |
-|-------------------------------------------------------------------------------------------------|------------------|---------------------------------------------------------------------|
++=================================================================================================+==================+=====================================================================+
 | [Yiqing Xu: modern advancements in DiD](https://yiqingxu.org/packages/fect/05-panel.html#csdid) | Yiqing Xu        | Useful overview of all modern DiD methods and R code.               |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Asjad Naqvi: repository on DiD](https://asjadnaqvi.github.io/DiD/)                             | Asjad Naqvi      | Useful R and state code for DiD.                                    |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [User Guides for DiD](https://bcallaway11.github.io/did/articles/index.html)                    | Brantly Callaway | Useful guides and explanations of DiD with R.                       |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Lecture: Problems with TWFE](https://psantanna.com/DiD/11_Staggered_problems.pdf)              | Pedro Sant'Anna  | Bacon decomposition and introduction to csdid.                      |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Causal Inference: The Mixtape](https://mixtape.scunning.com/)                                  | Scott Cunningham | Textbook chapter introducing DiD.                                   |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Chiu et al (2025)](https://yiqingxu.org/papers/english/2023_panel/CLLX.pdf)                    | Chiu et al       | Paper exploring new DiD methods and reanalysing old polisci papers. |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Roth et al (2025)](https://www.jonathandroth.com/assets/files/DiD_Review_Paper.pdf)            | Roth et al       | An overview of new DiD methods.                                     |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 | [Liu et al (2025)](https://yiqingxu.org/papers/english/2022_fect/LWX2022.pdf)                   | Liu et al        | An overview of imputation DiD methods.                              |
++-------------------------------------------------------------------------------------------------+------------------+---------------------------------------------------------------------+
 
 <br />
 

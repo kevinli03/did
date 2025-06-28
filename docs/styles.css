@@ -18,3 +18,10 @@ table {
 .bolder {
   font-weight: 900;
 }
+
+.my-output-class {
+  background-color: #ccc;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-family: monospace;
+}

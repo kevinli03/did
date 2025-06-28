@@ -1,1 +1,98 @@
 # csdid {.unnumbered}
+
+::: small
+Python package for doubly-robust and ipw DiD estimator (callaway and sant'anna 2021)
+:::
+
+```{r}
+#| eval: false
+```
+
+**csdid** is a package that implements the DiD estimators proposed by Callaway and Sant'Anna (2021) that solves the bias of the TWFE estimator in staggered DiD. Documentation can be found [here](https://github.com/d2cml-ai/csdid).
+
+Install the package by inputting the following into the terminal:
+
+```{python}
+#| eval: false
+
+pip install csdid
+pip install git+https://github.com/d2cml-ai/DRDID
+```
+
+------------------------------------------------------------------------
+
+#### sample code
+
+Start by loading packages and the data:
+
+```{python}
+from csdid.att_gt import ATTgt
+import pandas as pd
+df = pd.read_csv('df.csv')
+```
+
+<br />
+
+We first create the estimation object with the `ATTgt()` function, then fit the model with the `.fit()` method.
+
+::: small
+Note: `id` variable should be transformed to an integer variable before starting. Set `cohort = 0` for never-treated units.
+:::
+
+```{python}
+#| warning: false
+#| message: false
+
+csdid = ATTgt(
+  yname          = "outcome",
+  gname          = "cohort",            # cohort = 0 for never-treated
+  idname         = "id",                # must be a integer-variable
+  tname          = "time",
+  xformla        = f"outcome ~ covar",  # (optional)
+  control_group  = "notyettreated",     # use "nevertreated" if large sample
+  data           = df,
+)
+
+mod = csdid.fit(est_method = 'dr')  # switch to ipw if issues
+```
+
+<br />
+
+We use the `aggte()` method to aggregate our matched treatment effects into an overall treatment effect.
+
+```{python}
+#| warning: false
+#| message: false
+#| comment: "#>"
+#| class-output: r
+
+mod.aggte(typec = 'simple')
+```
+
+<br />
+
+We can estimate dynamic treatment effects with the `.aggte()` method and plot with the `.plot_aggte()` method.
+
+```{python}
+#| warning: false
+#| message: false
+#| comment: "#>"
+#| class-output: r
+
+mod.aggte(typec = 'dynamic')
+mod.plot_aggte()
+```
+
+<br />
+
+We can also aggregate effects by initial treatment period group, and with the `ggdid()` function:
+
+```{python}
+#| warning: false
+#| message: false
+#| comment: "#>"
+#| class-output: r
+
+mod.aggte(typec = 'group')
+mod.plot_aggte()
+```

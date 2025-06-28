@@ -5,12 +5,7 @@ Python package for TWFE, 2-stage DiD (Gardner 2021), and interaction-weighted (S
 :::
 
 ```{r}
-#| echo: false
-#| warning: false
-#| message: false
-
-library(readr)
-# just to make sure rendering is correct
+#| eval: false
 ```
 
 **pyfixest** is a port of the **fixest** package for python, with slighty different syntax and offerings. **pyfixest** can implement the standard TWFE estimator, the 2-stage DiD estimator proposed by Gardner (2021), and the interaction-weighted estimator proposed by Sun and Abraham (2021). Documentation can be found [here](https://py-econometrics.github.io/pyfixest/pyfixest.html).
@@ -51,10 +46,10 @@ df = df.rename(columns = {'rel.time': 'rel_time'})
 We can use the `pf.feols()` function to run the TWFE estimation for the ATT:
 
 ```{python}
-#| comment: "#>"
-#| class-output: python
 #| warning: false
 #| message: false
+#| comment: "#>"
+#| class-output: r
 
 mod = pf.feols(
   fml   = "outcome ~ treat + covar | id + time",
@@ -69,10 +64,10 @@ mod.summary()
 Dynamic treatment effects for a TWFE event study can be calculated as follows, but there is no quick plot option:
 
 ```{python}
-#| comment: "#>"
-#| class-output: python
 #| warning: false
 #| message: false
+#| comment: "#>"
+#| class-output: r
 
 mod = pf.feols(
   fml   = "outcome ~ i(rel_time, group, ref = -1) + covar | id + time",
@@ -92,7 +87,7 @@ The `first_stage =` should contain all covariates and fixed effects. If no covar
 
 ```{python}
 #| comment: "#>"
-#| class-output: python
+#| class-output: r
 #| warning: false
 #| message: false
 

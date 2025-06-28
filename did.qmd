@@ -4,7 +4,7 @@
 R package for doubly-robust and ipw DiD estimator (callaway and sant'anna 2021)
 :::
 
-**did** is a package that implements the DiD estimators proposed by Callaway and Sant'Anna (2021) that solve the bias of the TWFE estimator in staggered DiD. Documentation can be found [here](https://bcallaway11.github.io/did/index.html).
+**did** is a package that implements the DiD estimators proposed by Callaway and Sant'Anna (2021) that solves the bias of the TWFE estimator in staggered DiD. Documentation can be found [here](https://bcallaway11.github.io/did/index.html).
 
 Install the package as follows:
 
