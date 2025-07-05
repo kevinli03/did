@@ -66,9 +66,9 @@ Lag refers to periods **before** the treatment in which to match on. Leads refer
 #| warning: false
 
 match = PanelMatch(
-  lag                = 4,              # number of pre-periods to match treat history
+  lag                = 3,              # number of pre-periods to match treat history
   panel.data         = df.panel,       # PanelData generated data
-  lead               = c(0:3),         # how many post-treat dynamic effects to estimate
+  lead               = c(0:6),         # how many post-treat dynamic effects to estimate
   qoi                = "att",
   refinement.method  = "mahalanobis",  # set to "none" if no covariates
   match.missing      = T,
@@ -98,7 +98,7 @@ The `Point estimates` are the estimated ATT, and the standard errors are provide
 
 <br />
 
-We can estimate dynamic treatment effects with the `PanelEstimate()` function:
+We can estimate event-study effects with the `PanelEstimate()` function for post-treatment effects, and the `placebo_test()` function for pre-treatment effects. Since these are separate, we can manually combine the two results from both functions to get event-study estimates.
 
 ```{r}
 #| comment: "#>"
@@ -107,32 +107,59 @@ We can estimate dynamic treatment effects with the `PanelEstimate()` function:
 #| fig-height: 3.5
 #| fig-align: center
 
-match |>
+# estimate post-treatment effects
+post = match |>
   PanelEstimate(
     panel.data = df.panel,  # PanelData object
     pooled     = F          # tells R to calculate dynamic effects
-  ) |>
-  plot(
-    ylab = "Estimate",            # y-axis label
-    xlab = "Time to Treatment",   # x-axis label
-    main = "Dynamic Effects"      # title of plot
-  )
+)
+
+# estimate pre-treatment effects
+pre = match |>
+  placebo_test(
+  panel.data = df.panel,  # PanelData object
+  lag.in     = 3,         # should equal lag in PanelMatch()
+  plot       = F
+)
+
+# combine pre and post estimates
+effects = c(pre$estimate, 0, post$estimate)  # there is no t=-1 effect estimated so add it
+se = c(pre$standard.error, 0, post$standard.error)
+
+# create rel.time variable for pre/post periods
+rel.time = c(-3:6)  
+
+# create results df
+results.df = data.frame(rel.time, effects, se)  
+
+results.df
+
 ```
 
 <br />
 
-We can conduct pre-treatment period placebo tests (pre-treatment effects to test for parallel trends) as well. These are done with the `placebo_test()` function.
+The built in plotting functions are lackluster, so we will create a manual ggplot to plot the results.
 
 ```{r}
 #| results: hold
 #| fig-height: 3.5
 #| fig-align: center
+#| warning: false
 
-match |> placebo_test(
-  panel.data = df.panel,  # PanelData object
-  lag.in     = 4,         # should equal lag in PanelMatch()
-  plot       = T
-)
+library(ggplot2)
+
+# first create lwr and upr bounds for se
+results.df$se.lwr = results.df$effects - 1.96*results.df$se
+results.df$se.upr = results.df$effects + 1.96*results.df$se
+
+results.df |>
+  ggplot(aes(x = rel.time, y = effects)) +
+  geom_point() +
+  geom_linerange(aes(ymin = se.lwr, ymax = se.upr)) +
+  geom_hline(yintercept = 0, color = "gray") +
+  geom_vline(xintercept = -0.5, color = "gray") +
+  labs(title = "Event-Study Estimates (PanelMatch)") +
+  xlab("Time to initial treatment period") +
+  ylab("Estimate") +
+  theme_light()
 ```
-
-Note: the estimate for the last pre-treatment period (t-1) is always 0, so it is not displayed.

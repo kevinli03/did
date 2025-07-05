@@ -65,7 +65,9 @@ The `Estimation of treatment effects: Event-study effects` are the post-treatmen
 
 <br />
 
-We can plot the dynamic treatment effects in a plot. The original estimation process already creates a (very flawed) plot, so we extract it and input it into ggplot.
+We can plot the dynamic treatment effects in a plot. The simplest way is to use the default plot - in the original model estimation within `did_multiplegt_dyn()`, set `graph_off =` equal to `F`.
+
+However, the default plot is kind of ugly (in my opinion), and also does not use the conventional numbering of the initial treatment period (it uses t=1 as the initial treatment period). Thus, we can also manually create a ggplot:
 
 ```{r}
 #| message: false
@@ -73,21 +75,26 @@ We can plot the dynamic treatment effects in a plot. The original estimation pro
 #| fig-height: 3
 #| fig-align: center
 
+# extract effects (the rev() function used because placebo effects are in the opposite order)
+effects = c(rev(mod$results$Placebos[,1]), 0, mod$results$Effects[,1])  # extract pre/post effects
+lwr = c(rev(mod$results$Placebos[,3]), 0, mod$results$Effects[,3])  # extract lower confint
+upr = c(rev(mod$results$Placebos[,4]), 0, mod$results$Effects[,4]) # extract upper confint
 
+# create rel.time variable matching number of pre/post periods
+rel.time = c(-5:3)
 
-# assign plot to plot object
-plot = mod$plot
+# create plotting dataframe
+plot.df = data.frame(rel.time, effects, lwr, upr)
 
-# get rid of weird line in default plot
-plot$layers[[1]] <- NULL
-
-# customise plot
-plot +
-  labs(title = "Dynamic Treatment Effects") +
-  xlab("Time to Treatment (t=1)") + ylab("Estimate") +
-  
-  # lines for treatment time and 0 treatment effect
-  geom_vline(xintercept = 0.5, linetype = 3) +
-  geom_hline(yintercept = 0, linetype = 3, color = "red") +
-  theme_classic()
+# ggplot
+plot.df |>
+  ggplot(aes(x = rel.time, y = effects)) +
+  geom_point() +
+  geom_linerange(aes(ymin = lwr, ymax = upr)) +
+  geom_hline(yintercept = 0, color = "gray") +
+  geom_vline(xintercept = -0.5, color = "gray") +
+  labs(title = "Event-Study Estimates (DIDmultipleDYN)") +
+  xlab("Time to initial treatment period") +
+  ylab("Estimate") +
+  theme_light()
 ```

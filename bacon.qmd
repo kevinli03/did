@@ -67,9 +67,9 @@ We can plot the estimates and weights of all the comparisons to better understan
 #| fig-align: center
 
 decomp |>
-  ggplot(aes(x = weight, y = estimate, shape = type, col = type)) +  # don't change
+  ggplot(aes(x = weight, y = estimate, shape = type, col = type)) +
   geom_point() +
-  theme_bw() +
+  theme_light() +
   labs(
     x      = "Weights",
     y      = "Estimates",

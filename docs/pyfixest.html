@@ -236,7 +236,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="small">
 <p>Python package for TWFE, 2-stage DiD (Gardner 2021), and interaction-weighted (Sun and Abraham 2021).</p>
 </div>
-<p><strong>pyfixest</strong> is a port of the <strong>fixest</strong> package for python, with slighty different syntax and offerings. <strong>pyfixest</strong> can implement the standard TWFE estimator, the 2-stage DiD estimator proposed by Gardner (2021), and the interaction-weighted estimator proposed by Sun and Abraham (2021). Documentation can be found <a href="https://py-econometrics.github.io/pyfixest/pyfixest.html">here</a>.</p>
+<p><strong>pyfixest</strong> is a port of the <strong>fixest</strong> package for python, with slighty different syntax and offerings. <strong>pyfixest</strong> can implement the standard TWFE estimator for difference-in-differences. Documentation can be found <a href="https://py-econometrics.github.io/pyfixest/pyfixest.html">here</a>.</p>
 <p>Install the package by inputting the following into the terminal:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip install <span class="op">-</span>U pyfixest</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -248,7 +248,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pyfixest <span class="im">as</span> pf</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'df.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'df.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <p>We can use the <code>pf.feols()</code> function to run the TWFE estimation for the ATT:</p>
@@ -276,78 +278,64 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><br></p>
-<p>Dynamic treatment effects for a TWFE event study can be calculated as follows, but there is no quick plot option:</p>
+<p>Dynamic treatment effects for a TWFE event study can be calculated as follows:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mod <span class="op">=</span> pf.feols(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  fml   <span class="op">=</span> <span class="st">"outcome ~ i(rel_time, group, ref = -1) + covar | id + time"</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  data  <span class="op">=</span> df,</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  vcov  <span class="op">=</span> {<span class="st">"CRV1"</span>: <span class="st">"id"</span>},  <span class="co"># change "id", do not touch "CRV1"</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>mod.tidy().head()  <span class="co"># .head() because output is long, remove for full output</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                  Estimate  ...     97.5%</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Coefficient                                                ...          </span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; covar                                            1.012549  ...  1.052697</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; C(rel_time, contr.treatment(base=-1))[-9]:group  1.798499  ...  2.481064</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; C(rel_time, contr.treatment(base=-1))[-8]:group  1.065690  ...  1.680437</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; C(rel_time, contr.treatment(base=-1))[-7]:group  1.214181  ...  1.997759</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; C(rel_time, contr.treatment(base=-1))[-6]:group  1.076372  ...  1.787558</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5 rows x 6 columns]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
-<p>We can estimate the ATT using the 2-stage difference-in-differences method (Gardner) using the <code>pf.did2s()</code> function. The syntax is almost identical to that of <a href="./did2s.html">did2s</a>.</p>
-<div class="small">
-<p>The <code>first_stage =</code> should contain all covariates and fixed effects. If no covariates, the formula should be <code>"~ 0 | id + time"</code>. The <code>second_stage =</code> should only contain the treatment variable.</p>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>mod <span class="op">=</span> pf.did2s(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  data          <span class="op">=</span> df, </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  yname         <span class="op">=</span> <span class="st">"outcome"</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  first_stage   <span class="op">=</span> <span class="st">"~ covar | id + time"</span>,  <span class="co"># if no covar, see above</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  second_stage  <span class="op">=</span> <span class="st">"~ i(treat)"</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  treatment     <span class="op">=</span> <span class="st">"treat"</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  cluster       <span class="op">=</span> <span class="st">"id"</span>,                   <span class="co"># clustered se var</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>mod.summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span><span class="al">###</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Estimation:  DID2S</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Dep. var.: outcome_hat, Fixed effects: 0</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Inference:  CRV1 (GMM)</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Observations:  950</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; | Coefficient      |   Estimate |   Std. Error |   t value |   Pr(&gt;|t|) |   2.5% |   97.5% |</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; |:-----------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; | C(treat)[T.True] |     -1.091 |        0.476 |    -2.291 |      0.022 | -2.026 |  -0.157 |</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; RMSE: 2.048 R2: 0.049</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<p><br></p>
-<p>We use the <code>pf.event_study()</code> function to estimate the dynamic ATTs using the interaction-weighted estimator by Sun and Abraham.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mod <span class="op">=</span> pf.event_study(</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  data       <span class="op">=</span> df, </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  yname      <span class="op">=</span> <span class="st">"outcome"</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  idname     <span class="op">=</span> <span class="st">"id"</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  tname      <span class="op">=</span> <span class="st">"time"</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  gname      <span class="op">=</span> <span class="st">"cohort"</span>,</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  xfml       <span class="op">=</span> <span class="st">"covar"</span>,      <span class="co"># can drop if no covar. Form: covar1 + covar2 ...</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  estimator  <span class="op">=</span> <span class="st">"saturated"</span>,  <span class="co"># don't change</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>mod.iplot_aggregate()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The iplot option within pyfixest is flawed, so we will have to manually plot them with matplotlib.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save the results into tidy</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> mod.tidy()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># drop covariates from result dataframe (if required)</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> res.drop(<span class="st">'covar'</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># select needed columns</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> res[[<span class="st">'Estimate'</span>, <span class="st">'2.5%'</span>, <span class="st">'97.5%'</span>]]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># no t=-1 estimate, so we will need to add it</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>new <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Estimate'</span>: [<span class="fl">0.00</span>],</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">'2.5%'</span>: [<span class="fl">0.00</span>],</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'97.5%'</span>: [<span class="fl">0.00</span>]</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>pre <span class="op">=</span> res.iloc[:<span class="dv">8</span>]  <span class="co"># split dataframe so only pre-treat</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>post <span class="op">=</span> res.iloc[<span class="dv">8</span>:]  <span class="co"># split dataframe so only post-treat</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>plot_df <span class="op">=</span> pd.concat([pre, new, post], ignore_index <span class="op">=</span> <span class="va">True</span>)  <span class="co"># stick t=-1 between pre and post</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># rel_time variable</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>rel_time <span class="op">=</span> np.arange(<span class="op">-</span><span class="dv">9</span>, <span class="dv">9</span>, dtype<span class="op">=</span>np.int64)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>plot_df[<span class="st">'rel_time'</span>] <span class="op">=</span> rel_time  <span class="co"># add to dataframe</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting time</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> plot_df[<span class="st">'rel_time'</span>]</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> plot_df[<span class="st">'Estimate'</span>]</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>yerr <span class="op">=</span> [y <span class="op">-</span> plot_df[<span class="st">'2.5%'</span>], plot_df[<span class="st">'97.5%'</span>] <span class="op">-</span> y]  <span class="co"># err distances</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>ax.scatter(x, y, color <span class="op">=</span> <span class="st">"black"</span>, s <span class="op">=</span> <span class="dv">15</span>)  <span class="co"># s is for size</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>ax.errorbar(x, y, yerr <span class="op">=</span> yerr, fmt <span class="op">=</span> <span class="st">'none'</span>, color <span class="op">=</span> <span class="st">'black'</span>, ecolor <span class="op">=</span> <span class="st">'black'</span>, capsize <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>ax.axvline(x <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, color <span class="op">=</span> <span class="st">"gray"</span>)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>ax.axhline(y <span class="op">=</span> <span class="dv">0</span>, color <span class="op">=</span> <span class="st">"gray"</span>)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, linewidth <span class="op">=</span> <span class="fl">0.3</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, color <span class="op">=</span> <span class="st">"gray"</span>)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Event Study Estimates'</span>)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Time to initial treatment'</span>)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Estimate'</span>)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="pyfixest_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="pyfixest_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="576"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>There is no method to aggregate the dynamic effects into a singular overall ATT for sun and abraham.</p>
+<p><br></p>
 
 
 </section>

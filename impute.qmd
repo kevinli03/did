@@ -95,12 +95,12 @@ tbl = tbl |> na.omit()
 # ggplot
 tbl |>
   ggplot(aes(x = term, y = estimate)) +
-  geom_vline(xintercept = -0.5, linetype = 3) +  # vertical line at treatment +
-  geom_hline(yintercept = 0) +  # horizontal line at 0 effect
-  geom_point() +  # plot treatment effects
-  geom_linerange(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +  # conf intervals
+  geom_vline(xintercept = -0.5, color = "gray") +
+  geom_hline(yintercept = 0, color = "gray") +
+  geom_point() +
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high)) + 
   labs(title = "Dynamic Treatment Effects") +
   xlab("Time to Treatment") +
   ylab("Estimate") +
-  theme_bw()
+  theme_light()
 ```

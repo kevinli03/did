@@ -8,7 +8,7 @@ Python package for TWFE, 2-stage DiD (Gardner 2021), and interaction-weighted (S
 #| eval: false
 ```
 
-**pyfixest** is a port of the **fixest** package for python, with slighty different syntax and offerings. **pyfixest** can implement the standard TWFE estimator, the 2-stage DiD estimator proposed by Gardner (2021), and the interaction-weighted estimator proposed by Sun and Abraham (2021). Documentation can be found [here](https://py-econometrics.github.io/pyfixest/pyfixest.html).
+**pyfixest** is a port of the **fixest** package for python, with slighty different syntax and offerings. **pyfixest** can implement the standard TWFE estimator for difference-in-differences. Documentation can be found [here](https://py-econometrics.github.io/pyfixest/pyfixest.html).
 
 Install the package by inputting the following into the terminal:
 
@@ -30,6 +30,8 @@ Start by loading packages and the data:
 
 import pyfixest as pf
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 df = pd.read_csv('df.csv')
 ```
 
@@ -61,7 +63,7 @@ mod.summary()
 
 <br />
 
-Dynamic treatment effects for a TWFE event study can be calculated as follows, but there is no quick plot option:
+Dynamic treatment effects for a TWFE event study can be calculated as follows:
 
 ```{python}
 #| warning: false
@@ -74,54 +76,57 @@ mod = pf.feols(
   data  = df,
   vcov  = {"CRV1": "id"},  # change "id", do not touch "CRV1"
 )
-mod.tidy().head()  # .head() because output is long, remove for full output
 ```
 
 <br />
 
-We can estimate the ATT using the 2-stage difference-in-differences method (Gardner) using the `pf.did2s()` function. The syntax is almost identical to that of [did2s](did2s.qmd).
-
-::: small
-The `first_stage =` should contain all covariates and fixed effects. If no covariates, the formula should be `"~ 0 | id + time"`. The `second_stage =` should only contain the treatment variable.
-:::
+The iplot option within pyfixest is flawed, so we will have to manually plot them with matplotlib.
 
 ```{python}
-#| comment: "#>"
-#| class-output: r
 #| warning: false
 #| message: false
+#| fig-height: 4
+#| fig-align: center
+#| fig-width: 6
 
-mod = pf.did2s(
-  data          = df, 
-  yname         = "outcome",
-  first_stage   = "~ covar | id + time",  # if no covar, see above
-  second_stage  = "~ i(treat)",
-  treatment     = "treat",
-  cluster       = "id",                   # clustered se var
-)
-mod.summary()
+# save the results into tidy
+res = mod.tidy()
+
+# drop covariates from result dataframe (if required)
+res = res.drop('covar')
+
+# select needed columns
+res = res[['Estimate', '2.5%', '97.5%']]
+
+# no t=-1 estimate, so we will need to add it
+new = pd.DataFrame({
+    'Estimate': [0.00],
+    '2.5%': [0.00],
+    '97.5%': [0.00]
+})
+pre = res.iloc[:8]  # split dataframe so only pre-treat
+post = res.iloc[8:]  # split dataframe so only post-treat
+plot_df = pd.concat([pre, new, post], ignore_index = True)  # stick t=-1 between pre and post
+
+# rel_time variable
+rel_time = np.arange(-9, 9, dtype=np.int64)
+plot_df['rel_time'] = rel_time  # add to dataframe
+
+# plotting time
+x = plot_df['rel_time']
+y = plot_df['Estimate']
+yerr = [y - plot_df['2.5%'], plot_df['97.5%'] - y]  # err distances
+
+fig, ax = plt.subplots()
+ax.scatter(x, y, color = "black", s = 15)  # s is for size
+ax.errorbar(x, y, yerr = yerr, fmt = 'none', color = 'black', ecolor = 'black', capsize = 0)
+ax.axvline(x = -0.5, color = "gray")
+ax.axhline(y = 0, color = "gray")
+ax.grid(True, linewidth = 0.3, alpha = 0.5, color = "gray")
+ax.set_title('Event Study Estimates')
+ax.set_xlabel('Time to initial treatment')
+ax.set_ylabel('Estimate')
+plt.show()
 ```
 
 <br />
-
-We use the `pf.event_study()` function to estimate the dynamic ATTs using the interaction-weighted estimator by Sun and Abraham.
-
-```{python}
-#| message: false
-#| warning: false
-#| comment: "#>"
-#| class-output: r
-
-mod = pf.event_study(
-  data       = df, 
-  yname      = "outcome",
-  idname     = "id",
-  tname      = "time",
-  gname      = "cohort",
-  xfml       = "covar",      # can drop if no covar. Form: covar1 + covar2 ...
-  estimator  = "saturated",  # don't change
-)
-mod.iplot_aggregate()
-```
-
-There is no method to aggregate the dynamic effects into a singular overall ATT for sun and abraham.
