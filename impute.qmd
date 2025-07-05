@@ -74,14 +74,14 @@ mod = did_imputation(
 )
 ```
 
-There is no simple way to plot this, so we will have to manually do so.
+There is no simple built-in plot function for the package, so we will need to manually create a ggplot.
 
 ```{r}
 #| message: false
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 3
+#| fig-height: 4
 #| fig-align: center
 
 

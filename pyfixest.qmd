@@ -85,7 +85,7 @@ The iplot option within pyfixest is flawed, so we will have to manually plot the
 ```{python}
 #| warning: false
 #| message: false
-#| fig-height: 4
+#| fig-height: 5
 #| fig-align: center
 #| fig-width: 6
 

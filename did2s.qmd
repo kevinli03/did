@@ -66,7 +66,7 @@ We still use the `did2s()` function to run the event study model, but we alter t
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 3
+#| fig-height: 4
 #| fig-align: center
 
 mod = did2s(

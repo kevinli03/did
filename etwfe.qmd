@@ -66,12 +66,12 @@ The `estimate` for `TRUE` is our ATT, and the p-value is given by `Pr(>|Z|)`.
 
 <br />
 
-We can use the `emfx()` function to aggregate dynamic treatment effects. We can then plot these effects with the `plot()` function.
+We can use the `emfx()` function to aggregate dynamic treatment effects. We can then plot these effects with the `plot()` function. Note that etwfe cannot estimate pre-treatment effects.
 
 ```{r}
 #| message: false
 #| warning: false
-#| fig-height: 3.5
+#| fig-height: 4
 #| fig-align: center
 
 mod |>
@@ -79,19 +79,17 @@ mod |>
   plot()
 ```
 
-Note that etwfe cannot estimate pre-treatment effects.
-
-<br />
-
 If we are interested in how the ATT differs by year of treatment adoption, we can also aggregate effects by initial treatment period group. We can then plot these effects with the `plot()` function:
 
 ```{r}
 #| message: false
 #| warning: false
-#| fig-height: 3.5
+#| fig-height: 4
 #| fig-align: center
 
 mod |>
   emfx(type = "group") |>
   plot()
 ```
+
+<br />

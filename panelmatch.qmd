@@ -25,7 +25,8 @@ Start by loading packages and the data:
 #| warning: false
 
 library(PanelMatch)
-library(readr)  # for importing data
+library(readr)    # for importing data
+library(ggplot2)  # for plotting
 df = read_csv('df.csv')
 ```
 
@@ -98,7 +99,7 @@ The `Point estimates` are the estimated ATT, and the standard errors are provide
 
 <br />
 
-We can estimate event-study effects with the `PanelEstimate()` function for post-treatment effects, and the `placebo_test()` function for pre-treatment effects. Since these are separate, we can manually combine the two results from both functions to get event-study estimates.
+We can estimate event-study effects with the `PanelEstimate()` function for post-treatment effects, and the `placebo_test()` function for pre-treatment effects.
 
 ```{r}
 #| comment: "#>"
@@ -121,6 +122,15 @@ pre = match |>
   lag.in     = 3,         # should equal lag in PanelMatch()
   plot       = F
 )
+```
+
+The built in plotting functions are lackluster, so we will create a manual ggplot to plot the results.
+
+```{r}
+#| results: hold
+#| fig-height: 4
+#| fig-align: center
+#| warning: false
 
 # combine pre and post estimates
 effects = c(pre$estimate, 0, post$estimate)  # there is no t=-1 effect estimated so add it
@@ -130,23 +140,7 @@ se = c(pre$standard.error, 0, post$standard.error)
 rel.time = c(-3:6)  
 
 # create results df
-results.df = data.frame(rel.time, effects, se)  
-
-results.df
-
-```
-
-<br />
-
-The built in plotting functions are lackluster, so we will create a manual ggplot to plot the results.
-
-```{r}
-#| results: hold
-#| fig-height: 3.5
-#| fig-align: center
-#| warning: false
-
-library(ggplot2)
+results.df = data.frame(rel.time, effects, se)
 
 # first create lwr and upr bounds for se
 results.df$se.lwr = results.df$effects - 1.96*results.df$se

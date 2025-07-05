@@ -58,7 +58,7 @@ We use the `feols()` function to run the TWFE event study for dynamic treatment 
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 3
+#| fig-height: 4
 #| fig-align: center
 
 mod = feols(
@@ -85,7 +85,7 @@ Note: The `cohort` value for never-treated units should be a very large or very 
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 3
+#| fig-height: 4
 #| fig-align: center
 
 mod = feols(
@@ -107,7 +107,7 @@ And we can plot the Sun and Abraham event study using the `ggiplot()` function.
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 3
+#| fig-height: 4
 #| fig-align: center
 
 mod |> ggiplot(

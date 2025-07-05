@@ -78,7 +78,7 @@ We can estimate dynamic treatment effects with the `aggte()` function and plot w
 ```{r}
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 3.5
+#| fig-height: 4
 #| message: false
 #| fig-align: center
 
@@ -91,14 +91,12 @@ mod |>
   )
 ```
 
-<br />
-
 We can also aggregate effects by initial treatment period group, and with the `ggdid()` function:
 
 ```{r}
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 3
+#| fig-height: 4.5
 #| fig-align: center
 
 mod |>
@@ -109,3 +107,7 @@ mod |>
     title   = "Group ATT"      # you can include a title string if you want
   )
 ```
+
+Other options for `type =` include `"calendar"`, which displays the treatment effects grouped by actual (not relative) time period.
+
+<br />

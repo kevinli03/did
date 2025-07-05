@@ -278,7 +278,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The <code>estimate</code> for <code>TRUE</code> is our ATT, and the p-value is given by <code>Pr(&gt;|Z|)</code>.</p>
 <p><br></p>
-<p>We can use the <code>emfx()</code> function to aggregate dynamic treatment effects. We can then plot these effects with the <code>plot()</code> function.</p>
+<p>We can use the <code>emfx()</code> function to aggregate dynamic treatment effects. We can then plot these effects with the <code>plot()</code> function. Note that etwfe cannot estimate pre-treatment effects.</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">emfx</span>(<span class="at">type =</span> <span class="st">"event"</span>) <span class="sc">|&gt;</span></span>
@@ -291,8 +291,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Note that etwfe cannot estimate pre-treatment effects.</p>
-<p><br></p>
 <p>If we are interested in how the ATT differs by year of treatment adoption, we can also aggregate effects by initial treatment period group. We can then plot these effects with the <code>plot()</code> function:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>mod <span class="sc">|&gt;</span></span>
@@ -306,6 +304,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p><br></p>
 
 
 </section>

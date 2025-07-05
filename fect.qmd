@@ -65,7 +65,7 @@ To plot dynamic effects, we use the `plot()` function.
 
 ```{r}
 #| message: false
-#| fig-height: 3.5
+#| fig-height: 4
 #| fig-align: center
 
 mod |> plot(
@@ -77,13 +77,11 @@ mod |> plot(
 )
 ```
 
-<br />
-
 We can also plot the distributions of dynamic treatment effects as follows:
 
 ```{r}
 #| message: false
-#| fig-height: 3.5
+#| fig-height: 4.5
 #| fig-align: center
 
 mod |> plot(
@@ -96,13 +94,11 @@ mod |> plot(
 )
 ```
 
-<br />
-
 The fect package contains an F-test and equivalence test to test parallel trends, accessed through `plot()`:
 
 ```{r}
 #| message: false
-#| fig-height: 4
+#| fig-height: 4.5
 #| fig-align: center
 
 mod |> plot(

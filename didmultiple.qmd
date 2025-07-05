@@ -72,7 +72,7 @@ However, the default plot is kind of ugly (in my opinion), and also does not use
 ```{r}
 #| message: false
 #| warning: false
-#| fig-height: 3
+#| fig-height: 4
 #| fig-align: center
 
 # extract effects (the rev() function used because placebo effects are in the opposite order)

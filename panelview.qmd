@@ -39,7 +39,7 @@ We use the `panelview()` function to create a visualisation of treatment adoptio
 #| warning: false
 #| comment: "#>"
 #| class-output: r
-#| fig-height: 3.5
+#| fig-height: 4
 #| fig-align: center
 
 panelview(
