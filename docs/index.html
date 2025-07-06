@@ -175,18 +175,8 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#welcome" id="toc-welcome" class="nav-link active" data-scroll-target="#welcome">Welcome!</a></li>
-  <li><a href="#types-of-did" id="toc-types-of-did" class="nav-link" data-scroll-target="#types-of-did">Types of DiD</a></li>
-  <li><a href="#identification-assumptions" id="toc-identification-assumptions" class="nav-link" data-scroll-target="#identification-assumptions">Identification Assumptions</a></li>
-  <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional Resources</a></li>
-  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link" data-scroll-target="#acknowledgements">Acknowledgements</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -217,99 +207,120 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="welcome" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="welcome">Welcome!</h3>
-<p>This repository is a collection of resources on Difference-in-Differences (DiD) packages in <strong>R</strong> and <strong>Python</strong> (and Julia coming soon). Use the left sidebar to navigate between pages.</p>
-<p>Lectures/Overview on DiD (from my lectures on causal inference):</p>
-<ol type="1">
-<li><a href="https://kevinli03.github.io/causal/frameworks1.pdf">Exogeneity</a> (Background for DiD and causal inference)</li>
-<li><a href="https://kevinli03.github.io/causal/frameworks2.pdf">Potential Outcomes</a> (Background for DiD and causal inference)</li>
-<li><a href="https://kevinli03.github.io/causal/did1.pdf">Classical DiD</a></li>
-<li><a href="https://kevinli03.github.io/causal/did2.pdf">Generalised DiD</a></li>
-<li><a href="https://kevinli03.github.io/causal/did3.pdf">Staggered DiD</a></li>
-<li><a href="https://kevinli03.github.io/causal/did4.pdf">Extensions to DiD</a></li>
-</ol>
-<p><br></p>
-</section>
-<section id="types-of-did" class="level3">
-<h3 class="anchored" data-anchor-id="types-of-did">Types of DiD</h3>
+<section id="welcome" class="level4 unnumbered">
+<h4 class="unnumbered anchored" data-anchor-id="welcome">Welcome!</h4>
+<p>This repository is a collection of resources on Difference-in-Differences (DiD) packages in <strong>R</strong> and <strong>Python</strong> (and Julia coming soon). For a more in-depth overview of the DiD design and estimators, see this pdf.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 24%">
-<col style="width: 38%">
-<col style="width: 38%">
-</colgroup>
-<tbody>
-<tr class="odd">
-<td></td>
-<td><strong>Non-Staggered</strong></td>
-<td><strong>Staggered</strong></td>
-</tr>
-<tr class="even">
-<td><strong>Absorbing</strong></td>
-<td><p>All units that get treatment begin treatment in the same period.</p>
-<p>Once a unit is treated, they remain treated for the duration of the study.</p></td>
-<td><p>Units that get treatment begin treatment in different periods (staggered adoption).</p>
-<p>Once a unit is treated, they remain treated for the duration of the study.</p></td>
-</tr>
-<tr class="odd">
-<td><strong>Non Absorbing</strong></td>
-<td><p>All units that get treatment begin treatment in the same period.</p>
-<p>A treated unit may become untreated after already receiving the treatment.</p></td>
-<td><p>Units that get treatment begin treatment in different periods (staggered adoption).</p>
-<p>A treated unit may become untreated after already receiving the treatment.</p></td>
-</tr>
-</tbody>
-</table>
-<p><br></p>
-</section>
-<section id="identification-assumptions" class="level3">
-<h3 class="anchored" data-anchor-id="identification-assumptions">Identification Assumptions</h3>
-<p>For a quick review, these are the identification assumptions for DiD.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 24%">
-<col style="width: 38%">
-<col style="width: 38%">
+<col style="width: 40%">
+<col style="width: 18%">
+<col style="width: 18%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Assumption</th>
-<th>Description</th>
-<th>Testing/Dealing With</th>
+<th>Estimator</th>
+<th>Brief Description</th>
+<th>R</th>
+<th>Python</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><u>Parallel Trends Assumption</u></td>
-<td>Had the treated group not received the treatment, they would have followed the same trend in outcomes as the never-treated group.</td>
-<td><p>We can test parallel trends by looking at pre-treatment dynamic treatment effects. If the pre-treatment effects are significantly different than 0, that is evidence against parallel trends.</p>
-<p>We can address this using conditional parallel trends - parallel trends met when conditioning on covariates with differing trends.</p></td>
+<td>two-way fixed effects (twfe)</td>
+<td><div class="small">
+<p>Standard estimator for DiD. Can be biased with staggered treatment or non-absorbing treatment.</p>
+</div></td>
+<td><a href="./fixest.html"><code>fixest</code></a> <a href="./bacon.html"><code>bacondecomp</code></a></td>
+<td><a href="./pyfixest.html"><code>pyfixest</code></a></td>
 </tr>
 <tr class="even">
-<td><u>No Anticipation</u></td>
-<td>The treated group’s outcome variables do not respond to treatment before treatment officially begins.</td>
-<td><p>Testing is done theoretically.</p>
-<p>We address this by altering the treatment variable (move forward/backward) to match the anticipation structure.</p></td>
+<td>interaction-weighted (iw)</td>
+<td><div class="small">
+<p>Sun and Abraham (2020). Matching and reweighting regression estimator for staggered treatment.</p>
+</div></td>
+<td><a href="./fixest.html"><code>fixest</code></a></td>
+<td>–</td>
 </tr>
 <tr class="odd">
-<td><u>Stable Unit Treatment Value (SUTVA)</u></td>
-<td>One unit’s treatment status does not affect the potential outcomes of another unit.</td>
-<td><p>Testing is done theoretically.</p>
-<p>Very little can be done to address this.</p></td>
+<td>doubly-robust (dr)</td>
+<td><div class="small">
+<p>Callaway and Sant’Anna (2021). Matching and reweighting semi-parametric estimator for staggered treatment.</p>
+</div></td>
+<td><a href="./did.html"><code>did</code></a></td>
+<td><a href="./csdid.html"><code>csdid</code></a></td>
 </tr>
 <tr class="even">
-<td><u>Stable Group Composition</u></td>
-<td>(Repeated cross-section only). The sample from each time period is consistent in terms of composition of confounders.</td>
-<td><p>Testing can be done with balance tests.</p>
-<p>We can address this issue by controlling for confounders that differ between different samples.</p></td>
+<td>inverse probability weighting (ipw)</td>
+<td><div class="small">
+<p>Callaway and Sant’Anna (2021). Matching and reweighting non-parametric estimator for staggered treatment.</p>
+</div></td>
+<td><a href="./did.html"><code>did</code></a></td>
+<td><a href="./csdid.html"><code>csdid</code></a></td>
+</tr>
+<tr class="odd">
+<td>imputation / counterfactual / 2-stage</td>
+<td><div class="small">
+<p>Borusyak et al (2024), Gardner (2021), and Liu et al (2024). Imputation estimator using a simple fixed effects design for staggered and non-absorbing treatment.</p>
+</div></td>
+<td><a href="./fect.html"><code>fect</code></a> <a href="./did2s.html"><code>did2s</code></a> <a href="./impute.html"><code>didimputation</code></a></td>
+<td>–</td>
+</tr>
+<tr class="even">
+<td>interactive fixed effects (ifect)</td>
+<td><div class="small">
+<p>Xu (2017) and Liu et al (2024). Imputation estimator using estimated latent trends for staggered and non-absorbing treatment. Can be semi-robust to parallel trends violations.</p>
+</div></td>
+<td><a href="./fect.html"><code>fect</code></a></td>
+<td>–</td>
+</tr>
+<tr class="odd">
+<td>matrix completion (mc)</td>
+<td><div class="small">
+<p>Athey (2017) and Liu et al (2024). Imputation estimator using computer-science matrix completion methods for staggered and non-absorbing treatment. Can be semi-robust to parallel trends violations.</p>
+</div></td>
+<td><a href="./fect.html"><code>fect</code></a></td>
+<td>–</td>
+</tr>
+<tr class="even">
+<td>did multiple</td>
+<td><div class="small">
+<p>de Chaisemartin and D’Haultfœuille (2020, 2024). Matching and reweighting estimator that for staggered and non-absorbing treatment. Also handles continuous treatment.</p>
+</div></td>
+<td><a href="./didmultiple.html"><code>DIDmultiplegtDYN</code></a></td>
+<td>–</td>
+</tr>
+<tr class="odd">
+<td>panelmatch</td>
+<td><div class="small">
+<p>Imai et al (2023). Matching and reweighting estimator for staggered and non-absorbing treatment.</p>
+</div></td>
+<td><a href="./panelmatch.html"><code>PanelMatch</code></a></td>
+<td>–</td>
+</tr>
+<tr class="even">
+<td>extended twfe</td>
+<td><div class="small">
+<p>Wooldridge (2021, 2023). Imputation estimator using two-way mundlak regression for staggered treatment.</p>
+</div></td>
+<td><a href="./etwfe.html"><code>etwfe</code></a></td>
+<td>–</td>
 </tr>
 </tbody>
 </table>
 <p><br></p>
-</section>
-<section id="additional-resources" class="level3">
-<h3 class="anchored" data-anchor-id="additional-resources">Additional Resources</h3>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Additional Resources
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -361,16 +372,9 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<p><br></p>
-</section>
-<section id="acknowledgements" class="level3">
-<h3 class="anchored" data-anchor-id="acknowledgements">Acknowledgements</h3>
-<p>This repository was created to help me collect all that I had learned about DiD together into one place. I hope this can be helpful for others.</p>
-<p>I would like to thank the following individuals for teaching me so much about DiD and causal inference during my Master’s degree at LSE:</p>
-<ul>
-<li>Dr.&nbsp;Daniel de Kadt</li>
-<li>Dr.&nbsp;Aliz Toth</li>
-</ul>
+</div>
+</div>
+</div>
 
 
 </section>

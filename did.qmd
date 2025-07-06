@@ -4,7 +4,7 @@
 R package for doubly-robust and ipw DiD estimator (callaway and sant'anna 2021)
 :::
 
-**did** is a package that implements the DiD estimators proposed by Callaway and Sant'Anna (2021) that solves the bias of the TWFE estimator in staggered DiD. Documentation can be found [here](https://bcallaway11.github.io/did/index.html).
+**did** is a package that implements the DiD estimators (doubly-robust, inverse probability weighting) proposed by Callaway and Sant'Anna (2021) that solves the bias of the TWFE estimator in staggered DiD. Documentation can be found [here](https://bcallaway11.github.io/did/index.html).
 
 Install the package as follows:
 
@@ -32,10 +32,10 @@ df = read_csv('df.csv')
 
 <br />
 
-We use the `att_gt()` function to run the matching process of csdid:
+We use the `att_gt()` function to run the matching process of csdid. We can use the doubly-robust (dr) method, or the inverse probability weighing (ipw) method by changing the argument of `est_method =`.
 
 ::: small
-Note: `id` variable should be transformed to an integer variable before starting. Set `cohort = 0` for never-treated units.
+Notes: `id` variable should be transformed to an integer variable before starting. Set `cohort = 0` for never-treated units. Generally, doubly-robust is the better estimator, so use doubly-robust unless there is an error.
 :::
 
 ```{r}
