@@ -1,6 +1,6 @@
 #### Welcome! {.unnumbered}
 
-This repository is a collection of resources on Difference-in-Differences (DiD) packages in **R** and **Python** (and Julia coming soon). For a more in-depth overview of the DiD design and estimators, see this pdf.
+This repository is a collection of resources on Difference-in-Differences (DiD) packages in **R** and **Python** (and Julia coming soon). For a more in-depth overview of the DiD design and estimators, see [this page](https://kevinli03.github.io/causal/).
 
 +---------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------+----------------------------+
 | Estimator                             | Brief Description                                                                                                                                                                                     | R                                                                     | Python                     |

@@ -1,0 +1,181 @@
+---
+title: "Overview of Difference-in-Differences"
+subtitle: "Kevin Lingfeng Li"
+format:
+  pdf:
+    toc: true
+    number-sections: true
+    papersize: A4
+    fontsize: 13pt
+    linestretch: 1.25
+    geometry:
+      - width=155mm
+      - height=245mm
+      - top=20mm
+    include-in-header:
+      text: |
+        \usepackage{mathastext}
+        \usepackage{upgreek}
+        \addtokomafont{disposition}{\rmfamily}
+        \usepackage{parskip}
+        \setlength{\parskip}{0.35cm}
+---
+
+\clearpage
+
+# Classical DID
+
+## Intuition of Identification
+
+We have a treatment group g = 1, and a control group g = 0. We have two time periods t = 0 and t = 1.
+
+-   In time period t = 0, both treatment group g = 1 and control group g = 0 both do not receive treatment.
+-   In time period t = 1, only treatment group g = 1 receives treatment. Control group g = 0 is still untreated.
+
+To estimate the average causal effect of receiving treatment, it might seem natural to compare the treatment group's average outcome after and before receiving treatment.
+
+$$
+\uptau_\text{naive} = \overline Y_{g=1, t=1} - \overline Y_{g=1, t=0}
+$$ {#eq-naive}
+
+**Issue**: what if in between time periods t = 0 and t =1, something happened that affected the average outcome of Y (some trend in Y without treatment)? Our estimates will be biased because the difference contains both the causal effect, and the change in the trend of Y.
+
+**Solution**: Use an control group to estimate the trend in Y had no treatment occurred.
+
+$$
+\text{trend in Y with no treatment} = \overline Y_{g=0, t=1} - \overline Y_{g=0, t=0}
+$$
+
+Then, subtract this trend from the difference to obtain an unbiased estimate.
+
+$$
+\uptau_\text{DID} =  \underbrace{\left(\overline Y_{g=1, t=1} - \overline Y_{g=1, t=0}\right)}_\text{change in treatment group} - \underbrace{\left(\overline Y_{g=0, t=1} - \overline Y_{g=0, t=0} \right)}_\text{trend in control group}
+$$ {#eq-classical}
+
+\clearpage
+
+## Regression Estimator
+
+We have established that the difference-in-differences estimate is
+
+$$
+\uptau_\text{DID} =  \underbrace{\left(\overline Y_{g=1, t=1} - \overline Y_{g=1, t=0}\right)}_\text{change in treatment group} - \underbrace{\left(\overline Y_{g=0, t=1} - \overline Y_{g=0, t=0} \right)}_\text{trend in control group}
+$$ {#eq-classical1}
+
+We can estimate the same effect more simply (with standard errors) with a simple regression model:
+
+$$
+Y_{it} = \upalpha + \upgamma G_i + \updelta T_t + \uptau G_iT_t + \upvarepsilon_{it}
+$$ {#eq-reg}
+
+Where $G_i \in \{0, 1\}$ represented which group (control/treatment) unit $i$ is in, and $T_t \in \{0, 1\}$ representing which time period $t$ the observation is in.
+
+**Proof of equivalency**:
+
+Using conditional expectation definition of regression, we can see:
+
+$$
+\begin{split}
+& \mathbb E[Y_{it}|G_i = 1, T_t = 1] = \upalpha + \upgamma + \updelta + \uptau \\
+& \mathbb E[Y_{it}|G_i = 1, T_t = 0] = \upalpha + \upgamma \\
+& \mathbb E[Y_{it}|G_i = 0, T_t = 1] = \upalpha + \updelta \\
+& \mathbb E[Y_{it}|G_i = 0, T_t = 0] = \upalpha
+\end{split}
+$$ {#eq-condexp}
+
+Plugging values from @eq-condexp into @eq-classical1, we get:
+
+$$
+\begin{split}
+\uptau_\text{DID} & = \left(\overline Y_{g=1, t=1} - \overline Y_{g=1, t=0}\right) - \left(\overline Y_{g=0, t=1} - \overline Y_{g=0, t=0} \right) \\
+& = \left([\upalpha + \upgamma + \updelta + \uptau] - [\upalpha + \upgamma] \right) - \left([\upalpha + \updelta] - [\upalpha]\right) \\
+& = (\delta + \tau) - (\delta) \\
+& = \tau
+\end{split}
+$$ {#eq-proof}
+
+Use standard errors clustered by group for accurate statistical inference.
+
+## Identification Assumptions
+
+The whole idea of difference-in-differences is to use the control group trend to adjust for a possible trend in the treatment group.
+
+But for this to be accurate, we are assuming that the trend in outcome in the control group is equal to the trend in the treatment group had no treatment occured. This is called the **parallel trends** assumption.
+
+> Had the treatment group not received treatment, it would have followed the same average trend in outcome as the control group.
+
+If parallel trends is not met, we can use **conditional parallel trends**: where the parallel trends assumption is met subject to conditioning on a set of covariates. This set of covariates X might be correlated with Y, and the trends of X in treatment vs. control groups may differ - thus controlling/conditioning for X solves the issue of parallel trends.
+
+Another assumption is **no anticipation**: that the individuals in the treatment group are not anticipating treatment and so respond in t = 0. This can be considered a measurement problem: event though the treatment officially begins in t = 1, its effects are being felt in t = 0, so the actual official treatment begin date is mis-measuring the true treatment begin date.
+
+Finally, the **stable unit treatment value assumption (SUTVA)** states that if one unit i is treated, that does not affect the potential outcomes of another unit j. Or in other words, ones outcomes under treatment and control are only caused by their own treatment status, not other individual's treatment status.
+
+For repeated cross-section designs where the sample of individuals is different between time periods t = 0 and t = 1, we also require **stable group composition**. This means that for key covariates that affect Y, the average values in each sample for each time period must be equivalent. If they are not equivalent, it is possible differences in samples are explaining our effect, and not the treatment.
+
+# Two-Way Fixed Effects
+
+## Introduction
+
+Recall the regression estimator for two-period estimates from @eq-reg:
+
+$$
+Y_{it} = \upalpha + \upgamma G_i + \updelta T_t + \uptau G_iT_t + \upvarepsilon_{it}
+$$ {#eq-reg1}
+
+We can rewrite this regression equation using a fixed effect approach:
+
+$$
+Y_{itg} = \upalpha_g + \updelta_t + \uptau D_{it} + \upvarepsilon_{it}
+$$ {#eq-twfe1}
+
+Where $D_{it} \in \{0, 1\}= G_iT_t$ is a treatment variable that indicates if unit i is treated at time period t. $\upalpha_g$ is a group-level fixed effect, and $\updelta_t$ is a time-fixed effect.
+
+Recall regression is only unbiased if exogeneity is met, or in other words, no omitted variables/confounders. Group fixed effects $\upalpha_g$ accounts for between-group differences. Time fixed effects $\updelta_t$ accounts for between-time differences. The only remaining potential confounders are differential trends, which are assumed to not be present based on parallel trends.
+
+If we have panel data, we can further-ensure exogeneity is met by using unit, rather than group fixed effects. With unit fixed effects, we are not only accounting for between-group differences, but also between-unit differences within and between groups:
+
+$$
+Y_{it} = \upalpha_i + \updelta_t + \uptau D_{it} + \upvarepsilon_{it}
+$$ {#eq-twfe2}
+
+This is the standard TWFE estimator for panel data. With all regression estimators, standard errors should be clustered by unit.
+
+We can also add covariates $\mathbf X_{it}$ to condition for parallel trends in our model:
+
+$$
+Y_{it} = \upalpha_i + \updelta_t + \uptau D_{it} + \mathbf X_{it}^\top \pmb{\upbeta} + \upvarepsilon_{it}
+$$ {#eq-twfe3}
+
+## Generalised DID
+
+So far, we have considered DID with only two time periods, t = 0 before treatment, and t = 1 after treatment. But we do not need this limitation. We can have many pre-treatment periods, and many post-treatment periods.
+
+We still use TWFE for causal effects, since if the parallel trends assumption is met, and all units in the treatment group begin treatment at the same time, TWFE is still exogenous.
+
+Since we have multiple time periods, we might be interested in not just an overall treatment effect $\uptau$, but also treatment effects for each post-treatment period t = 1, t =2, etc. This is called an **event-study** or **dynamic treatment effects**.
+
+To estimate these effects, we define a new variable called relative time R. This variable has a value of 0 for the first treatment period, positive values for subsequent post-treatment periods, and negative values for pre-treatment periods.
+
+-   Ex. If treatment begins in 2007, 2007 would get a value R = 0 since it is the initial treatment period. 2005 would be R = -2, 2009 would be R = 2.
+
+Using the relative time variable, we can use the TWFE estimator to estimate an event study (you can include covariates as well to condition for parallel trends):
+
+$$
+Y_{itr} = \upalpha_i + \updelta_t + \sum\limits_{r ≠ -1} \uptau_r \cdot 1\{R_{itr} = r\} + \upvarepsilon_{it}
+$$ {#eq-event}
+
+$1\{R_{itr} = r\}$ is an indicator function that takes value 1 if the observation $itr$ has a relative time R value of r. The $\sum$ basically tells us to calculate an effect $\uptau$ for every relative time period r expect for r = -1 (our reference category).
+
+The $\uptau_r$ estimates post-treatment (so $R ≥ 0$) are dynamic treatment effects. We can plot $\uptau_r$ to see how treatment effects change over time-periods.
+
+The $\uptau_r$ estimates pre-treatment (so $R ≤ -2$ since R = -1 is always 0) are pre-treatment estimates. They are not causal estimates since this is before treatment. They can be used to check for parallel trends - if they are insignificant, parallel trends is likely to be met. We generally want to see a few pre-treatment periods in a row right before treatment (so r = -2, r = -3, r = -4) to be insignificant if we want evidence for parallel trends.
+
+## TWFE Bias in Staggered Treatment
+
+So far, we have assumed all units in the treatment group begin treatment at the same time. But frequently, this is not the case. For example, many states begin a programme at different times (staggered rollout), such as different states adopting the Common Core curriculum in different years.
+
+**Issue**: TWFE is biased in
+
+# Matching and Reweigthing
+
+# Imputation
